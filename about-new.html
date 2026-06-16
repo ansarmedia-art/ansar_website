@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="About Ansar English School - Learn about our vision, mission, history, and values.">
+    <meta name="keywords" content="about, school, mission, vision, history, Ansar English School">
+    <meta name="author" content="Ansar English School">
+    <title>About Ansar English School | Our Vision & Mission</title>
+    <link rel="stylesheet" href="theme.css">
+    <style>
+        /* Page-Specific Styles */
+        .page-hero {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+            color: var(--text-white);
+            padding: 100px 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-hero h1 {
+            color: var(--text-white);
+            font-size: 2.5rem;
+            animation: fadeInDown var(--transition-base) ease-out;
+        }
+
+        .page-hero p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.2rem;
+            animation: fadeIn 1s ease-out 0.2s backwards;
+        }
+
+        .timeline {
+            position: relative;
+            padding: 60px 0;
+        }
+
+        .timeline-item {
+            margin-bottom: 40px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: center;
+        }
+
+        .timeline-item:nth-child(even) {
+            direction: rtl;
+        }
+
+        .timeline-item:nth-child(even) > div {
+            direction: ltr;
+        }
+
+        .timeline-dot {
+            width: 20px;
+            height: 20px;
+            background: var(--primary-color);
+            border: 4px solid var(--primary-lighter);
+            border-radius: 50%;
+            position: absolute;
+            left: 50%;
+            top: 0;
+            transform: translateX(-50%);
+        }
+
+        .timeline-content {
+            background: var(--bg-white);
+            padding: 30px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .timeline-year {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--accent-color);
+            margin-bottom: 10px;
+        }
+
+        .timeline-title {
+            font-size: 1.2rem;
+            color: var(--text-dark);
+            margin-bottom: 10px;
+        }
+
+        .timeline-description {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        .values-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            padding: 60px 0;
+        }
+
+        .value-card {
+            background: linear-gradient(135deg, var(--bg-white) 0%, var(--bg-lighter) 100%);
+            padding: 40px;
+            border-radius: var(--radius-lg);
+            text-align: center;
+            box-shadow: var(--shadow-md);
+            transition: all var(--transition-base);
+            border-top: 4px solid var(--primary-color);
+        }
+
+        .value-card:hover {
+            transform: translateY(-12px);
+            box-shadow: var(--shadow-xl);
+            border-top-color: var(--accent-color);
+        }
+
+        .value-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .value-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .leadership-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            padding: 60px 0;
+        }
+
+        .leader-card {
+            background: var(--bg-white);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            transition: all var(--transition-base);
+        }
+
+        .leader-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .leader-image {
+            width: 100%;
+            height: 250px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: var(--text-white);
+        }
+
+        .leader-info {
+            padding: 20px;
+        }
+
+        .leader-name {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 5px;
+        }
+
+        .leader-position {
+            color: var(--accent-color);
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .leader-bio {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        @media (max-width: 768px) {
+            .page-hero h1 {
+                font-size: 1.75rem;
+            }
+
+            .timeline-item {
+                grid-template-columns: 1fr;
+            }
+
+            .timeline-item:nth-child(even) {
+                direction: ltr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-top">
+                <div class="logo">
+                    <img src="https://ansarschool.in/logo.png" alt="Ansar School Logo">
+                    <div class="logo-text">
+                        <h1>ANSAR ENGLISH SCHOOL</h1>
+                        <p>Quality Education for All</p>
+                    </div>
+                </div>
+                <button class="nav-toggle" id="navToggle" aria-label="Toggle Navigation">☰</button>
+                <nav id="mainNav">
+                    <a href="index-new.html">Home</a>
+                    <a href="about-new.html" class="active">About</a>
+                    <a href="#academics">Academics</a>
+                    <a href="#admission">Admission</a>
+                    <a href="#news">News</a>
+                    <a href="#events">Events</a>
+                    <a href="#contact">Contact</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="page-hero">
+        <div class="container">
+            <h1 data-scroll-animate data-animation="animate-fade-in-down">About Ansar English School</h1>
+            <p data-scroll-animate data-animation="animate-fade-in" data-delay="200">42+ Years of Excellence in Education</p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Vision & Mission -->
+        <section class="section">
+            <div class="container">
+                <h2 data-scroll-animate data-animation="animate-fade-in-down">Our Vision & Mission</h2>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; margin-top: 40px;">
+                    <div data-scroll-animate data-animation="animate-fade-in-left">
+                        <h3 style="color: var(--primary-color); margin-bottom: 15px;">Vision</h3>
+                        <p>To nurture students who are creative, compassionate, and confident leaders capable of making a positive impact on society in this dynamic world.</p>
+                        <h3 style="color: var(--primary-color); margin-top: 30px; margin-bottom: 15px;">Mission</h3>
+                        <p>To provide quality education that empowers students with knowledge, skills, and values to excel academically and personally.</p>
+                    </div>
+                    <img src="https://via.placeholder.com/500x400?text=Vision+Mission" alt="Vision" class="skeleton" data-scroll-animate data-animation="animate-fade-in-right" style="border-radius: var(--radius-lg); box-shadow: var(--shadow-lg);">
+                </div>
+            </div>
+        </section>
+
+        <!-- Core Values -->
+        <section class="section section-alt" style="background: var(--bg-light);">
+            <div class="container">
+                <h2 data-scroll-animate data-animation="animate-fade-in-down">Our Core Values</h2>
+                <div class="values-grid">
+                    <div class="value-card" data-scroll-animate data-animation="animate-fade-in-up">
+                        <div class="value-icon">🎓</div>
+                        <h3>Excellence</h3>
+                        <p>Striving for the highest standards in teaching and learning</p>
+                    </div>
+                    <div class="value-card" data-scroll-animate data-animation="animate-fade-in-up" data-delay="100">
+                        <div class="value-icon">🤝</div>
+                        <h3>Integrity</h3>
+                        <p>Upholding honesty and strong moral principles</p>
+                    </div>
+                    <div class="value-card" data-scroll-animate data-animation="animate-fade-in-up" data-delay="200">
+                        <div class="value-icon">🌍</div>
+                        <h3>Community</h3>
+                        <p>Building inclusive and supportive learning environment</p>
+                    </div>
+                    <div class="value-card" data-scroll-animate data-animation="animate-fade-in-up" data-delay="300">
+                        <div class="value-icon">✨</div>
+                        <h3>Innovation</h3>
+                        <p>Embracing new ideas and modern teaching approaches</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- History/Timeline -->
+        <section class="section">
+            <div class="container">
+                <h2 data-scroll-animate data-animation="animate-fade-in-down">Our Journey</h2>
+                <div class="timeline">
+                    <div class="timeline-item" data-scroll-animate data-animation="animate-fade-in-left">
+                        <div class="timeline-content">
+                            <div class="timeline-year">1982</div>
+                            <div class="timeline-title">Foundation</div>
+                            <div class="timeline-description">Ansar English School was established with a vision to provide quality education to students in the region.</div>
+                        </div>
+                    </div>
+                    <div class="timeline-item" data-scroll-animate data-animation="animate-fade-in-right">
+                        <div class="timeline-content">
+                            <div class="timeline-year">1995</div>
+                            <div class="timeline-title">Expansion</div>
+                            <div class="timeline-description">Added secondary section and expanded campus facilities to accommodate growing student base.</div>
+                        </div>
+                    </div>
+                    <div class="timeline-item" data-scroll-animate data-animation="animate-fade-in-left">
+                        <div class="timeline-content">
+                            <div class="timeline-year">2010</div>
+                            <div class="timeline-title">Digital Transformation</div>
+                            <div class="timeline-description">Integrated technology into curriculum and established modern learning labs and library.</div>
+                        </div>
+                    </div>
+                    <div class="timeline-item" data-scroll-animate data-animation="animate-fade-in-right">
+                        <div class="timeline-content">
+                            <div class="timeline-year">2024</div>
+                            <div class="timeline-title">Excellence Achievement</div>
+                            <div class="timeline-description">First school in Thrissur to achieve NABET accreditation with 42+ years of continuous excellence.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Leadership -->
+        <section class="section section-alt" style="background: var(--bg-light);">
+            <div class="container">
+                <h2 data-scroll-animate data-animation="animate-fade-in-down">Our Leadership</h2>
+                <div class="leadership-grid">
+                    <div class="leader-card" data-scroll-animate data-animation="animate-fade-in-up">
+                        <div class="leader-image">👨‍💼</div>
+                        <div class="leader-info">
+                            <div class="leader-name">Principal Name</div>
+                            <div class="leader-position">Principal</div>
+                            <div class="leader-bio">Leading the institution with vision and dedication to academic excellence.</div>
+                        </div>
+                    </div>
+                    <div class="leader-card" data-scroll-animate data-animation="animate-fade-in-up" data-delay="100">
+                        <div class="leader-image">👩‍💼</div>
+                        <div class="leader-info">
+                            <div class="leader-name">Vice Principal</div>
+                            <div class="leader-position">Vice Principal</div>
+                            <div class="leader-bio">Supporting school operations and student development initiatives.</div>
+                        </div>
+                    </div>
+                    <div class="leader-card" data-scroll-animate data-animation="animate-fade-in-up" data-delay="200">
+                        <div class="leader-image">👨‍🏫</div>
+                        <div class="leader-info">
+                            <div class="leader-name">Academic Coordinator</div>
+                            <div class="leader-position">Academic Head</div>
+                            <div class="leader-bio">Overseeing curriculum development and educational standards.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Achievements -->
+        <section class="section">
+            <div class="container">
+                <h2 data-scroll-animate data-animation="animate-fade-in-down">Achievements & Recognition</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; margin-top: 40px;">
+                    <div class="card" data-scroll-animate data-animation="animate-fade-in-up">
+                        <div style="padding: 30px; text-align: center;">
+                            <div style="font-size: 2.5rem; color: var(--accent-color); margin-bottom: 15px;">🏆</div>
+                            <h3>NABET Accreditation</h3>
+                            <p>First school in Thrissur with NABET accreditation for academic excellence</p>
+                        </div>
+                    </div>
+                    <div class="card" data-scroll-animate data-animation="animate-fade-in-up" data-delay="100">
+                        <div style="padding: 30px; text-align: center;">
+                            <div style="font-size: 2.5rem; color: var(--accent-color); margin-bottom: 15px;">📚</div>
+                            <h3>42+ Years</h3>
+                            <p>Continuous excellence in education since 1982</p>
+                        </div>
+                    </div>
+                    <div class="card" data-scroll-animate data-animation="animate-fade-in-up" data-delay="200">
+                        <div style="padding: 30px; text-align: center;">
+                            <div style="font-size: 2.5rem; color: var(--accent-color); margin-bottom: 15px;">👥</div>
+                            <h3>5000+ Students</h3>
+                            <p>Educated and empowered across generations</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Call to Action -->
+        <section class="section section-alt" style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%); color: var(--text-white); text-align: center;">
+            <div class="container">
+                <h2 style="color: var(--text-white); margin-bottom: 20px;" data-scroll-animate data-animation="animate-fade-in-up">Join Our Learning Community</h2>
+                <p style="color: rgba(255, 255, 255, 0.9); font-size: 1.1rem; margin-bottom: 30px;" data-scroll-animate data-animation="animate-fade-in-up" data-delay="100">Be part of 42+ years of academic excellence and quality education</p>
+                <a href="#admission" class="btn btn-outline" style="border-color: white; color: white;" data-scroll-animate data-animation="animate-fade-in-up" data-delay="200">Learn More</a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>About Ansar</h3>
+                    <p>42+ years of excellence in education, shaping future leaders of society.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <a href="index-new.html">Home</a><br>
+                    <a href="about-new.html">About</a><br>
+                    <a href="#academics">Academics</a><br>
+                    <a href="#admission">Admissions</a>
+                </div>
+                <div class="footer-section">
+                    <h3>Connect With Us</h3>
+                    <div class="social-links">
+                        <a href="#" aria-label="Facebook">f</a>
+                        <a href="#" aria-label="Instagram">📷</a>
+                        <a href="#" aria-label="YouTube">▶</a>
+                        <a href="#" aria-label="WhatsApp">💬</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Ansar English School. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="animations.js"></script>
+    <script>
+        // Mobile menu toggle
+        const navToggle = document.getElementById('navToggle');
+        const mainNav = document.getElementById('mainNav');
+
+        navToggle?.addEventListener('click', () => {
+            mainNav?.classList.toggle('active');
+        });
+
+        document.querySelectorAll('#mainNav a').forEach(link => {
+            link.addEventListener('click', () => {
+                mainNav?.classList.remove('active');
+            });
+        });
+    </script>
+</body>
+</html>

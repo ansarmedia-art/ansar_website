@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Admissions - Join Ansar English School. Learn about admission process, eligibility, and apply now.">
+    <meta name="keywords" content="admissions, enrollment, apply, eligibility, admission process">
+    <title>Admissions | Ansar English School</title>
+    <link rel="stylesheet" href="theme.css">
+    <style>
+        .page-hero {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+            color: var(--text-white);
+            padding: 100px 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-hero h1 {
+            color: var(--text-white);
+            font-size: 2.5rem;
+            animation: fadeInDown var(--transition-base) ease-out;
+        }
+
+        .admission-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin: 60px 0;
+        }
+
+        .step-card {
+            position: relative;
+            background: var(--bg-white);
+            padding: 40px;
+            border-radius: var(--radius-lg);
+            text-align: center;
+            box-shadow: var(--shadow-md);
+            transition: all var(--transition-base);
+        }
+
+        .step-card::before {
+            content: attr(data-step);
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            color: var(--text-white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.5rem;
+        }
+
+        .step-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .step-title {
+            margin-top: 30px;
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+        }
+
+        .requirements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin: 60px 0;
+        }
+
+        .requirement-card {
+            background: linear-gradient(135deg, var(--bg-white) 0%, var(--bg-lighter) 100%);
+            padding: 30px;
+            border-radius: var(--radius-lg);
+            border-left: 4px solid var(--accent-color);
+            transition: all var(--transition-base);
+        }
+
+        .requirement-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .requirement-card h3 {
+            color: var(--accent-color);
+            margin-bottom: 15px;
+        }
+
+        .requirement-card ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .requirement-card li {
+            padding: 8px 0;
+            color: var(--text-medium);
+            position: relative;
+            padding-left: 25px;
+        }
+
+        .requirement-card li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--success-color);
+            font-weight: bold;
+        }
+
+        .faq-section {
+            margin: 60px 0;
+        }
+
+        .faq-item {
+            background: var(--bg-white);
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .faq-question {
+            padding: 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-light);
+            font-weight: 600;
+            color: var(--text-dark);
+            transition: all var(--transition-base);
+        }
+
+        .faq-question:hover {
+            background: var(--primary-lighter);
+            color: var(--primary-color);
+        }
+
+        .faq-toggle {
+            font-size: 1.5rem;
+            transition: transform var(--transition-base);
+        }
+
+        .faq-item.active .faq-toggle {
+            transform: rotate(180deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height var(--transition-base);
+            padding: 0 20px;
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 500px;
+            padding: 20px;
+        }
+
+        .cta-section {
+            background: linear-gradient(135deg, var(--accent-color) 0%, #dc2626 100%);
+            color: var(--text-white);
+            padding: 80px 0;
+            text-align: center;
+            border-radius: var(--radius-lg);
+        }
+
+        .cta-section h2 {
+            color: var(--text-white);
+        }
+
+        .apply-btn {
+            display: inline-block;
+            background: var(--text-white);
+            color: var(--accent-color);
+            padding: 16px 50px;
+            border-radius: var(--radius-md);
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: all var(--transition-base);
+            margin-top: 20px;
+        }
+
+        .apply-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .page-hero h1 {
+                font-size: 1.75rem;
+            }
+
+            .cta-section {
+                padding: 50px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-top">
+                <div class="logo">
+                    <img src="https://ansarschool.in/logo.png" alt="Ansar School Logo">
+                    <div class="logo-text">
+                        <h1>ANSAR ENGLISH SCHOOL</h1>
+                        <p>Quality Education for All</p>
+                    </div>
+                </div>
+                <button class="nav-toggle" id="navToggle" aria-label="Toggle Navigation">☰</button>
+                <nav id="mainNav">
+                    <a href="index-new.html">Home</a>
+                    <a href="about-new.html">About</a>
+                    <a href="#academics">Academics</a>
+                    <a href="admission-new.html" class="active">Admission</a>
+                    <a href="#news">News</a>
+                    <a href="#events">Events</a>
+                    <a href="contact-new.html">Contact</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="page-hero">
+        <div class="container">
+            <h1 data-scroll-animate data-animation="animate-fade-in-down">Join Our School Community</h1>
+            <p data-scroll-animate data-animation="animate-fade-in" data-delay="200">Start your journey of excellence with Ansar English School</p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Welcome Section -->
+        <section class="section">
+            <div class="container">
+                <h2 data-scroll-animate data-animation="animate-fade-in-down" style="text-align: center;">Why Choose Ansar?</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; margin-top: 40px;">
+                    <div class="card" data-scroll-animate data-animation="animate-fade-in-up">
+                        <div style="padding: 30px; text-align: center;">
+                            <div style="font-size: 2.5rem; color: var(--primary-color); margin-bottom: 15px;">🏆</div>
+                            <h3>Excellence</h3>
+                            <p>NABET accredited with proven track record of academic excellence</p>
+                        </div>
+                    </div>
+                    <div class="card" data-scroll-animate data-animation="animate-fade-in-up" data-delay="100">
+                        <div style="padding: 30px; text-align: center;">
+                            <div style="font-size: 2.5rem; color: var(--primary-color); margin-bottom: 15px;">👨‍🎓</div>
+                            <h3>Expert Faculty</h3>
+                            <p>Experienced and dedicated teachers committed to student success</p>
+                        </div>
+                    </div>
+                    <div class="card" data-scroll-animate data-animation="animate-fade-in-up" data-delay="200">
+                        <div style="padding: 30px; text-align: center;">
+                            <div style="font-size: 2.5rem; color: var(--primary-color); margin-bottom: 15px;">🌟</div>
+                            <h3>Holistic Growth</h3>
+                            <p>Focus on academic, personal, and social development</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Admission Process -->
+        <section class="section section-alt" style="background: var(--bg-light);">
+            <div class="container">
+                <h2 data-scroll-animate data-animation="animate-fade-in-down" style="text-align: center;">Admission Process</h2>
+                <div class="admission-steps">
+                    <div class="step-card" data-scroll-animate data-animation="animate-fade-in-up" data-step="1">
+                        <div class="step-title">Registration</div>
+                        <p>Complete the registration form with basic information</p>
+                    </div>
+                    <div class="step-card" data-scroll-animate data-animation="animate-fade-in-up" data-delay="100" data-step="2">
+                        <div class="step-title">Entrance Test</div>
+                        <p>Appear for entrance examination (if applicable)</p>
+                    </div>
+                    <div class="step-card" data-scroll-animate data-animation="animate-fade-in-up" data-delay="200" data-step="3">
+                        <div class="step-title">Interview</div>
+                        <p>Meet with admission committee for discussion</p>
+                    </div>
+                    <div class="step-card" data-scroll-animate data-animation="animate-fade-in-up" data-delay="300" data-step="4">
+                        <div class="step-title">Confirmation</div>
+                        <p>Receive admission confirmation and documentation</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Requirements -->
+        <section class="section">
+            <div class="container">
+                <h2 data-scroll-animate data-animation="animate-fade-in-down" style="text-align: center;">Admission Requirements</h2>
+                <div class="requirements-grid">
+                    <div class="requirement-card" data-scroll-animate data-animation="animate-fade-in-up">
+                        <h3>Documents Required</h3>
+                        <ul>
+                            <li>Birth Certificate</li>
+                            <li>Previous School Certificate</li>
+                            <li>Character Certificate</li>
+                            <li>Medical Certificate</li>
+                            <li>Photograph (4x6)</li>
+                        </ul>
+                    </div>
+                    <div class="requirement-card" data-scroll-animate data-animation="animate-fade-in-up" data-delay="100">
+                        <h3>Eligibility Criteria</h3>
+                        <ul>
+                            <li>Age as per guidelines</li>
+                            <li>Previous academic record</li>
+                            <li>Aptitude & interest</li>
+                            <li>Health clearance</li>
+                            <li>Character reference</li>
+                        </ul>
+                    </div>
+                    <div class="requirement-card" data-scroll-animate data-animation="animate-fade-in-up" data-delay="200">
+                        <h3>Fees & Charges</h3>
+                        <ul>
+                            <li>Admission Fee</li>
+                            <li>Tuition Fee</li>
+                            <li>Activity Fee</li>
+                            <li>Transport Fee</li>
+                            <li>Other Charges</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ Section -->
+        <section class="section section-alt" style="background: var(--bg-light);">
+            <div class="container">
+                <h2 data-scroll-animate data-animation="animate-fade-in-down" style="text-align: center;">Frequently Asked Questions</h2>
+                <div style="max-width: 800px; margin: 40px auto;" data-scroll-animate data-animation="animate-fade-in-up">
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="this.parentElement.classList.toggle('active')">
+                            <span>When does admission start?</span>
+                            <span class="faq-toggle">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Admission typically starts in January and continues until the capacity is filled. Early registration is recommended to secure a seat.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="this.parentElement.classList.toggle('active')">
+                            <span>What is the admission fee?</span>
+                            <span class="faq-toggle">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            <p>The admission fee varies by grade level. Please contact us for specific details about fees for your child's class.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="this.parentElement.classList.toggle('active')">
+                            <span>Are scholarships available?</span>
+                            <span class="faq-toggle">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Yes, merit-based and need-based scholarships are available for eligible students. Contact the admission office for application details.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="this.parentElement.classList.toggle('active')">
+                            <span>Is transport facility available?</span>
+                            <span class="faq-toggle">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Yes, we provide transport facility covering multiple routes in the city. Transport charges are separate from tuition fees.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="this.parentElement.classList.toggle('active')">
+                            <span>What are the school hours?</span>
+                            <span class="faq-toggle">▼</span>
+                        </div>
+                        <div class="faq-answer">
+                            <p>School hours are 8:30 AM to 3:30 PM for primary classes and 8:30 AM to 4:00 PM for secondary classes.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Call to Action -->
+        <section class="cta-section" data-scroll-animate data-animation="animate-scale-in">
+            <div class="container">
+                <h2 data-scroll-animate data-animation="animate-fade-in-down">Ready to Join Us?</h2>
+                <p style="font-size: 1.1rem; margin-bottom: 0;" data-scroll-animate data-animation="animate-fade-in-up" data-delay="200">Start your application today and become part of our learning community</p>
+                <a href="contact-new.html" class="apply-btn" data-scroll-animate data-animation="animate-fade-in-up" data-delay="400">Contact Us Now</a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>About Ansar</h3>
+                    <p>Quality education for all. NABET accredited with 42+ years of excellence.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <a href="index-new.html">Home</a><br>
+                    <a href="about-new.html">About</a><br>
+                    <a href="#academics">Academics</a><br>
+                    <a href="contact-new.html">Contact</a>
+                </div>
+                <div class="footer-section">
+                    <h3>Connect With Us</h3>
+                    <div class="social-links">
+                        <a href="#" aria-label="Facebook">f</a>
+                        <a href="#" aria-label="Instagram">📷</a>
+                        <a href="#" aria-label="YouTube">▶</a>
+                        <a href="#" aria-label="WhatsApp">💬</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Ansar English School. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="animations.js"></script>
+    <script>
+        const navToggle = document.getElementById('navToggle');
+        const mainNav = document.getElementById('mainNav');
+
+        navToggle?.addEventListener('click', () => {
+            mainNav?.classList.toggle('active');
+        });
+
+        document.querySelectorAll('#mainNav a').forEach(link => {
+            link.addEventListener('click', () => {
+                mainNav?.classList.remove('active');
+            });
+        });
+    </script>
+</body>
+</html>

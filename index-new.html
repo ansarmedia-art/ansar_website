@@ -12,45 +12,425 @@
     <meta property="og:type" content="website">
     <meta property="og:image" content="https://ansarschool.in/logo.png">
     <link rel="canonical" href="https://ansarschool.in/">
+    <link rel="stylesheet" href="theme.css">
     <title>Ansar English School | Quality Education | NABET Accredited</title>
+    <link rel="stylesheet" href="theme.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        /* Page-Specific Overrides & Enhancements */
+
+        /* ===== HERO SECTION ===== */
+        .hero {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+            color: var(--text-white);
+            padding: 120px 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
         }
 
-        :root {
-            --primary-color: #3498db;
-            --secondary-color: #2c3e50;
-            --accent-color: #e74c3c;
-            --text-dark: #2c3e50;
-            --text-light: #7f8c8d;
-            --bg-light: #f8f9fa;
-            --border-color: #ecf0f1;
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(255,255,255,0.05) 0%, transparent 50%);
+            pointer-events: none;
         }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
+        .hero .container {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero h2 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            line-height: 1.2;
+            animation: fadeInDown var(--transition-base) ease-out;
+        }
+
+        .hero p {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            opacity: 0.95;
+            color: var(--text-white);
+            animation: fadeIn 1s ease-out 0.2s backwards;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--accent-color), #b91c1c);
+            color: var(--text-white);
+            padding: 16px 48px;
+            border-radius: var(--radius-lg);
+            transition: all var(--transition-base);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 10px 25px rgba(220, 38, 38, 0.3);
+            animation: fadeInUp 1s ease-out 0.4s backwards;
+        }
+
+        .cta-button:hover {
+            background: linear-gradient(135deg, #b91c1c, #991b1b);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(220, 38, 38, 0.4);
+        }
+
+        /* ===== STATS SECTION ===== */
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 30px;
+            padding: 60px 0;
+            text-align: center;
+        }
+
+        .stat-card {
+            background: var(--bg-white);
+            padding: 40px 30px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            border: 2px solid transparent;
+            border-left-color: var(--primary-color);
+            transition: all var(--transition-base);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-12px);
+            box-shadow: var(--shadow-xl);
+            border-left-color: var(--accent-color);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 0.95rem;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        /* ===== MISSION SECTION ===== */
+        .mission-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .mission-text h3 {
+            font-size: 1.75rem;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+
+        .mission-text p {
+            font-size: 1.05rem;
+            color: var(--text-medium);
+            margin-bottom: 15px;
+        }
+
+        .mission-content img {
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            transition: all var(--transition-base);
+        }
+
+        .mission-content img:hover {
+            transform: scale(1.05) rotate(2deg);
+            box-shadow: var(--shadow-xl);
+        }
+
+        /* ===== FEATURES/CARDS GRID ===== */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        .feature-card {
+            background: var(--bg-white);
+            padding: 40px;
+            border-radius: var(--radius-lg);
+            text-align: center;
+            box-shadow: var(--shadow-md);
+            transition: all var(--transition-base);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform var(--transition-base);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-15px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .feature-card h3 {
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+
+        .feature-card p {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        /* ===== CONTENT CARDS (News/Events) ===== */
+        .content-card {
+            background: var(--bg-white);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            transition: all var(--transition-base);
+        }
+
+        .content-card:hover {
+            box-shadow: var(--shadow-xl);
+            transform: translateY(-8px);
+        }
+
+        .content-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            transition: transform var(--transition-base);
+        }
+
+        .content-card:hover img {
+            transform: scale(1.1);
+        }
+
+        .content-body {
+            padding: 20px;
+        }
+
+        .content-date {
+            font-size: 0.85rem;
+            color: var(--accent-color);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .content-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 10px;
             color: var(--text-dark);
         }
 
-        a {
-            color: var(--primary-color);
-            text-decoration: none;
-            transition: color 0.3s;
+        .content-card p {
+            color: var(--text-light);
+            font-size: 0.95rem;
+            margin-bottom: 0;
         }
 
-        a:hover {
-            color: var(--accent-color);
+        /* ===== SECTION TITLES ===== */
+        .section h2 {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 50px;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
+        .section h2::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            border-radius: 2px;
         }
+
+        /* ===== FOOTER ===== */
+        footer {
+            background: linear-gradient(135deg, var(--secondary-color) 0%, #1a1f3a 100%);
+            color: var(--text-white);
+            padding: 60px 0 20px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-section h3 {
+            color: var(--text-white);
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+
+        .footer-section p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.95rem;
+        }
+
+        .footer-section a {
+            color: rgba(255, 255, 255, 0.8);
+            transition: color var(--transition-base);
+            display: block;
+            margin: 8px 0;
+        }
+
+        .footer-section a:hover {
+            color: var(--primary-light);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-links a {
+            display: inline-flex;
+            width: 40px;
+            height: 40px;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transition: all var(--transition-base);
+        }
+
+        .social-links a:hover {
+            background: var(--primary-light);
+            transform: translateY(-3px) scale(1.1);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+        }
+
+        /* ===== CAROUSEL ENHANCEMENTS ===== */
+        .carousel {
+            background: var(--bg-light);
+            padding: 60px 0;
+        }
+
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            box-shadow: var(--shadow-xl);
+            animation: fadeInUp var(--transition-base) ease-out;
+        }
+
+        .carousel-slide img {
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .carousel-arrow {
+            background: rgba(0, 0, 0, 0.4) !important;
+            transition: all var(--transition-base) !important;
+        }
+
+        .carousel-arrow:hover {
+            background: rgba(0, 0, 0, 0.7) !important;
+        }
+
+        /* ===== POPUP NOTICE ENHANCEMENTS ===== */
+        .popup-notice {
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+            animation: slideIn var(--transition-base) ease-out !important;
+        }
+
+        .popup-overlay {
+            background: rgba(0, 0, 0, 0.6) !important;
+            backdrop-filter: blur(4px);
+        }
+
+        /* ===== RESPONSIVE ADJUSTMENTS ===== */
+        @media (max-width: 768px) {
+            .hero h2 {
+                font-size: 2.25rem;
+            }
+
+            .hero p {
+                font-size: 1.1rem;
+            }
+
+            .mission-content {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+
+            .mission-content img {
+                order: -1;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+
+            .feature-card,
+            .stat-card {
+                padding: 30px 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h2 {
+                font-size: 1.75rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .cta-button {
+                padding: 12px 30px;
+                font-size: 0.9rem;
+            }
+
+            .stats-section {
+                grid-template-columns: 1fr;
+            }
+
+            .hero {
+                padding: 80px 0;
+            }
+        }
+    </style>
+</head>
 
         /* ===== HEADER & NAVIGATION ===== */
         header {
@@ -510,9 +890,254 @@
             outline: 2px solid var(--primary-color);
             outline-offset: 2px;
         }
+
+        /* ===== CAROUSEL STYLES ===== */
+        .carousel {
+            background: white;
+            padding: 40px 0;
+            overflow: hidden;
+        }
+
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+        }
+
+        .carousel-wrapper {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+            width: 100%;
+        }
+
+        .carousel-slide {
+            min-width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .carousel-slide img {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+        }
+
+        .carousel-slide-text {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .carousel-controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+
+        .carousel-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.5);
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .carousel-dot.active {
+            background: white;
+        }
+
+        .carousel-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0,0,0,0.5);
+            color: white;
+            border: none;
+            font-size: 24px;
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: background 0.3s;
+            z-index: 5;
+        }
+
+        .carousel-arrow:hover {
+            background: rgba(0,0,0,0.8);
+        }
+
+        .carousel-prev {
+            left: 10px;
+        }
+
+        .carousel-next {
+            right: 10px;
+        }
+
+        /* ===== POPUP NOTICE STYLES ===== */
+        .popup-notice {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            z-index: 1000;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            display: none;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .popup-notice.active {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translate(-50%, -50%) scale(0.9);
+                opacity: 0;
+            }
+            to {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+        }
+
+        .popup-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .popup-header h3 {
+            margin: 0;
+            font-size: 20px;
+        }
+
+        .popup-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: white;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .popup-body {
+            padding: 20px;
+        }
+
+        .popup-body p {
+            color: var(--text-dark);
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .popup-footer {
+            padding: 15px 20px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .popup-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .popup-btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .popup-btn-primary:hover {
+            background: #2980b9;
+        }
+
+        .popup-btn-secondary {
+            background: var(--border-color);
+            color: var(--text-dark);
+        }
+
+        .popup-btn-secondary:hover {
+            background: #ddd;
+        }
+
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            display: none;
+        }
+
+        .popup-overlay.active {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .carousel-slide img {
+                height: 250px;
+            }
+
+            .popup-notice {
+                max-width: 95%;
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- Popup Notice Overlay -->
+    <div class="popup-overlay" id="popupOverlay"></div>
+
+    <!-- Popup Notice -->
+    <div class="popup-notice" id="popupNotice">
+        <div class="popup-header">
+            <h3 id="popupTitle">Important Notice</h3>
+            <button class="popup-close" id="popupClose">✕</button>
+        </div>
+        <div class="popup-body">
+            <p id="popupMessage">Loading notice...</p>
+        </div>
+        <div class="popup-footer">
+            <button class="popup-btn popup-btn-secondary" id="popupCloseBtn">Close</button>
+            <a id="popupRedirectBtn" class="popup-btn popup-btn-primary" style="text-decoration: none;">View</a>
+        </div>
+    </div>
     <!-- Header -->
     <header>
         <div class="container">
@@ -541,30 +1166,49 @@
     <!-- Hero Section -->
     <section class="hero" id="home">
         <div class="container">
-            <h2>1st School in Thrissur Accredited by NABET</h2>
-            <p>Shaping Bright Futures Through Quality Education</p>
-            <a href="#admission" class="cta-button">Apply Now</a>
+            <h2 data-scroll-animate data-animation="animate-fade-in-down">1st School in Thrissur Accredited by NABET</h2>
+            <p data-scroll-animate data-animation="animate-fade-in" data-delay="200">Shaping Bright Futures Through Quality Education</p>
+            <a href="#admission" class="cta-button" data-scroll-animate data-animation="animate-fade-in-up" data-delay="400">Apply Now</a>
+        </div>
+    </section>
+
+    <!-- Carousel Section -->
+    <section class="carousel">
+        <div class="container">
+            <div class="carousel-container">
+                <div class="carousel-wrapper" id="carouselWrapper">
+                    <div class="carousel-slide">
+                        <img src="https://via.placeholder.com/1000x400?text=Carousel" alt="Carousel">
+                        <div class="carousel-slide-text">
+                            <h3>Featured Images Loading...</h3>
+                        </div>
+                    </div>
+                </div>
+                <button class="carousel-arrow carousel-prev" id="carouselPrev">❮</button>
+                <button class="carousel-arrow carousel-next" id="carouselNext">❯</button>
+                <div class="carousel-controls" id="carouselDots"></div>
+            </div>
         </div>
     </section>
 
     <!-- Stats Section -->
     <section class="container">
         <div class="stats-section" id="statsSection">
-            <div class="stat-card skeleton"></div>
-            <div class="stat-card skeleton"></div>
-            <div class="stat-card skeleton"></div>
+            <div class="stat-card skeleton" data-scroll-animate data-animation="animate-fade-in-up"></div>
+            <div class="stat-card skeleton" data-scroll-animate data-animation="animate-fade-in-up" data-delay="100"></div>
+            <div class="stat-card skeleton" data-scroll-animate data-animation="animate-fade-in-up" data-delay="200"></div>
         </div>
     </section>
 
     <!-- Mission Section -->
-    <section class="section bg-light" id="about" style="background: var(--bg-light);">
+    <section class="section section-alt" id="about" style="background: var(--bg-light);">
         <div class="container">
-            <h2>Our Mission</h2>
+            <h2 data-scroll-animate data-animation="animate-fade-in-down">Our Mission</h2>
             <div class="mission-content">
-                <div class="mission-text" id="missionContent">
+                <div class="mission-text" data-scroll-animate data-animation="animate-fade-in-left">
                     <div class="skeleton" style="height: 200px; border-radius: 8px;"></div>
                 </div>
-                <img src="https://via.placeholder.com/500x400?text=Mission" alt="Mission" class="skeleton">
+                <img src="https://via.placeholder.com/500x400?text=Mission" alt="Mission" class="skeleton" data-scroll-animate data-animation="animate-fade-in-right">
             </div>
         </div>
     </section>
@@ -572,18 +1216,27 @@
     <!-- Features Section -->
     <section class="section" id="academics">
         <div class="container">
-            <h2>Why Choose Ansar?</h2>
+            <h2 data-scroll-animate data-animation="animate-fade-in-down">Why Choose Ansar?</h2>
             <div class="features-grid" id="featuresSection">
-                <div class="feature-card skeleton"></div>
-                <div class="feature-card skeleton"></div>
-                <div class="feature-card skeleton"></div>
-                <div class="feature-card skeleton"></div>
+                <div class="feature-card skeleton" data-scroll-animate data-animation="animate-fade-in-up"></div>
+                <div class="feature-card skeleton" data-scroll-animate data-animation="animate-fade-in-up" data-delay="100"></div>
+                <div class="feature-card skeleton" data-scroll-animate data-animation="animate-fade-in-up" data-delay="200"></div>
+                <div class="feature-card skeleton" data-scroll-animate data-animation="animate-fade-in-up" data-delay="300"></div>
             </div>
         </div>
     </section>
 
     <!-- News Section -->
-    <section class="section" id="news" style="background: var(--bg-light);">
+    <section class="section section-alt" id="news" style="background: var(--bg-light);">
+        <div class="container">
+            <h2 data-scroll-animate data-animation="animate-fade-in-down">Latest News</h2>
+            <div class="features-grid" id="newsSection">
+                <div class="content-card skeleton" data-scroll-animate data-animation="animate-fade-in-up"></div>
+                <div class="content-card skeleton" data-scroll-animate data-animation="animate-fade-in-up" data-delay="100"></div>
+                <div class="content-card skeleton" data-scroll-animate data-animation="animate-fade-in-up" data-delay="200"></div>
+            </div>
+        </div>
+    </section>
         <div class="container">
             <h2>Latest News</h2>
             <div class="content-grid" id="newsSection">
@@ -597,43 +1250,43 @@
     <!-- Events Section -->
     <section class="section" id="events">
         <div class="container">
-            <h2>Upcoming Events</h2>
-            <div class="content-grid" id="eventsSection">
-                <div class="content-card skeleton"></div>
-                <div class="content-card skeleton"></div>
-                <div class="content-card skeleton"></div>
+            <h2 data-scroll-animate data-animation="animate-fade-in-down">Upcoming Events</h2>
+            <div class="features-grid" id="eventsSection">
+                <div class="content-card skeleton" data-scroll-animate data-animation="animate-fade-in-up"></div>
+                <div class="content-card skeleton" data-scroll-animate data-animation="animate-fade-in-up" data-delay="100"></div>
+                <div class="content-card skeleton" data-scroll-animate data-animation="animate-fade-in-up" data-delay="200"></div>
             </div>
         </div>
     </section>
 
     <!-- Admission Section -->
-    <section class="section" id="admission" style="background: var(--bg-light);">
+    <section class="section section-alt" id="admission" style="background: var(--bg-light);">
         <div class="container">
-            <h2>Admissions Open</h2>
+            <h2 data-scroll-animate data-animation="animate-fade-in-down">Admissions Open</h2>
             <div class="mission-content">
-                <div id="admissionContent">
+                <div id="admissionContent" data-scroll-animate data-animation="animate-fade-in-left">
                     <div class="skeleton" style="height: 200px; border-radius: 8px;"></div>
                 </div>
-                <img src="https://via.placeholder.com/500x400?text=Admissions" alt="Admissions" class="skeleton">
+                <img src="https://via.placeholder.com/500x400?text=Admissions" alt="Admissions" class="skeleton" data-scroll-animate data-animation="animate-fade-in-right">
             </div>
         </div>
     </section>
 
     <!-- Contact Section -->
-    <section class="section" id="contact">
+    <section class="section section-alt" id="contact" style="background: var(--bg-light);">
         <div class="container">
-            <h2>Get In Touch</h2>
-            <div class="content-grid">
-                <div class="contact-card">
-                    <h3>Address</h3>
+            <h2 data-scroll-animate data-animation="animate-fade-in-down">Get In Touch</h2>
+            <div class="features-grid">
+                <div class="feature-card" data-scroll-animate data-animation="animate-fade-in-up">
+                    <h3>📍 Address</h3>
                     <p id="contactAddress">Loading...</p>
                 </div>
-                <div class="contact-card">
-                    <h3>Email</h3>
+                <div class="feature-card" data-scroll-animate data-animation="animate-fade-in-up" data-delay="100">
+                    <h3>📧 Email</h3>
                     <p><a href="mailto:" id="contactEmail">Loading...</a></p>
                 </div>
-                <div class="contact-card">
-                    <h3>Phone</h3>
+                <div class="feature-card" data-scroll-animate data-animation="animate-fade-in-up" data-delay="200">
+                    <h3>📞 Phone</h3>
                     <p><a href="tel:" id="contactPhone">Loading...</a></p>
                 </div>
             </div>
@@ -673,7 +1326,94 @@
 
     <!-- Scripts -->
     <script src="firebase-init.js"></script>
+    <script src="animations.js"></script>
     <script>
+        // ===== CAROUSEL FUNCTIONALITY =====
+        let carouselIndex = 0;
+        let carouselItems = [];
+        let carouselInterval;
+
+        function updateCarousel() {
+            if (carouselItems.length === 0) return;
+
+            const wrapper = document.getElementById('carouselWrapper');
+            if (wrapper) {
+                wrapper.style.transform = `translateX(-${carouselIndex * 100}%)`;
+            }
+
+            // Update dots
+            document.querySelectorAll('.carousel-dot').forEach((dot, i) => {
+                dot.classList.toggle('active', i === carouselIndex);
+            });
+        }
+
+        function nextCarouselSlide() {
+            carouselIndex = (carouselIndex + 1) % carouselItems.length;
+            updateCarousel();
+            resetCarouselInterval();
+        }
+
+        function prevCarouselSlide() {
+            carouselIndex = (carouselIndex - 1 + carouselItems.length) % carouselItems.length;
+            updateCarousel();
+            resetCarouselInterval();
+        }
+
+        function resetCarouselInterval() {
+            clearInterval(carouselInterval);
+            startCarouselAutoPlay();
+        }
+
+        function startCarouselAutoPlay() {
+            if (carouselItems.length > 1) {
+                carouselInterval = setInterval(nextCarouselSlide, 5000);
+            }
+        }
+
+        // ===== POPUP NOTICE FUNCTIONALITY =====
+        let currentNotice = null;
+        let noticeTimeout;
+
+        function showPopupNotice(notice) {
+            const popup = document.getElementById('popupNotice');
+            const overlay = document.getElementById('popupOverlay');
+
+            document.getElementById('popupTitle').textContent = notice.title;
+            document.getElementById('popupMessage').textContent = notice.message;
+
+            if (notice.redirectUrl) {
+                document.getElementById('popupRedirectBtn').href = notice.redirectUrl;
+                document.getElementById('popupRedirectBtn').textContent = notice.buttonText || 'View';
+                document.getElementById('popupRedirectBtn').style.display = 'block';
+            } else {
+                document.getElementById('popupRedirectBtn').style.display = 'none';
+            }
+
+            popup.classList.add('active');
+            overlay.classList.add('active');
+
+            // Auto-close after duration
+            clearTimeout(noticeTimeout);
+            noticeTimeout = setTimeout(closePopupNotice, notice.duration * 1000);
+        }
+
+        function closePopupNotice() {
+            const popup = document.getElementById('popupNotice');
+            const overlay = document.getElementById('popupOverlay');
+            popup.classList.remove('active');
+            overlay.classList.remove('active');
+            clearTimeout(noticeTimeout);
+        }
+
+        // Setup popup controls
+        document.getElementById('popupClose').addEventListener('click', closePopupNotice);
+        document.getElementById('popupCloseBtn').addEventListener('click', closePopupNotice);
+        document.getElementById('popupOverlay').addEventListener('click', closePopupNotice);
+
+        // Setup carousel controls
+        document.getElementById('carouselNext').addEventListener('click', nextCarouselSlide);
+        document.getElementById('carouselPrev').addEventListener('click', prevCarouselSlide);
+
         // Mobile menu toggle
         const navToggle = document.getElementById('navToggle');
         const mainNav = document.getElementById('mainNav');
@@ -698,6 +1438,64 @@
             }
 
             try {
+                // Load carousel images
+                const carouselSnapshot = await window.firebase.firestore().collection('carousel')
+                    .where('active', '==', true)
+                    .orderBy('order')
+                    .get();
+
+                carouselItems = [];
+                let carouselHTML = '';
+
+                if (!carouselSnapshot.empty) {
+                    carouselSnapshot.forEach(doc => {
+                        const data = doc.data();
+                        carouselItems.push(data);
+                        carouselHTML += `
+                            <div class="carousel-slide">
+                                <img src="${data.imageUrl}" alt="${data.title}" loading="lazy">
+                                <div class="carousel-slide-text">
+                                    <h3>${data.title}</h3>
+                                    ${data.description ? `<p>${data.description}</p>` : ''}
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+
+                if (carouselHTML) {
+                    document.getElementById('carouselWrapper').innerHTML = carouselHTML;
+
+                    // Create dots
+                    let dotsHTML = '';
+                    carouselItems.forEach((_, i) => {
+                        dotsHTML += `<div class="carousel-dot ${i === 0 ? 'active' : ''}" onclick="goToCarouselSlide(${i})"></div>`;
+                    });
+                    document.getElementById('carouselDots').innerHTML = dotsHTML;
+
+                    startCarouselAutoPlay();
+                }
+
+                // Load notices
+                const noticesSnapshot = await window.firebase.firestore().collection('notices')
+                    .where('active', '==', true)
+                    .get();
+
+                if (!noticesSnapshot.empty) {
+                    const notices = [];
+                    noticesSnapshot.forEach(doc => {
+                        notices.push(doc.data());
+                    });
+
+                    if (notices.length > 0) {
+                        // Show a random active notice
+                        const randomNotice = notices[Math.floor(Math.random() * notices.length)];
+                        setTimeout(() => {
+                            showPopupNotice(randomNotice);
+                        }, 500);
+                    }
+                }
+
                 // Load stats
                 const statsHTML = `
                     <div class="stat-card">
@@ -739,7 +1537,7 @@
                     const date = new Date(data.date).toLocaleDateString();
                     newsHTML += `
                         <div class="content-card">
-                            ${data.image ? `<img src="${data.image}" alt="${data.title}">` : '<img src="https://via.placeholder.com/300x200?text=News" alt="News">'}
+                            ${data.image ? `<img src="${data.image}" alt="${data.title}" loading="lazy">` : '<img src="https://via.placeholder.com/300x200?text=News" alt="News">'}
                             <div class="content-body">
                                 <div class="content-date">${date}</div>
                                 <h3>${data.title}</h3>
@@ -760,7 +1558,7 @@
                     const date = new Date(data.date).toLocaleDateString();
                     eventsHTML += `
                         <div class="content-card">
-                            ${data.image ? `<img src="${data.image}" alt="${data.title}">` : '<img src="https://via.placeholder.com/300x200?text=Event" alt="Event">'}
+                            ${data.image ? `<img src="${data.image}" alt="${data.title}" loading="lazy">` : '<img src="https://via.placeholder.com/300x200?text=Event" alt="Event">'}
                             <div class="content-body">
                                 <div class="content-date">${date}</div>
                                 <h3>${data.title}</h3>
@@ -788,6 +1586,13 @@
                 console.error('Error loading content:', error);
             }
         }
+
+        // Global function for carousel dots
+        window.goToCarouselSlide = (index) => {
+            carouselIndex = index;
+            updateCarousel();
+            resetCarouselInterval();
+        };
 
         // Initialize Firestore and load content
         if (document.readyState === 'loading') {
