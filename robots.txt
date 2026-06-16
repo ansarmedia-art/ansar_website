@@ -1,0 +1,24 @@
+# Robots.txt for Ansar English School website
+# This file helps search engines understand which pages to crawl and index
+
+User-agent: *
+Allow: /
+Allow: /index.html
+Allow: /news-page.html
+Allow: /events-page.html
+Allow: /gallery-page.html
+Allow: /admin.html
+Allow: /styles.css
+Allow: /firebase-init.js
+
+# Disallow admin and private directories if any
+# Disallow: /admin/*
+# Disallow: /private/*
+
+# Crawl delay and request rate
+Crawl-delay: 1
+
+# Sitemaps
+Sitemap: https://ansarschool.in/sitemap.xml
+Sitemap: https://ansarschool.in/sitemap-news.xml
+Sitemap: https://ansarschool.in/sitemap-pages.xml

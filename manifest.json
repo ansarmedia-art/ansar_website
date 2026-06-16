@@ -1,0 +1,15 @@
+{
+  "name": "Ansar English School Perumpillavu",
+  "short_name": "Ansar School",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8fbff",
+  "theme_color": "#0c4d9d",
+  "icons": [
+    {
+      "src": "https://i.imgur.com/5u6NQ2f.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}

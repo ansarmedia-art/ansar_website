@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="School Events - Ansar English School">
+    <meta name="robots" content="index, follow">
+    <title>Events - Ansar English School</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root { --primary: #3498db; --dark: #2c3e50; --light: #7f8c8d; --bg: #f8f9fa; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: var(--dark); }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        header { background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); padding: 20px 0; }
+        .header-top { display: flex; justify-content: space-between; align-items: center; }
+        .logo { display: flex; align-items: center; gap: 10px; }
+        .logo img { height: 50px; }
+        nav { display: flex; gap: 30px; }
+        nav a { color: var(--dark); text-decoration: none; }
+        nav a:hover { color: var(--primary); }
+        main { padding: 60px 0; }
+        h1 { font-size: 36px; margin-bottom: 50px; text-align: center; }
+        .events-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; }
+        .event-card { background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1); transition: transform 0.3s; }
+        .event-card:hover { transform: translateY(-5px); }
+        .event-card img { width: 100%; height: 200px; object-fit: cover; }
+        .event-body { padding: 20px; }
+        .event-date { background: var(--primary); color: white; padding: 10px 15px; border-radius: 4px; display: inline-block; font-weight: bold; margin-bottom: 15px; }
+        .event-card h2 { font-size: 20px; margin: 10px 0; }
+        .event-card p { color: var(--light); }
+        footer { background: var(--dark); color: white; padding: 40px 0 20px; margin-top: 60px; }
+        .footer-content { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; margin-bottom: 30px; }
+        @media (max-width: 768px) {
+            nav { display: none; }
+            h1 { font-size: 24px; }
+            .footer-content { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-top">
+                <div class="logo">
+                    <img src="https://ansarschool.in/logo.png" alt="Logo">
+                    <div><h2 style="margin: 0; font-size: 16px;">ANSAR SCHOOL</h2></div>
+                </div>
+                <nav>
+                    <a href="index.html">Home</a>
+                    <a href="#events">Events</a>
+                    <a href="admin.html">Admin</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <h1>School Events</h1>
+        <div class="events-grid" id="eventsGrid">
+            <div style="text-align: center; padding: 40px; color: var(--light);">Loading events...</div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div><h3>About</h3><p>Quality education for all</p></div>
+                <div><h3>Quick Links</h3><a href="index.html" style="color: rgba(255,255,255,0.8);">Home</a></div>
+                <div><h3>Contact</h3><p id="footerPhone" style="color: rgba(255,255,255,0.8);">Phone: Loading...</p></div>
+            </div>
+            <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; text-align: center;">
+                <p>&copy; 2026 Ansar English School. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="firebase-init.js"></script>
+    <script>
+        async function loadEvents() {
+            if (!window.db) {
+                setTimeout(loadEvents, 1000);
+                return;
+            }
+
+            try {
+                const snapshot = await window.firebase.firestore().collection('events').orderBy('date', 'desc').get();
+                let html = '';
+                
+                if (snapshot.empty) {
+                    html = '<p style="text-align: center; padding: 40px; color: var(--light);">No events scheduled.</p>';
+                } else {
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        const date = new Date(data.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                        html += `
+                            <div class="event-card">
+                                ${data.image ? `<img src="${data.image}" alt="${data.title}">` : '<img src="https://via.placeholder.com/300x200" alt="Event">'}
+                                <div class="event-body">
+                                    <div class="event-date">${date}${data.time ? ' • ' + data.time : ''}</div>
+                                    <h2>${data.title}</h2>
+                                    ${data.location ? `<p><strong>Location:</strong> ${data.location}</p>` : ''}
+                                    <p>${(data.description || '').substring(0, 150)}...</p>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+                
+                document.getElementById('eventsGrid').innerHTML = html;
+            } catch (error) {
+                console.error('Error loading events:', error);
+            }
+        }
+
+        setTimeout(() => loadEvents(), 2000);
+    </script>
+</body>
+</html>

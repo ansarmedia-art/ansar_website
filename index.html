@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ansar English School Perumpillavu | Home</title>
+  <meta name="description" content="Ansar English School Perumpillavu offers quality education, modern academics, and a student-first campus experience. Learn about admission, news, events, and our mission." />
+  <meta name="keywords" content="Ansar English School, Perumpillavu, School Admission, Education, Academic Excellence, School News, School Events" />
+  <link rel="canonical" href="https://your-domain.com/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Ansar English School Perumpillavu | Home" />
+  <meta property="og:description" content="A professional school website for Ansar English School Perumpillavu with responsive design, dynamic pages, and Firebase-ready admin controls." />
+  <meta property="og:image" content="https://your-domain.com/og-image.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="manifest" href="manifest.json" />
+  <script defer src="firebase-init.js"></script>
+  <script type="module" defer src="script.js"></script>
+</head>
+<body data-page="home">
+  <header class="site-header">
+    <div class="brand-bar">
+      <div class="logo-block">
+        <img src="https://i.imgur.com/5u6NQ2f.png" alt="Ansar English School logo" class="logo" />
+        <div>
+          <p class="brand-label">ANSAR ENGLISH SCHOOL</p>
+          <p class="brand-subtitle">Perumpillavu</p>
+        </div>
+      </div>
+      <a class="contact-button" href="contact.html">Contact Us</a>
+    </div>
+    <nav class="main-nav" aria-label="Primary navigation">
+      <a href="index.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="academics.html">Academics</a>
+      <a href="admission.html">Admission</a>
+      <a href="news.html">News</a>
+      <a href="events.html">Events</a>
+      <div class="nav-dropdown">
+        <button class="dropdown-toggle">More</button>
+        <div class="dropdown-panel" id="dynamic-pages-menu">
+          <a href="more.html">Overview</a>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero-section">
+      <div class="hero-copy">
+        <p class="eyebrow">Welcome to Ansar English School</p>
+        <h1>Empowering Students with Academic Rigor and Ethical Leadership</h1>
+        <p>At Ansar English School Perumpillavu, we create a caring learning environment that develops confident learners, strong values, and a future-ready mindset.</p>
+        <div class="hero-actions">
+          <a class="primary-button" href="admission.html">Apply Now</a>
+          <a class="secondary-button" href="about.html">Our Vision</a>
+        </div>
+      </div>
+      <div class="hero-image-wrap">
+        <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=1200&q=80" alt="School campus and students" />
+      </div>
+    </section>
+
+    <section class="quick-info">
+      <article>
+        <h2>Our Mission</h2>
+        <p>Deliver high-quality education that shapes students into ethical contributors who thrive in a diverse, modern world.</p>
+      </article>
+      <article>
+        <h2>Academic Excellence</h2>
+        <p>Innovative curriculum, skilled teachers, and continuous improvement help students achieve excellence in academics and life skills.</p>
+      </article>
+      <article>
+        <h2>Community & Values</h2>
+        <p>We cultivate integrity, community service, and self-awareness while preparing students for future academic success.</p>
+      </article>
+    </section>
+
+    <section class="feature-panel" id="latest-pages-section">
+      <div class="section-header">
+        <h2>Dynamic Pages & Latest Updates</h2>
+        <p>New sections and pages can be added through the admin dashboard to keep your website fresh and SEO-friendly.</p>
+      </div>
+      <div class="feature-cards" id="dynamic-page-cards">
+        <article>
+          <h3>Interactive School Pages</h3>
+          <p>Create new pages for admissions, activities, faculty bios, and special events directly from the admin panel.</p>
+          <a href="admin.html">Open Admin Panel</a>
+        </article>
+        <article>
+          <h3>Easy Content Updates</h3>
+          <p>Update stories, announcements, images, and text using secure Firebase authentication and Firestore storage.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="seo-details">
+      <div>
+        <h2>Search Engine Visibility</h2>
+        <p>Optimized metadata, clean structure, and fast loading make the site ready to rank better on search engines.</p>
+      </div>
+      <div>
+        <h2>Fast, Responsive Design</h2>
+        <p>Built for mobile, tablet, and desktop with a lightweight layout, optimized images, and modern performance best practices.</p>
+      </div>
+    </section>
+
+    <section class="testimonial-section">
+      <div class="testimonial-card">
+        <p>“Ansar English School promotes moral and academic excellence.”</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div>
+      <p><strong>Ansar English School Perumpillavu</strong></p>
+      <p>Academic rigor, student leadership, and ethical values in every classroom.</p>
+    </div>
+    <div class="footer-links">
+      <a href="about.html">About</a>
+      <a href="admission.html">Admission</a>
+      <a href="admin.html">Admin Panel</a>
+    </div>
+  </footer>
+</body>
+</html>

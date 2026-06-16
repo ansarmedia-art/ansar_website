@@ -1,0 +1,6 @@
+# Ignore local files and OS artifacts
+.DS_Store
+Thumbs.db
+node_modules/
+*.log
+firebase-debug.log

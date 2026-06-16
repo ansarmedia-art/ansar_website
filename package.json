@@ -1,0 +1,6 @@
+{
+  "devDependencies": {
+    "firebase": "^12.14.0",
+    "firebase-tools": "^15.20.0"
+  }
+}

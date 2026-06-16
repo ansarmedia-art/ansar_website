@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Ansar English School - Quality education for all. NABET accredited institution with 42+ years of excellence.">
+    <meta name="keywords" content="school, education, Ansar English School, academics, students, quality education">
+    <meta name="author" content="Ansar English School">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Ansar English School">
+    <meta property="og:description" content="Quality education for all. NABET accredited institution with 42+ years of excellence.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://ansarschool.in/logo.png">
+    <link rel="canonical" href="https://ansarschool.in/">
+    <title>Ansar English School | Quality Education | NABET Accredited</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --accent-color: #e74c3c;
+            --text-dark: #2c3e50;
+            --text-light: #7f8c8d;
+            --bg-light: #f8f9fa;
+            --border-color: #ecf0f1;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+        }
+
+        a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        a:hover {
+            color: var(--accent-color);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* ===== HEADER & NAVIGATION ===== */
+        header {
+            background: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo img {
+            height: 50px;
+        }
+
+        .logo-text h1 {
+            font-size: 20px;
+            color: var(--secondary-color);
+            margin: 0;
+        }
+
+        .logo-text p {
+            font-size: 12px;
+            color: var(--text-light);
+            margin: 0;
+        }
+
+        .nav-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-dark);
+        }
+
+        nav {
+            display: flex;
+            gap: 30px;
+        }
+
+        nav a {
+            padding: 10px 0;
+            border-bottom: 3px solid transparent;
+            transition: border-color 0.3s;
+        }
+
+        nav a:hover {
+            border-color: var(--primary-color);
+        }
+
+        /* ===== HERO SECTION ===== */
+        .hero {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 100px 0;
+            text-align: center;
+        }
+
+        .hero h2 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: 20px;
+            margin-bottom: 30px;
+            opacity: 0.95;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: var(--accent-color);
+            color: white;
+            padding: 15px 40px;
+            border-radius: 5px;
+            transition: background 0.3s, transform 0.3s;
+            font-weight: bold;
+        }
+
+        .cta-button:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+        }
+
+        /* ===== STATS SECTION ===== */
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            padding: 60px 0;
+            text-align: center;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-light);
+            text-transform: uppercase;
+        }
+
+        /* ===== MISSION SECTION ===== */
+        .section {
+            padding: 80px 0;
+        }
+
+        .section h2 {
+            font-size: 36px;
+            margin-bottom: 50px;
+            text-align: center;
+            color: var(--text-dark);
+        }
+
+        .mission-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: center;
+        }
+
+        .mission-content img {
+            width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .mission-text h3 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+
+        .mission-text p {
+            margin-bottom: 15px;
+            line-height: 1.8;
+            color: var(--text-light);
+        }
+
+        /* ===== FEATURES SECTION ===== */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-left: 4px solid var(--primary-color);
+            transition: transform 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-card h3 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: var(--text-dark);
+        }
+
+        .feature-card p {
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        /* ===== NEWS & EVENTS ===== */
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .content-card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .content-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .content-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .content-body {
+            padding: 20px;
+        }
+
+        .content-date {
+            font-size: 12px;
+            color: var(--accent-color);
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .content-card h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: var(--text-dark);
+        }
+
+        .content-card p {
+            color: var(--text-light);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* ===== FOOTER ===== */
+        footer {
+            background: var(--secondary-color);
+            color: white;
+            padding: 60px 0 20px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 15px;
+            color: white;
+        }
+
+        .footer-section p,
+        .footer-section a {
+            color: rgba(255,255,255,0.8);
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .footer-section a:hover {
+            color: var(--primary-color);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .social-links a {
+            display: inline-flex;
+            width: 40px;
+            height: 40px;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            transition: background 0.3s;
+        }
+
+        .social-links a:hover {
+            background: var(--primary-color);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 20px;
+            text-align: center;
+            color: rgba(255,255,255,0.7);
+            font-size: 14px;
+        }
+
+        /* ===== LOADING STATES ===== */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-light);
+        }
+
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* ===== RESPONSIVE DESIGN ===== */
+        @media (max-width: 768px) {
+            .nav-toggle {
+                display: block;
+            }
+
+            nav {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                flex-direction: column;
+                background: white;
+                box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+                padding: 20px;
+                gap: 10px;
+                z-index: 50;
+            }
+
+            nav.active {
+                display: flex;
+            }
+
+            nav a {
+                padding: 10px;
+                border: none;
+            }
+
+            .hero h2 {
+                font-size: 32px;
+            }
+
+            .hero p {
+                font-size: 16px;
+            }
+
+            .mission-content {
+                grid-template-columns: 1fr;
+            }
+
+            .section {
+                padding: 50px 0;
+            }
+
+            .section h2 {
+                font-size: 24px;
+                margin-bottom: 30px;
+            }
+
+            .header-top {
+                flex-wrap: wrap;
+            }
+
+            .logo-text h1 {
+                font-size: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 15px;
+            }
+
+            .hero {
+                padding: 60px 0;
+            }
+
+            .hero h2 {
+                font-size: 24px;
+            }
+
+            .hero p {
+                font-size: 14px;
+            }
+
+            .section {
+                padding: 30px 0;
+            }
+
+            .stat-number {
+                font-size: 28px;
+            }
+
+            nav {
+                width: 100%;
+                left: auto;
+                right: auto;
+            }
+        }
+
+        /* ===== SEO ENHANCEMENTS ===== */
+        h1, h2, h3 {
+            font-weight: 600;
+        }
+
+        h1 {
+            font-size: 24px;
+        }
+
+        .section h2 {
+            color: var(--secondary-color);
+        }
+
+        .breadcrumb {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-bottom: 20px;
+        }
+
+        .breadcrumb a {
+            color: var(--primary-color);
+        }
+
+        /* Accessibility */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+
+        /* Focus visible for keyboard navigation */
+        a:focus-visible,
+        button:focus-visible {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-top">
+                <div class="logo">
+                    <img src="https://ansarschool.in/logo.png" alt="Ansar School Logo">
+                    <div class="logo-text">
+                        <h1>ANSAR ENGLISH SCHOOL</h1>
+                        <p>Quality Education for All</p>
+                    </div>
+                </div>
+                <button class="nav-toggle" id="navToggle" aria-label="Toggle Navigation">☰</button>
+                <nav id="mainNav">
+                    <a href="#home">Home</a>
+                    <a href="#about">About</a>
+                    <a href="#academics">Academics</a>
+                    <a href="#admission">Admission</a>
+                    <a href="#news">News</a>
+                    <a href="#events">Events</a>
+                    <a href="#contact">Contact</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="container">
+            <h2>1st School in Thrissur Accredited by NABET</h2>
+            <p>Shaping Bright Futures Through Quality Education</p>
+            <a href="#admission" class="cta-button">Apply Now</a>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="container">
+        <div class="stats-section" id="statsSection">
+            <div class="stat-card skeleton"></div>
+            <div class="stat-card skeleton"></div>
+            <div class="stat-card skeleton"></div>
+        </div>
+    </section>
+
+    <!-- Mission Section -->
+    <section class="section bg-light" id="about" style="background: var(--bg-light);">
+        <div class="container">
+            <h2>Our Mission</h2>
+            <div class="mission-content">
+                <div class="mission-text" id="missionContent">
+                    <div class="skeleton" style="height: 200px; border-radius: 8px;"></div>
+                </div>
+                <img src="https://via.placeholder.com/500x400?text=Mission" alt="Mission" class="skeleton">
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="section" id="academics">
+        <div class="container">
+            <h2>Why Choose Ansar?</h2>
+            <div class="features-grid" id="featuresSection">
+                <div class="feature-card skeleton"></div>
+                <div class="feature-card skeleton"></div>
+                <div class="feature-card skeleton"></div>
+                <div class="feature-card skeleton"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- News Section -->
+    <section class="section" id="news" style="background: var(--bg-light);">
+        <div class="container">
+            <h2>Latest News</h2>
+            <div class="content-grid" id="newsSection">
+                <div class="content-card skeleton"></div>
+                <div class="content-card skeleton"></div>
+                <div class="content-card skeleton"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Events Section -->
+    <section class="section" id="events">
+        <div class="container">
+            <h2>Upcoming Events</h2>
+            <div class="content-grid" id="eventsSection">
+                <div class="content-card skeleton"></div>
+                <div class="content-card skeleton"></div>
+                <div class="content-card skeleton"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Admission Section -->
+    <section class="section" id="admission" style="background: var(--bg-light);">
+        <div class="container">
+            <h2>Admissions Open</h2>
+            <div class="mission-content">
+                <div id="admissionContent">
+                    <div class="skeleton" style="height: 200px; border-radius: 8px;"></div>
+                </div>
+                <img src="https://via.placeholder.com/500x400?text=Admissions" alt="Admissions" class="skeleton">
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="section" id="contact">
+        <div class="container">
+            <h2>Get In Touch</h2>
+            <div class="content-grid">
+                <div class="contact-card">
+                    <h3>Address</h3>
+                    <p id="contactAddress">Loading...</p>
+                </div>
+                <div class="contact-card">
+                    <h3>Email</h3>
+                    <p><a href="mailto:" id="contactEmail">Loading...</a></p>
+                </div>
+                <div class="contact-card">
+                    <h3>Phone</h3>
+                    <p><a href="tel:" id="contactPhone">Loading...</a></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>About Ansar</h3>
+                    <p>Committed to providing quality education and shaping future leaders of society.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <a href="#about">About Us</a><br>
+                    <a href="#academics">Academics</a><br>
+                    <a href="#admission">Admissions</a><br>
+                    <a href="#contact">Contact</a>
+                </div>
+                <div class="footer-section">
+                    <h3>Connect With Us</h3>
+                    <div class="social-links">
+                        <a href="#" aria-label="Facebook">f</a>
+                        <a href="#" aria-label="Instagram">📷</a>
+                        <a href="#" aria-label="YouTube">▶</a>
+                        <a href="#" aria-label="WhatsApp">💬</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Ansar English School. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="firebase-init.js"></script>
+    <script>
+        // Mobile menu toggle
+        const navToggle = document.getElementById('navToggle');
+        const mainNav = document.getElementById('mainNav');
+
+        navToggle?.addEventListener('click', () => {
+            mainNav?.classList.toggle('active');
+        });
+
+        // Close menu on link click
+        document.querySelectorAll('#mainNav a').forEach(link => {
+            link.addEventListener('click', () => {
+                mainNav?.classList.remove('active');
+            });
+        });
+
+        // Load dynamic content from Firestore
+        async function loadDynamicContent() {
+            if (!window.db) {
+                console.log('Firebase not ready yet');
+                setTimeout(loadDynamicContent, 1000);
+                return;
+            }
+
+            try {
+                // Load stats
+                const statsHTML = `
+                    <div class="stat-card">
+                        <div class="stat-number">5000+</div>
+                        <div class="stat-label">Students</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">270+</div>
+                        <div class="stat-label">Experienced Staff</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">42+</div>
+                        <div class="stat-label">Years of Excellence</div>
+                    </div>
+                `;
+                document.getElementById('statsSection').innerHTML = statsHTML;
+
+                // Load features (from pages collection)
+                const pagesSnapshot = await window.firebase.firestore().collection('pages').get();
+                let featuresHTML = '';
+                pagesSnapshot.forEach(doc => {
+                    const data = doc.data();
+                    featuresHTML += `
+                        <div class="feature-card">
+                            <h3>${data.title}</h3>
+                            <p>${data.subtitle || ''}</p>
+                        </div>
+                    `;
+                });
+                if (featuresHTML) {
+                    document.getElementById('featuresSection').innerHTML = featuresHTML;
+                }
+
+                // Load news
+                const newsSnapshot = await window.firebase.firestore().collection('news').orderBy('date', 'desc').limit(3).get();
+                let newsHTML = '';
+                newsSnapshot.forEach(doc => {
+                    const data = doc.data();
+                    const date = new Date(data.date).toLocaleDateString();
+                    newsHTML += `
+                        <div class="content-card">
+                            ${data.image ? `<img src="${data.image}" alt="${data.title}">` : '<img src="https://via.placeholder.com/300x200?text=News" alt="News">'}
+                            <div class="content-body">
+                                <div class="content-date">${date}</div>
+                                <h3>${data.title}</h3>
+                                <p>${(data.excerpt || data.content || '').substring(0, 100)}...</p>
+                            </div>
+                        </div>
+                    `;
+                });
+                if (newsHTML) {
+                    document.getElementById('newsSection').innerHTML = newsHTML;
+                }
+
+                // Load events
+                const eventsSnapshot = await window.firebase.firestore().collection('events').orderBy('date', 'desc').limit(3).get();
+                let eventsHTML = '';
+                eventsSnapshot.forEach(doc => {
+                    const data = doc.data();
+                    const date = new Date(data.date).toLocaleDateString();
+                    eventsHTML += `
+                        <div class="content-card">
+                            ${data.image ? `<img src="${data.image}" alt="${data.title}">` : '<img src="https://via.placeholder.com/300x200?text=Event" alt="Event">'}
+                            <div class="content-body">
+                                <div class="content-date">${date}</div>
+                                <h3>${data.title}</h3>
+                                <p>${(data.description || '').substring(0, 100)}...</p>
+                            </div>
+                        </div>
+                    `;
+                });
+                if (eventsHTML) {
+                    document.getElementById('eventsSection').innerHTML = eventsHTML;
+                }
+
+                // Load settings
+                const settingsDoc = await window.firebase.firestore().collection('settings').doc('general').get();
+                if (settingsDoc.exists()) {
+                    const data = settingsDoc.data();
+                    document.getElementById('contactAddress').textContent = data.address || '';
+                    document.getElementById('contactEmail').textContent = data.email || '';
+                    document.getElementById('contactEmail').href = `mailto:${data.email}`;
+                    document.getElementById('contactPhone').textContent = data.phone || '';
+                    document.getElementById('contactPhone').href = `tel:${data.phone}`;
+                }
+
+            } catch (error) {
+                console.error('Error loading content:', error);
+            }
+        }
+
+        // Initialize Firestore and load content
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                setTimeout(initFirebase, 500);
+                setTimeout(loadDynamicContent, 2000);
+            });
+        } else {
+            setTimeout(initFirebase, 500);
+            setTimeout(loadDynamicContent, 2000);
+        }
+    </script>
+</body>
+</html>
