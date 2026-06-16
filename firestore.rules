@@ -1,77 +1,238 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    
-    // Admin emails list (checked against request.auth.token.email)
+
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Public website content collections:
+    // - navigation/{itemId}: label, href, type, order, optional slug
+    // - pages/{slug}: title, slug, subtitle, category, heroImageUrl, bodyHtml,
+    //   href, order, published, createdAt, updatedAt
+    // - news/{newsId}: title, excerpt, content, image, date, published,
+    //   createdAt, updatedAt
+    // - events/{eventId}: title, description, image, date, location, published,
+    //   createdAt, updatedAt
+    // - gallery/{galleryId}: title, caption, imageUrl, category, order,
+    //   published, createdAt, updatedAt
+    // - carousel/{carouselId}: title, description, imageUrl, linkUrl, order,
+    //   active, createdAt, updatedAt
+    // - notices/{noticeId}: title, message, buttonText, buttonUrl, duration,
+    //   active, createdAt, updatedAt
+    // - settings/general: schoolName, email, phone, address, logoUrl,
+    //   siteDescription, updatedAt
+    //
+    // These collections are intentionally public-readable for the public school
+    // website. Writes are restricted to bootstrapped admin email addresses.
+    // ===============================================================
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
     function isAdminEmail() {
-      return request.auth != null && 
-             request.auth.token.email in [
-               'd3ztudio@gmail.com',
-               'ansarmedia@ansarschool.in',
-               'ansarschooloffice@gmail.com'
-             ];
+      return isSignedIn() &&
+        request.auth.token.email in [
+          'd3ztudio@gmail.com',
+          'ansarmedia@ansarschool.in',
+          'ansarschooloffice@gmail.com'
+        ];
     }
-    
-    // Public pages content (editable by admins only)
+
+    function hasOnly(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    function optionalString(field, max) {
+      return !(field in request.resource.data) ||
+        (request.resource.data[field] is string &&
+         request.resource.data[field].size() <= max);
+    }
+
+    function requiredString(field, max) {
+      return field in request.resource.data &&
+        request.resource.data[field] is string &&
+        request.resource.data[field].size() > 0 &&
+        request.resource.data[field].size() <= max;
+    }
+
+    function optionalBool(field) {
+      return !(field in request.resource.data) || request.resource.data[field] is bool;
+    }
+
+    function optionalNumber(field, min, max) {
+      return !(field in request.resource.data) ||
+        (request.resource.data[field] is number &&
+         request.resource.data[field] >= min &&
+         request.resource.data[field] <= max);
+    }
+
+    function optionalUrl(field) {
+      return !(field in request.resource.data) ||
+        request.resource.data[field] == '' ||
+        (request.resource.data[field] is string &&
+         request.resource.data[field].size() <= 600 &&
+         request.resource.data[field].matches('^https?://.*'));
+    }
+
+    function optionalTimestamp(field) {
+      return !(field in request.resource.data) || request.resource.data[field] is timestamp;
+    }
+
+    function optionalDateString(field) {
+      return !(field in request.resource.data) ||
+        request.resource.data[field] == '' ||
+        (request.resource.data[field] is string &&
+         request.resource.data[field].size() <= 40);
+    }
+
+    function isValidPage() {
+      return hasOnly(['title', 'slug', 'subtitle', 'category', 'heroImageUrl', 'bodyHtml', 'href', 'order', 'published', 'createdAt', 'updatedAt']) &&
+        requiredString('title', 160) &&
+        requiredString('slug', 120) &&
+        optionalString('subtitle', 600) &&
+        optionalString('category', 80) &&
+        optionalUrl('heroImageUrl') &&
+        optionalString('bodyHtml', 20000) &&
+        optionalString('href', 240) &&
+        optionalNumber('order', 0, 999) &&
+        optionalBool('published') &&
+        optionalTimestamp('createdAt') &&
+        optionalTimestamp('updatedAt');
+    }
+
+    function isValidNavigation() {
+      return hasOnly(['label', 'href', 'slug', 'type', 'order']) &&
+        requiredString('label', 80) &&
+        requiredString('href', 240) &&
+        optionalString('slug', 120) &&
+        requiredString('type', 20) &&
+        request.resource.data.type in ['primary', 'more'] &&
+        optionalNumber('order', 0, 999);
+    }
+
+    function isValidNews() {
+      return hasOnly(['title', 'excerpt', 'content', 'image', 'date', 'published', 'createdAt', 'updatedAt']) &&
+        requiredString('title', 180) &&
+        optionalString('excerpt', 600) &&
+        optionalString('content', 12000) &&
+        optionalUrl('image') &&
+        optionalDateString('date') &&
+        optionalBool('published') &&
+        optionalTimestamp('createdAt') &&
+        optionalTimestamp('updatedAt');
+    }
+
+    function isValidEvent() {
+      return hasOnly(['title', 'description', 'image', 'date', 'location', 'published', 'createdAt', 'updatedAt']) &&
+        requiredString('title', 180) &&
+        optionalString('description', 6000) &&
+        optionalUrl('image') &&
+        optionalDateString('date') &&
+        optionalString('location', 180) &&
+        optionalBool('published') &&
+        optionalTimestamp('createdAt') &&
+        optionalTimestamp('updatedAt');
+    }
+
+    function isValidGallery() {
+      return hasOnly(['title', 'caption', 'imageUrl', 'category', 'order', 'published', 'createdAt', 'updatedAt']) &&
+        requiredString('title', 180) &&
+        optionalString('caption', 600) &&
+        optionalUrl('imageUrl') &&
+        optionalString('category', 80) &&
+        optionalNumber('order', 0, 999) &&
+        optionalBool('published') &&
+        optionalTimestamp('createdAt') &&
+        optionalTimestamp('updatedAt');
+    }
+
+    function isValidCarousel() {
+      return hasOnly(['title', 'description', 'imageUrl', 'linkUrl', 'order', 'active', 'createdAt', 'updatedAt']) &&
+        requiredString('title', 180) &&
+        optionalString('description', 600) &&
+        optionalUrl('imageUrl') &&
+        optionalUrl('linkUrl') &&
+        optionalNumber('order', 0, 999) &&
+        optionalBool('active') &&
+        optionalTimestamp('createdAt') &&
+        optionalTimestamp('updatedAt');
+    }
+
+    function isValidNotice() {
+      return hasOnly(['title', 'message', 'buttonText', 'buttonUrl', 'duration', 'active', 'createdAt', 'updatedAt']) &&
+        requiredString('title', 180) &&
+        requiredString('message', 1200) &&
+        optionalString('buttonText', 80) &&
+        optionalUrl('buttonUrl') &&
+        optionalNumber('duration', 1, 120) &&
+        optionalBool('active') &&
+        optionalTimestamp('createdAt') &&
+        optionalTimestamp('updatedAt');
+    }
+
+    function isValidSettings() {
+      return hasOnly(['schoolName', 'email', 'phone', 'address', 'logoUrl', 'siteDescription', 'updatedAt']) &&
+        optionalString('schoolName', 160) &&
+        optionalString('email', 160) &&
+        optionalString('phone', 80) &&
+        optionalString('address', 600) &&
+        optionalUrl('logoUrl') &&
+        optionalString('siteDescription', 600) &&
+        optionalTimestamp('updatedAt');
+    }
+
+    match /navigation/{itemId} {
+      allow read: if true;
+      allow create, update: if isAdminEmail() && isValidNavigation();
+      allow delete: if isAdminEmail();
+    }
+
     match /pages/{pageId} {
-      allow read: if true; // Public read
-      allow create, update, delete: if isAdminEmail();
-      
-      match /images/{imageId} {
-        allow read: if true;
-        allow create, update, delete: if isAdminEmail();
-      }
+      allow read: if true;
+      allow create, update: if isAdminEmail() && isValidPage();
+      allow delete: if isAdminEmail();
     }
-    
-    // News collection
+
     match /news/{newsId} {
       allow read: if true;
-      allow create, update, delete: if isAdminEmail();
-      
-      match /images/{imageId} {
-        allow read: if true;
-        allow create, update, delete: if isAdminEmail();
-      }
+      allow create, update: if isAdminEmail() && isValidNews();
+      allow delete: if isAdminEmail();
     }
-    
-    // Events collection
+
     match /events/{eventId} {
       allow read: if true;
-      allow create, update, delete: if isAdminEmail();
-      
-      match /images/{imageId} {
-        allow read: if true;
-        allow create, update, delete: if isAdminEmail();
-      }
+      allow create, update: if isAdminEmail() && isValidEvent();
+      allow delete: if isAdminEmail();
     }
-    
-    // Settings collection (admin only)
-    match /settings/{settingId} {
-      allow read: if true; // Public read for SEO meta
-      allow create, update, delete: if isAdminEmail();
-    }
-    
-    // Gallery collection
+
     match /gallery/{galleryId} {
       allow read: if true;
-      allow create, update, delete: if isAdminEmail();
-      
-      match /images/{imageId} {
-        allow read: if true;
-        allow create, update, delete: if isAdminEmail();
-      }
+      allow create, update: if isAdminEmail() && isValidGallery();
+      allow delete: if isAdminEmail();
     }
-    
-    // Carousel/Featured images collection
+
     match /carousel/{carouselId} {
       allow read: if true;
-      allow create, update, delete: if isAdminEmail();
+      allow create, update: if isAdminEmail() && isValidCarousel();
+      allow delete: if isAdminEmail();
     }
-    
-    // Notices/Popups collection
+
     match /notices/{noticeId} {
-      allow read: if true; // Public read for popups
-      allow create, update, delete: if isAdminEmail();
+      allow read: if true;
+      allow create, update: if isAdminEmail() && isValidNotice();
+      allow delete: if isAdminEmail();
+    }
+
+    match /settings/{settingId} {
+      allow read: if true;
+      allow create, update: if isAdminEmail() && isValidSettings();
+      allow delete: if isAdminEmail();
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }
