@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News Detail - Ansar English School</title>
+    <style>
+        :root { --primary-color: #0f2b46; --accent-color: #d4af37; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f7fa; color: #333; margin: 0; }
+        header { background: white; padding: 15px 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .container { max-width: 900px; margin: 0 auto; padding: 0 20px; }
+        .logo img { height: 60px; object-fit: contain; }
+        .news-detail-container { background: white; padding: 40px; margin-top: 40px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .news-image { width: 100%; max-height: 500px; object-fit: cover; border-radius: 8px; margin-bottom: 30px; }
+        .news-title { font-size: 2.5rem; color: var(--primary-color); margin-bottom: 10px; line-height: 1.2; }
+        .news-date { color: var(--accent-color); font-weight: bold; margin-bottom: 30px; display: block; text-transform: uppercase; letter-spacing: 1px;}
+        .news-content { font-size: 1.1rem; line-height: 1.8; color: #444; white-space: pre-wrap; }
+        .back-btn { display: inline-block; margin-top: 30px; padding: 10px 20px; background: var(--primary-color); color: white; text-decoration: none; border-radius: 4px; font-weight: bold; }
+        .back-btn:hover { background: #1a426b; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container" style="display:flex; justify-content:space-between; align-items:center;">
+            <div class="logo">
+                <a href="index-new.html"><img src="https://i.ibb.co/JjbQmpgR/St-Sebastian-church-Purnattukara.png" alt="Ansar School Logo"></a>
+            </div>
+            <a href="news-page.html" style="color: var(--primary-color); text-decoration: none; font-weight: bold;">← All News</a>
+        </div>
+    </header>
+    
+    <main class="container">
+        <div class="news-detail-container" id="newsContent">
+            <h2 style="text-align:center; color: var(--primary-color);">Loading News...</h2>
+        </div>
+    </main>
+
+    <script src="firebase-init.js"></script>
+    <script>
+        async function loadNewsDetail() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const id = urlParams.get('id');
+            if(!id) {
+                document.getElementById('newsContent').innerHTML = "<h2>News not found.</h2>";
+                return;
+            }
+            if(!window.db) { setTimeout(loadNewsDetail, 1000); return; }
+            
+            try {
+                const doc = await window.firebase.firestore().collection('news').doc(id).get();
+                if(doc.exists) {
+                    const data = doc.data();
+                    const date = new Date(data.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+                    
+                    document.getElementById('newsContent').innerHTML = `
+                        ${data.image ? `<img src="${data.image}" class="news-image" alt="${data.title}">` : ''}
+                        <h1 class="news-title">${data.title}</h1>
+                        <span class="news-date">${date}</span>
+                        <div class="news-content">${data.content || data.excerpt || 'No content provided.'}</div>
+                        <a href="news-page.html" class="back-btn">← Back to News Feed</a>
+                    `;
+                    document.title = `${data.title} - Ansar English School`;
+                } else {
+                    document.getElementById('newsContent').innerHTML = "<h2>News article not found.</h2>";
+                }
+            } catch(e) { console.error(e); }
+        }
+        setTimeout(loadNewsDetail, 1500);
+    </script>
+</body>
+</html>

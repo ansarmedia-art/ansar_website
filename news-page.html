@@ -10,37 +10,54 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
-            --primary-color: #3498db;
-            --secondary-color: #2c3e50;
+            --primary-color: #0f2b46;
+            --secondary-color: #1a426b;
             --text-dark: #2c3e50;
             --text-light: #7f8c8d;
             --bg-light: #f8f9fa;
+            --accent-color: #d4af37;
         }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: var(--text-dark); }
         .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
         header { background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); padding: 20px 0; }
         .header-top { display: flex; justify-content: space-between; align-items: center; }
         .logo { display: flex; align-items: center; gap: 10px; }
-        .logo img { height: 50px; }
+        .logo img { height: 60px; object-fit: contain; }
         nav { display: flex; gap: 30px; }
         nav a { color: var(--text-dark); text-decoration: none; padding: 10px 0; }
-        nav a:hover { color: var(--primary-color); }
+        nav a:hover { color: var(--accent-color); font-weight: bold;}
         main { padding: 60px 0; }
         h1 { font-size: 36px; margin-bottom: 50px; text-align: center; }
         .news-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; }
         .news-card { background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1); transition: transform 0.3s; }
         .news-card:hover { transform: translateY(-5px); }
-        .news-card img { width: 100%; height: 200px; object-fit: cover; }
+        .news-card img { width: 100%; height: auto; aspect-ratio: 16/9; object-fit: cover; object-position: center; }
         .news-body { padding: 20px; }
         .news-date { font-size: 12px; color: var(--primary-color); text-transform: uppercase; }
         .news-card h2 { font-size: 20px; margin: 10px 0; }
         .news-card p { color: var(--text-light); margin-bottom: 10px; }
-        .read-more { color: var(--primary-color); font-weight: bold; }
+        .read-more { color: var(--accent-color); font-weight: bold; text-decoration: none; }
+        .social-icons-container { display: flex; gap: 8px; margin-top: 15px; }
+        .social-icon { 
+            display: inline-flex; align-items: center; justify-content: center; 
+            width: 28px; height: 28px; border-radius: 50%; color: white; 
+            transition: transform 0.2s; text-decoration: none; 
+        }
+        .social-icon:hover { transform: scale(1.1); color: white;}
+        .fb { background: #3b5998; }
+        .ig { background: #e1306c; }
+        .yt { background: #ff0000; }
         footer { background: var(--secondary-color); color: white; padding: 40px 0 20px; margin-top: 60px; }
         .footer-content { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; margin-bottom: 30px; }
         .footer-content h3 { margin-bottom: 15px; }
         .footer-content a { color: rgba(255,255,255,0.8); text-decoration: none; }
         .footer-bottom { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; text-align: center; }
+        .footer-credit { display: inline-block; margin-top: 10px; font-size: 0.85rem; }
+        .footer-credit a { color: var(--accent-color); font-weight: bold; text-decoration: none; }
+        .social-links { display: flex; gap: 15px; margin-top: 15px; }
+        .social-links a { display: inline-flex; width: 40px; height: 40px; align-items: center; justify-content: center; background: rgba(255,255,255,0.1); border-radius: 50%; transition: background 0.3s; color: white; text-decoration: none; }
+        .social-links a:hover { background: var(--primary-color); }
+
         @media (max-width: 768px) {
             nav { display: none; }
             h1 { font-size: 24px; }
@@ -53,7 +70,7 @@
         <div class="container">
             <div class="header-top">
                 <div class="logo">
-                    <img src="public/ansar-logo.png" alt="Ansar English School logo">
+                    <img src="https://i.ibb.co/JjbQmpgR/St-Sebastian-church-Purnattukara.png" alt="Ansar English School logo">
                     <div><h2 style="margin: 0; font-size: 16px;">ANSAR SCHOOL</h2></div>
                 </div>
                 <nav>
@@ -76,10 +93,19 @@
             <div class="footer-content">
                 <div><h3>About</h3><p>Quality education for all</p></div>
                 <div><h3>Quick Links</h3><a href="index.html">Home</a></div>
-                <div><h3>Contact</h3><p id="footerPhone">Ansar English School</p></div>
+                <div>
+                    <h3>Connect With Us</h3>
+                    <div class="social-links">
+                        <a href="https://www.facebook.com/profile.php" target="_blank" aria-label="Facebook"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg></a>
+                        <a href="https://www.instagram.com/ansarenglishschool" target="_blank" aria-label="Instagram"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg></a>
+                        <a href="https://www.youtube.com/@Ansarenglishschoolperumpilavu" target="_blank" aria-label="YouTube"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33 2.78 2.78 0 0 0 1.94 2c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.33 29 29 0 0 0-.46-5.33zM9.75 15.02V8.48L15.5 11.75z"></path></svg></a>
+                        <a href="https://whatsapp.com/channel/0029VbD9HEH23n3kbNrSCN0W" target="_blank" aria-label="WhatsApp"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"></path></svg></a>
+                    </div>
+                </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2026 Ansar English School. All Rights Reserved.</p>
+                <p>&copy; 2026 Ansar English School. All Rights Reserved.<br>
+                <span class="footer-credit">Website developed and deployed by <a href="https://d3ztudio-main.web.app" target="_blank">D3ZTUDIO</a></span></p>
             </div>
         </div>
     </footer>
@@ -102,6 +128,16 @@
                     snapshot.forEach(doc => {
                         const data = doc.data();
                         const date = new Date(data.date).toLocaleDateString();
+                        
+                        const fbIcon = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>';
+                        const igIcon = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>';
+                        const ytIcon = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33 2.78 2.78 0 0 0 1.94 2c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.33 29 29 0 0 0-.46-5.33zM9.75 15.02V8.48L15.5 11.75z"></path></svg>';
+
+                        const fb = data.facebookUrl ? `<a href="${data.facebookUrl}" target="_blank" class="social-icon fb" aria-label="Facebook">${fbIcon}</a>` : '';
+                        const ig = data.instagramUrl ? `<a href="${data.instagramUrl}" target="_blank" class="social-icon ig" aria-label="Instagram">${igIcon}</a>` : '';
+                        const yt = data.youtubeUrl ? `<a href="${data.youtubeUrl}" target="_blank" class="social-icon yt" aria-label="YouTube">${ytIcon}</a>` : '';
+                        const socialHTML = (fb || ig || yt) ? `<div class="social-icons-container">${fb}${ig}${yt}</div>` : '';
+
                         html += `
                             <div class="news-card">
                                 ${data.image ? `<img src="${data.image}" alt="${data.title}">` : '<img src="https://via.placeholder.com/300x200" alt="News">'}
@@ -110,6 +146,7 @@
                                     <h2>${data.title}</h2>
                                     <p>${(data.excerpt || data.content || '').substring(0, 150)}...</p>
                                     <a href="news-detail.html?id=${doc.id}" class="read-more">Read More →</a>
+                                    ${socialHTML}
                                 </div>
                             </div>
                         `;

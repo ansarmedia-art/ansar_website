@@ -268,7 +268,7 @@ async function loadHome() {
 
   const activeSlide = carousel.find(item => item.active !== false && item.imageUrl);
   const hero = document.querySelector('[data-hero-media]');
-  hero.style.backgroundImage = `url("${text(activeSlide?.imageUrl || 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=1600&q=80')}")`;
+  hero.style.backgroundImage = `url("${text(activeSlide?.imageUrl || 'https://i.ibb.co/whydB756/image.png')}")`;
   if (activeSlide?.title) document.querySelector('[data-home-title]').textContent = activeSlide.title;
   if (activeSlide?.description) document.querySelector('[data-home-subtitle]').textContent = activeSlide.description;
 

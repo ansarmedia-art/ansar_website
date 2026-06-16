@@ -114,6 +114,9 @@ const COLLECTIONS = {
       ['content', 'Content', 'textarea'],
       ['image', 'Image URL', 'url'],
       ['date', 'Date', 'date'],
+      ['instagramUrl', 'Instagram URL (Optional)', 'url'],
+      ['youtubeUrl', 'YouTube URL (Optional)', 'url'],
+      ['facebookUrl', 'Facebook URL (Optional)', 'url'],
       ['published', 'Published', 'checkbox']
     ]
   },
@@ -127,6 +130,9 @@ const COLLECTIONS = {
       ['image', 'Image URL', 'url'],
       ['date', 'Date', 'date'],
       ['location', 'Location', 'text'],
+      ['instagramUrl', 'Instagram URL (Optional)', 'url'],
+      ['youtubeUrl', 'YouTube URL (Optional)', 'url'],
+      ['facebookUrl', 'Facebook URL (Optional)', 'url'],
       ['published', 'Published', 'checkbox']
     ]
   },
@@ -206,10 +212,22 @@ function showLogin() {
   document.getElementById('loginForm').addEventListener('submit', async event => {
     event.preventDefault();
     const form = new FormData(event.target);
+    const errorEl = document.getElementById('loginError');
+    const submitBtn = event.target.querySelector('button[type="submit"]');
+
+    errorEl.textContent = '';
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Signing In...';
+
     try {
       await signInWithEmailAndPassword(auth, form.get('email'), form.get('password'));
+      // Reload the page to ensure the admin panel initializes correctly
+      // with the new authentication state and the proper HTML structure.
+      window.location.reload();
     } catch (error) {
-      document.getElementById('loginError').textContent = error.message;
+      errorEl.textContent = error.message;
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Sign In';
     }
   });
 }

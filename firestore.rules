@@ -6,233 +6,290 @@ service cloud.firestore {
     // Assumed Data Model
     // ===============================================================
     //
-    // Public website content collections:
-    // - navigation/{itemId}: label, href, type, order, optional slug
-    // - pages/{slug}: title, slug, subtitle, category, heroImageUrl, bodyHtml,
-    //   href, order, published, createdAt, updatedAt
-    // - news/{newsId}: title, excerpt, content, image, date, published,
-    //   createdAt, updatedAt
-    // - events/{eventId}: title, description, image, date, location, published,
-    //   createdAt, updatedAt
-    // - gallery/{galleryId}: title, caption, imageUrl, category, order,
-    //   published, createdAt, updatedAt
-    // - carousel/{carouselId}: title, description, imageUrl, linkUrl, order,
-    //   active, createdAt, updatedAt
-    // - notices/{noticeId}: title, message, buttonText, buttonUrl, duration,
-    //   active, createdAt, updatedAt
-    // - settings/general: schoolName, email, phone, address, logoUrl,
-    //   siteDescription, updatedAt
+    // Collection: admins
+    // Document ID: email address
+    // Fields: role (string), email (string)
     //
-    // These collections are intentionally public-readable for the public school
-    // website. Writes are restricted to bootstrapped admin email addresses.
+    // Collection: pages
+    // Fields: title (string), slug (string), subtitle (string), heroImageUrl (string), 
+    //         bodyHtml (string), order (number), published (bool), createdAt/updatedAt (timestamp)
+    //
+    // Collection: news / events
+    // Fields: title (string), excerpt/description (string), content (string), image (string),
+    //         date (string), facebookUrl/instagramUrl/youtubeUrl (string), published (bool)
+    //
+    // Collection: gallery / carousel / notices
+    // Fields: title, imageUrl, message, linkUrl, order, active/published (all strictly typed)
+    //
+    // Collection: settings
+    // Fields: schoolName, email, phone, address, logoUrl, siteDescription
     // ===============================================================
 
-    function isSignedIn() {
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    
+    function isAuthenticated() {
       return request.auth != null;
     }
 
-    function isAdminEmail() {
-      return isSignedIn() &&
-        request.auth.token.email in [
-          'd3ztudio@gmail.com',
-          'ansarmedia@ansarschool.in',
-          'ansarschooloffice@gmail.com'
-        ];
+    // Check if the user is an admin
+    // Admins must be authenticated AND exist in the 'admins' collection 
+    // OR match the hardcoded initialization emails.
+    function isAdmin() {
+      return isAuthenticated() && (
+        request.auth.token.email in ['d3ztudio@gmail.com', 'ansarmedia@ansarschool.in', 'ansarschooloffice@gmail.com'] ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.token.email))
+      );
     }
 
-    function hasOnly(fields) {
+    // Validate string length to prevent 1MB DoS attacks
+    function isValidStringLength(field, minLen, maxLen) {
+      return request.resource.data[field] is string &&
+             request.resource.data[field].size() >= minLen &&
+             request.resource.data[field].size() <= maxLen;
+    }
+
+    // Validate optional string (if present, must be string and within length)
+    function isValidOptionalString(field, minLen, maxLen) {
+      return !(field in request.resource.data) ||
+             (request.resource.data[field] is string &&
+              request.resource.data[field].size() >= minLen &&
+              request.resource.data[field].size() <= maxLen);
+    }
+
+    // Enforce strict schema by ensuring no extraneous fields are added
+    function hasOnlyAllowedFields(fields) {
       return request.resource.data.keys().hasOnly(fields);
     }
 
-    function optionalString(field, max) {
-      return !(field in request.resource.data) ||
-        (request.resource.data[field] is string &&
-         request.resource.data[field].size() <= max);
-    }
-
-    function requiredString(field, max) {
-      return field in request.resource.data &&
-        request.resource.data[field] is string &&
-        request.resource.data[field].size() > 0 &&
-        request.resource.data[field].size() <= max;
-    }
-
-    function optionalBool(field) {
-      return !(field in request.resource.data) || request.resource.data[field] is bool;
-    }
-
-    function optionalNumber(field, min, max) {
-      return !(field in request.resource.data) ||
-        (request.resource.data[field] is number &&
-         request.resource.data[field] >= min &&
-         request.resource.data[field] <= max);
-    }
-
-    function optionalUrl(field) {
-      return !(field in request.resource.data) ||
-        request.resource.data[field] == '' ||
-        (request.resource.data[field] is string &&
-         request.resource.data[field].size() <= 600 &&
-         request.resource.data[field].matches('^https?://.*'));
-    }
-
-    function optionalTimestamp(field) {
+    // Validate that a field is a timestamp (if present)
+    function isOptionalTimestamp(field) {
       return !(field in request.resource.data) || request.resource.data[field] is timestamp;
     }
 
-    function optionalDateString(field) {
+    // Validate URL format (must start with https:// or http://)
+    function isValidUrl(field) {
+      return !(field in request.resource.data) || 
+             request.resource.data[field] == "" ||
+             (request.resource.data[field] is string &&
+              request.resource.data[field].size() < 1000 &&
+             (request.resource.data[field].matches("^https://.*") || request.resource.data[field].matches("^http://.*")));
+    }
+
+    // Validate basic date string format (YYYY-MM-DD)
+    function isValidDateString(field) {
       return !(field in request.resource.data) ||
-        request.resource.data[field] == '' ||
-        (request.resource.data[field] is string &&
-         request.resource.data[field].size() <= 40);
+             request.resource.data[field] == "" ||
+             (request.resource.data[field] is string &&
+              request.resource.data[field].matches("^\\\\d{4}-\\\\d{2}-\\\\d{2}$"));
     }
 
+    function isOptionalBool(field) {
+      return !(field in request.resource.data) || request.resource.data[field] is bool;
+    }
+
+    function isOptionalNumber(field) {
+      return !(field in request.resource.data) || request.resource.data[field] is number;
+    }
+
+    // Protect immutable fields like createdAt
+    function isImmutable(field) {
+      return !(field in request.resource.data) || 
+             (field in resource.data && request.resource.data[field] == resource.data[field]);
+    }
+
+    // ===============================================================
+    // Domain Validators
+    // ===============================================================
+    
     function isValidPage() {
-      return hasOnly(['title', 'slug', 'subtitle', 'category', 'heroImageUrl', 'bodyHtml', 'href', 'order', 'published', 'createdAt', 'updatedAt']) &&
-        requiredString('title', 160) &&
-        requiredString('slug', 120) &&
-        optionalString('subtitle', 600) &&
-        optionalString('category', 80) &&
-        optionalUrl('heroImageUrl') &&
-        optionalString('bodyHtml', 20000) &&
-        optionalString('href', 240) &&
-        optionalNumber('order', 0, 999) &&
-        optionalBool('published') &&
-        optionalTimestamp('createdAt') &&
-        optionalTimestamp('updatedAt');
-    }
-
-    function isValidNavigation() {
-      return hasOnly(['label', 'href', 'slug', 'type', 'order']) &&
-        requiredString('label', 80) &&
-        requiredString('href', 240) &&
-        optionalString('slug', 120) &&
-        requiredString('type', 20) &&
-        request.resource.data.type in ['primary', 'more'] &&
-        optionalNumber('order', 0, 999);
+      return hasOnlyAllowedFields(['title', 'slug', 'subtitle', 'category', 'heroImageUrl', 'bodyHtml', 'order', 'published', 'href', 'metaDescription', 'keywords', 'createdAt', 'updatedAt']) &&
+             isValidStringLength('title', 1, 200) &&
+             isValidStringLength('slug', 1, 200) &&
+             isValidOptionalString('subtitle', 0, 1000) &&
+             isValidOptionalString('category', 0, 100) &&
+             isValidOptionalString('bodyHtml', 0, 100000) && // Limit HTML body to ~100KB
+             isValidUrl('heroImageUrl') &&
+             isValidOptionalString('href', 0, 500) &&
+             isValidOptionalString('metaDescription', 0, 1000) &&
+             isValidOptionalString('keywords', 0, 500) &&
+             isOptionalNumber('order') &&
+             isOptionalBool('published') &&
+             isOptionalTimestamp('createdAt') &&
+             isOptionalTimestamp('updatedAt');
     }
 
     function isValidNews() {
-      return hasOnly(['title', 'excerpt', 'content', 'image', 'date', 'published', 'createdAt', 'updatedAt']) &&
-        requiredString('title', 180) &&
-        optionalString('excerpt', 600) &&
-        optionalString('content', 12000) &&
-        optionalUrl('image') &&
-        optionalDateString('date') &&
-        optionalBool('published') &&
-        optionalTimestamp('createdAt') &&
-        optionalTimestamp('updatedAt');
+      return hasOnlyAllowedFields(['title', 'excerpt', 'content', 'image', 'date', 'facebookUrl', 'instagramUrl', 'youtubeUrl', 'published', 'author', 'createdAt', 'updatedAt']) &&
+             isValidStringLength('title', 1, 200) &&
+             isValidOptionalString('excerpt', 0, 1500) &&
+             isValidOptionalString('content', 0, 50000) &&
+             isValidDateString('date') &&
+             isValidUrl('image') &&
+             isValidUrl('facebookUrl') &&
+             isValidUrl('instagramUrl') &&
+             isValidUrl('youtubeUrl') &&
+             isOptionalBool('published') &&
+             isValidOptionalString('author', 0, 100) &&
+             isOptionalTimestamp('createdAt') &&
+             isOptionalTimestamp('updatedAt');
     }
 
     function isValidEvent() {
-      return hasOnly(['title', 'description', 'image', 'date', 'location', 'published', 'createdAt', 'updatedAt']) &&
-        requiredString('title', 180) &&
-        optionalString('description', 6000) &&
-        optionalUrl('image') &&
-        optionalDateString('date') &&
-        optionalString('location', 180) &&
-        optionalBool('published') &&
-        optionalTimestamp('createdAt') &&
-        optionalTimestamp('updatedAt');
+      return hasOnlyAllowedFields(['title', 'description', 'location', 'time', 'image', 'date', 'facebookUrl', 'instagramUrl', 'youtubeUrl', 'published', 'createdAt', 'updatedAt']) &&
+             isValidStringLength('title', 1, 200) &&
+             isValidOptionalString('description', 0, 10000) &&
+             isValidOptionalString('location', 0, 300) &&
+             isValidOptionalString('time', 0, 100) &&
+             isValidDateString('date') &&
+             isValidUrl('image') &&
+             isValidUrl('facebookUrl') &&
+             isValidUrl('instagramUrl') &&
+             isValidUrl('youtubeUrl') &&
+             isOptionalBool('published') &&
+             isOptionalTimestamp('createdAt') &&
+             isOptionalTimestamp('updatedAt');
     }
 
-    function isValidGallery() {
-      return hasOnly(['title', 'caption', 'imageUrl', 'category', 'order', 'published', 'createdAt', 'updatedAt']) &&
-        requiredString('title', 180) &&
-        optionalString('caption', 600) &&
-        optionalUrl('imageUrl') &&
-        optionalString('category', 80) &&
-        optionalNumber('order', 0, 999) &&
-        optionalBool('published') &&
-        optionalTimestamp('createdAt') &&
-        optionalTimestamp('updatedAt');
+    function isValidGalleryItem() {
+      return hasOnlyAllowedFields(['title', 'caption', 'imageUrl', 'category', 'order', 'published', 'createdAt', 'updatedAt']) &&
+             isValidStringLength('title', 1, 200) &&
+             isValidOptionalString('caption', 0, 1000) &&
+             isValidOptionalString('category', 0, 100) &&
+             isValidUrl('imageUrl') &&
+             isOptionalNumber('order') &&
+             isOptionalBool('published') &&
+             isOptionalTimestamp('createdAt') &&
+             isOptionalTimestamp('updatedAt');
     }
 
-    function isValidCarousel() {
-      return hasOnly(['title', 'description', 'imageUrl', 'linkUrl', 'order', 'active', 'createdAt', 'updatedAt']) &&
-        requiredString('title', 180) &&
-        optionalString('description', 600) &&
-        optionalUrl('imageUrl') &&
-        optionalUrl('linkUrl') &&
-        optionalNumber('order', 0, 999) &&
-        optionalBool('active') &&
-        optionalTimestamp('createdAt') &&
-        optionalTimestamp('updatedAt');
+    function isValidCarouselItem() {
+      return hasOnlyAllowedFields(['title', 'description', 'imageUrl', 'linkUrl', 'order', 'active', 'createdAt', 'updatedAt']) &&
+             isValidStringLength('title', 1, 200) &&
+             isValidOptionalString('description', 0, 1000) &&
+             isValidUrl('imageUrl') &&
+             isValidUrl('linkUrl') &&
+             isOptionalNumber('order') &&
+             isOptionalBool('active') &&
+             isOptionalTimestamp('createdAt') &&
+             isOptionalTimestamp('updatedAt');
     }
 
     function isValidNotice() {
-      return hasOnly(['title', 'message', 'buttonText', 'buttonUrl', 'duration', 'active', 'createdAt', 'updatedAt']) &&
-        requiredString('title', 180) &&
-        requiredString('message', 1200) &&
-        optionalString('buttonText', 80) &&
-        optionalUrl('buttonUrl') &&
-        optionalNumber('duration', 1, 120) &&
-        optionalBool('active') &&
-        optionalTimestamp('createdAt') &&
-        optionalTimestamp('updatedAt');
+      return hasOnlyAllowedFields(['title', 'message', 'buttonText', 'buttonUrl', 'duration', 'active', 'createdAt', 'updatedAt']) &&
+             isValidStringLength('title', 1, 200) &&
+             isValidStringLength('message', 1, 2000) &&
+             isValidOptionalString('buttonText', 0, 100) &&
+             isValidUrl('buttonUrl') &&
+             isOptionalNumber('duration') &&
+             isOptionalBool('active') &&
+             isOptionalTimestamp('createdAt') &&
+             isOptionalTimestamp('updatedAt');
     }
 
     function isValidSettings() {
-      return hasOnly(['schoolName', 'email', 'phone', 'address', 'logoUrl', 'siteDescription', 'updatedAt']) &&
-        optionalString('schoolName', 160) &&
-        optionalString('email', 160) &&
-        optionalString('phone', 80) &&
-        optionalString('address', 600) &&
-        optionalUrl('logoUrl') &&
-        optionalString('siteDescription', 600) &&
-        optionalTimestamp('updatedAt');
+      return hasOnlyAllowedFields(['schoolName', 'email', 'phone', 'address', 'logoUrl', 'siteDescription', 'siteKeywords', 'createdAt', 'updatedAt']) &&
+             isValidOptionalString('schoolName', 0, 200) &&
+             isValidOptionalString('email', 0, 200) &&
+             isValidOptionalString('phone', 0, 50) &&
+             isValidOptionalString('address', 0, 500) &&
+             isValidOptionalString('siteDescription', 0, 1000) &&
+             isValidOptionalString('siteKeywords', 0, 1000) &&
+             isValidUrl('logoUrl') &&
+             isOptionalTimestamp('createdAt') &&
+             isOptionalTimestamp('updatedAt');
     }
 
-    match /navigation/{itemId} {
-      allow read: if true;
-      allow create, update: if isAdminEmail() && isValidNavigation();
-      allow delete: if isAdminEmail();
+    function isValidNavigation() {
+      return hasOnlyAllowedFields(['label', 'href', 'slug', 'type', 'order', 'createdAt', 'updatedAt']) &&
+             isValidStringLength('label', 1, 100) &&
+             isValidOptionalString('href', 0, 500) &&
+             isValidOptionalString('slug', 0, 200) &&
+             isValidOptionalString('type', 0, 50) &&
+             isOptionalNumber('order') &&
+             isOptionalTimestamp('createdAt') &&
+             isOptionalTimestamp('updatedAt');
     }
 
-    match /pages/{pageId} {
-      allow read: if true;
-      allow create, update: if isAdminEmail() && isValidPage();
-      allow delete: if isAdminEmail();
-    }
+    // ===============================================================
+    // Access Rules
+    // ===============================================================
 
-    match /news/{newsId} {
-      allow read: if true;
-      allow create, update: if isAdminEmail() && isValidNews();
-      allow delete: if isAdminEmail();
-    }
-
-    match /events/{eventId} {
-      allow read: if true;
-      allow create, update: if isAdminEmail() && isValidEvent();
-      allow delete: if isAdminEmail();
-    }
-
-    match /gallery/{galleryId} {
-      allow read: if true;
-      allow create, update: if isAdminEmail() && isValidGallery();
-      allow delete: if isAdminEmail();
-    }
-
-    match /carousel/{carouselId} {
-      allow read: if true;
-      allow create, update: if isAdminEmail() && isValidCarousel();
-      allow delete: if isAdminEmail();
-    }
-
-    match /notices/{noticeId} {
-      allow read: if true;
-      allow create, update: if isAdminEmail() && isValidNotice();
-      allow delete: if isAdminEmail();
-    }
-
-    match /settings/{settingId} {
-      allow read: if true;
-      allow create, update: if isAdminEmail() && isValidSettings();
-      allow delete: if isAdminEmail();
-    }
-
+    // Deny access by default
     match /{document=**} {
       allow read, write: if false;
+    }
+
+    // Security rules for the Administrators list
+    // Strictly restricted to prevent privilege escalation
+    match /admins/{emailId} {
+      allow read: if isAdmin();
+      allow create, update, delete: if false; // Must be managed directly via Firebase Console
+    }
+
+    // Public Pages
+    match /pages/{pageId} {
+      allow read: if true;
+      allow create: if isAdmin() && isValidPage();
+      allow update: if isAdmin() && isValidPage() && isImmutable('createdAt');
+      allow delete: if isAdmin();
+    }
+
+    // News Articles
+    match /news/{newsId} {
+      allow read: if true;
+      allow create: if isAdmin() && isValidNews();
+      allow update: if isAdmin() && isValidNews() && isImmutable('createdAt');
+      allow delete: if isAdmin();
+    }
+
+    // Events
+    match /events/{eventId} {
+      allow read: if true;
+      allow create: if isAdmin() && isValidEvent();
+      allow update: if isAdmin() && isValidEvent() && isImmutable('createdAt');
+      allow delete: if isAdmin();
+    }
+
+    // Photo Gallery
+    match /gallery/{galleryId} {
+      allow read: if true;
+      allow create: if isAdmin() && isValidGalleryItem();
+      allow update: if isAdmin() && isValidGalleryItem() && isImmutable('createdAt');
+      allow delete: if isAdmin();
+    }
+
+    // Carousel Images
+    match /carousel/{carouselId} {
+      allow read: if true;
+      allow create: if isAdmin() && isValidCarouselItem();
+      allow update: if isAdmin() && isValidCarouselItem() && isImmutable('createdAt');
+      allow delete: if isAdmin();
+    }
+
+    // Notices & Popups
+    match /notices/{noticeId} {
+      allow read: if true;
+      allow create: if isAdmin() && isValidNotice();
+      allow update: if isAdmin() && isValidNotice() && isImmutable('createdAt');
+      allow delete: if isAdmin();
+    }
+
+    // Site Navigation links
+    match /navigation/{navId} {
+      allow read: if true;
+      allow create: if isAdmin() && isValidNavigation();
+      allow update: if isAdmin() && isValidNavigation() && isImmutable('createdAt');
+      allow delete: if isAdmin();
+    }
+
+    // Global Settings (General, SEO)
+    match /settings/{settingId} {
+      allow read: if true;
+      allow create: if isAdmin() && isValidSettings();
+      allow update: if isAdmin() && isValidSettings() && isImmutable('createdAt');
+      allow delete: if false; // Settings documents should not be deleted, only updated
     }
   }
 }
