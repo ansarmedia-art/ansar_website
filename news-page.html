@@ -6,6 +6,7 @@
     <meta name="description" content="All News and Updates from Ansar English School">
     <meta name="robots" content="index, follow">
     <title>News - Ansar English School</title>
+    <link rel="icon" type="image/png" href="public/ansar-logo.png">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
@@ -52,13 +53,12 @@
         <div class="container">
             <div class="header-top">
                 <div class="logo">
-                    <img src="https://ansarschool.in/logo.png" alt="Logo">
+                    <img src="public/ansar-logo.png" alt="Ansar English School logo">
                     <div><h2 style="margin: 0; font-size: 16px;">ANSAR SCHOOL</h2></div>
                 </div>
                 <nav>
                     <a href="index.html">Home</a>
                     <a href="#news">News</a>
-                    <a href="admin.html">Admin</a>
                 </nav>
             </div>
         </div>
@@ -67,7 +67,7 @@
     <main class="container">
         <h1>Latest News & Updates</h1>
         <div class="news-grid" id="newsGrid">
-            <div style="text-align: center; padding: 40px; color: var(--text-light);">Loading news...</div>
+            <div style="text-align: center; padding: 40px; color: var(--text-light);">News updates will appear here shortly.</div>
         </div>
     </main>
 
@@ -76,7 +76,7 @@
             <div class="footer-content">
                 <div><h3>About</h3><p>Quality education for all</p></div>
                 <div><h3>Quick Links</h3><a href="index.html">Home</a></div>
-                <div><h3>Contact</h3><p id="footerPhone">Phone: Loading...</p></div>
+                <div><h3>Contact</h3><p id="footerPhone">Ansar English School</p></div>
             </div>
             <div class="footer-bottom">
                 <p>&copy; 2026 Ansar English School. All Rights Reserved.</p>
@@ -119,7 +119,7 @@
                 document.getElementById('newsGrid').innerHTML = html;
             } catch (error) {
                 console.error('Error loading news:', error);
-                document.getElementById('newsGrid').innerHTML = '<p style="text-align: center; color: red;">Error loading news</p>';
+                document.getElementById('newsGrid').innerHTML = '<p style="text-align: center; color: red;">News could not be displayed right now.</p>';
             }
         }
 

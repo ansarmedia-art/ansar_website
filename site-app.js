@@ -19,6 +19,12 @@ const FALLBACK_NAV = [
   ['Contact Us', 'contact-new.html', 'primary']
 ].map(([label, href, type], index) => ({ label, href, type, order: index + 1 }));
 
+const ADMIN_EMAILS = [
+  'd3ztudio@gmail.com',
+  'ansarmedia@ansarschool.in',
+  'ansarschooloffice@gmail.com'
+];
+
 const FALLBACK_FEATURES = [
   'CCTV-enabled safety',
   'Spacious classrooms with smart boards',
@@ -71,6 +77,13 @@ function dbReady() {
   });
 }
 
+function authReady() {
+  return new Promise(resolve => {
+    const check = () => window.auth && window.firebase ? resolve(window.auth) : setTimeout(check, 120);
+    check();
+  });
+}
+
 function text(value = '') {
   return String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
 }
@@ -108,7 +121,114 @@ function setupShell(navItems, settings = {}) {
   });
   document.querySelector('[data-footer]').innerHTML = `
     <div><strong>${text(settings.schoolName || 'Ansar English School')}</strong><p>${text(settings.address || 'Perumpilavu, Thrissur, Kerala')}</p></div>
-    <div class="footer-links"><a href="admin.html">Admin Panel</a><a href="page.html?slug=mandatory-public-disclosure">Mandatory Public Disclosure</a></div>`;
+    <div class="footer-links"><a href="page.html?slug=mandatory-public-disclosure">Mandatory Public Disclosure</a><a href="contact-new.html">Contact</a></div>`;
+  setupAuthControls();
+}
+
+function isAdminUser(user) {
+  return Boolean(user?.email && ADMIN_EMAILS.includes(user.email));
+}
+
+function openAuthModal() {
+  const modal = document.querySelector('[data-auth-modal]');
+  if (modal) modal.hidden = false;
+}
+
+function closeAuthModal() {
+  const modal = document.querySelector('[data-auth-modal]');
+  if (modal) modal.hidden = true;
+}
+
+function setAuthMessage(message, type = '') {
+  const node = document.querySelector('[data-auth-message]');
+  if (!node) return;
+  node.textContent = message;
+  node.dataset.type = type;
+}
+
+async function afterAuth(user) {
+  if (isAdminUser(user)) {
+    window.location.href = 'admin.html';
+    return;
+  }
+  closeAuthModal();
+  setAuthMessage('You are signed in. This account does not have admin rights, so the public website stays open.', 'success');
+}
+
+async function setupAuthControls() {
+  const auth = await authReady();
+  const button = document.querySelector('[data-auth-open]');
+  const modal = document.querySelector('[data-auth-modal]');
+  const form = document.querySelector('[data-email-auth]');
+  const googleButton = document.querySelector('[data-google-login]');
+  const signoutButton = document.querySelector('[data-signout]');
+  if (!button || !modal) return;
+
+  button.addEventListener('click', async () => {
+    const user = auth.currentUser;
+    if (isAdminUser(user)) {
+      window.location.href = 'admin.html';
+      return;
+    }
+    if (user) {
+      setAuthMessage(`Signed in as ${user.email}. This account has client access.`, 'success');
+    }
+    openAuthModal();
+  });
+
+  document.querySelector('[data-auth-close]')?.addEventListener('click', closeAuthModal);
+  modal.addEventListener('click', event => {
+    if (event.target === modal) closeAuthModal();
+  });
+
+  googleButton?.addEventListener('click', async () => {
+    try {
+      setAuthMessage('Opening Google sign in...');
+      const provider = new window.firebase.auth.GoogleAuthProvider();
+      const credential = await auth.signInWithPopup(provider);
+      await afterAuth(credential.user);
+    } catch (error) {
+      setAuthMessage(error.message, 'error');
+    }
+  });
+
+  form?.addEventListener('submit', async event => {
+    event.preventDefault();
+    const submitter = event.submitter;
+    const mode = submitter?.dataset.authMode || 'login';
+    const form = new FormData(event.currentTarget);
+    const email = form.get('email').trim();
+    const password = form.get('password');
+    try {
+      setAuthMessage(mode === 'create' ? 'Creating your account...' : 'Signing you in...');
+      const credential = mode === 'create'
+        ? await auth.createUserWithEmailAndPassword(email, password)
+        : await auth.signInWithEmailAndPassword(email, password);
+      await afterAuth(credential.user);
+    } catch (error) {
+      setAuthMessage(error.message, 'error');
+    }
+  });
+
+  signoutButton?.addEventListener('click', async () => {
+    await auth.signOut();
+    setAuthMessage('Signed out successfully.');
+    closeAuthModal();
+  });
+
+  auth.onAuthStateChanged(user => {
+    if (!user) {
+      button.textContent = 'Login / Account';
+      if (form) form.hidden = false;
+      if (googleButton) googleButton.hidden = false;
+      if (signoutButton) signoutButton.hidden = true;
+      return;
+    }
+    button.textContent = isAdminUser(user) ? 'Admin Panel' : 'My Account';
+    if (form) form.hidden = true;
+    if (googleButton) googleButton.hidden = true;
+    if (signoutButton) signoutButton.hidden = false;
+  });
 }
 
 function setupAnimations() {
