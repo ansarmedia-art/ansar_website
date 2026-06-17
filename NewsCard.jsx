@@ -17,6 +17,7 @@ export default function NewsCard({ id, title, excerpt, imageUrl, date, type = 'n
             alt={title} 
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
             loading="lazy"
+            onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/600x400/e2e8f0/94a3b8?text=Image+Unavailable'; }}
           />
         ) : (
           <div className="flex items-center justify-center h-full w-full text-slate-300">

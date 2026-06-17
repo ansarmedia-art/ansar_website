@@ -37,7 +37,7 @@ export default function About() {
           <p>Founded in 1982 by the Ansari Charitable Trust under the guidance of Late Jb. A V Abdul Majeed Saheb and visionary leaders, <strong>Ansar English School</strong> has grown into a beacon of holistic education in Perumpilavu, Thrissur. We are proud to be the <strong>first school in Thrissur accredited by NABET</strong> and are affiliated with the CBSE board. Today, our sprawling campus serves over 4,600 students, guided by a dedicated team of 270+ experienced educators.</p>
           <p>Our expansive educational ecosystem goes beyond traditional schooling, encompassing a Senior Secondary School, an NIOS center, an Arts & Science College for Women, a Special School for Mentally Challenged Children, a nurturing Orphanage, and a well-equipped hospital.</p>
           <h2>Our Vision</h2>
-          <p>To nurture students to thrive as creative, value-driven, and globally aware citizens in a diverse and rapidly changing world.</p>
+          <p>To empower students with academic rigor, skill and ethical leadership  to serve  society.</p>
           <h2>Our Mission</h2>
           <ul>
             <li><strong>Shape Contributors:</strong> Conduct educational programs that mold students into active contributors to a just and equitable society.</li>

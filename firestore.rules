@@ -78,6 +78,12 @@ service cloud.firestore {
              (request.resource.data[field].matches("^https://.*") || request.resource.data[field].matches("^http://.*")));
     }
 
+    // Validate URL List (for Event image carousels)
+    function isOptionalUrlList(field, maxListSize) {
+      return !(field in request.resource.data) ||
+             (request.resource.data[field] is list && request.resource.data[field].size() <= maxListSize);
+    }
+
     // Validate basic date string format (YYYY-MM-DD)
     function isValidDateString(field) {
       return !(field in request.resource.data) ||
@@ -138,16 +144,30 @@ service cloud.firestore {
     }
 
     function isValidEvent() {
-      return hasOnlyAllowedFields(['title', 'description', 'location', 'time', 'image', 'date', 'facebookUrl', 'instagramUrl', 'youtubeUrl', 'published', 'createdAt', 'updatedAt']) &&
+      return hasOnlyAllowedFields(['title', 'description', 'location', 'time', 'image', 'imageUrls', 'date', 'facebookUrl', 'instagramUrl', 'youtubeUrl', 'published', 'createdAt', 'updatedAt']) &&
              isValidStringLength('title', 1, 200) &&
              isValidOptionalString('description', 0, 10000) &&
              isValidOptionalString('location', 0, 300) &&
              isValidOptionalString('time', 0, 100) &&
              isValidDateString('date') &&
              isValidUrl('image') &&
+             isOptionalUrlList('imageUrls', 20) &&
              isValidUrl('facebookUrl') &&
              isValidUrl('instagramUrl') &&
              isValidUrl('youtubeUrl') &&
+             isOptionalBool('published') &&
+             isOptionalTimestamp('createdAt') &&
+             isOptionalTimestamp('updatedAt');
+    }
+
+    function isValidUpdate() {
+      return hasOnlyAllowedFields(['category', 'title', 'description', 'imageUrl', 'imageUrls', 'date', 'published', 'createdAt', 'updatedAt']) &&
+             request.resource.data.category in ['News', 'Events'] &&
+             isValidStringLength('title', 1, 200) &&
+             isValidOptionalString('description', 0, 50000) &&
+             isValidUrl('imageUrl') &&
+             isOptionalUrlList('imageUrls', 20) &&
+             isValidDateString('date') &&
              isOptionalBool('published') &&
              isOptionalTimestamp('createdAt') &&
              isOptionalTimestamp('updatedAt');
@@ -235,12 +255,13 @@ service cloud.firestore {
     }
 
     function isValidAchievement() {
-        return hasOnlyAllowedFields(['title', 'description', 'imageUrl', 'date', 'studentName', 'published', 'createdAt', 'updatedAt']) &&
+        return hasOnlyAllowedFields(['title', 'description', 'imageUrl', 'date', 'studentName', 'order', 'published', 'createdAt', 'updatedAt']) &&
                isValidStringLength('title', 1, 200) &&
                isValidOptionalString('description', 0, 10000) &&
                isValidUrl('imageUrl') &&
                isValidDateString('date') &&
                isValidOptionalString('studentName', 0, 500) &&
+               isOptionalNumber('order') &&
                isOptionalBool('published') &&
                isOptionalTimestamp('createdAt') &&
                isOptionalTimestamp('updatedAt');
@@ -278,6 +299,14 @@ service cloud.firestore {
       allow read: if true;
       allow create: if isAdmin() && isValidEvent();
       allow update: if isAdmin() && isValidEvent() && isImmutable('createdAt');
+      allow delete: if isAdmin();
+    }
+
+    // Unified News/Events Collection
+    match /updates/{updateId} {
+      allow read: if true;
+      allow create: if isAdmin() && isValidUpdate();
+      allow update: if isAdmin() && isValidUpdate() && isImmutable('createdAt');
       allow delete: if isAdmin();
     }
 

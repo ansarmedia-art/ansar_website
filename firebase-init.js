@@ -2,16 +2,14 @@ import { initializeApp } from 'firebase/app';
 import { getFirestore, enableIndexedDbPersistence } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 
-// ⚠️ CRITICAL: Paste your actual configuration from the Firebase Console here!
-// This now safely loads variables from your .env.local file
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
-  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
+  apiKey: "AIzaSyApBeUtd8i7VC6wpOSxjD1PPYjQEQBGQ4Y",
+  authDomain: "ansar-english-school.firebaseapp.com",
+  projectId: "ansar-english-school",
+  storageBucket: "ansar-english-school.firebasestorage.app",
+  messagingSenderId: "729617648651",
+  appId: "1:729617648651:web:f5d90b86b9b387d86b0b0e",
+  measurementId: "G-Y7YNPNVFP1"
 };
 
 export const app = initializeApp(firebaseConfig);

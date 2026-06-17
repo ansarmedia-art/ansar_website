@@ -1,10 +1,24 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { collection, query, where, onSnapshot } from 'firebase/firestore';
+import { db } from './firebase-init';
 import Layout from './Layout';
-import { useFirestoreCollection } from './useFirestoreCollection';
 import NewsCard from './NewsCard';
 
 export default function News() {
-  const { data: news, loading } = useFirestoreCollection('news', 'date', 'desc');
+  const [news, setNews] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Strict category filtering + Real-time listeners
+    const q = query(collection(db, 'updates'), where('category', '==', 'News'));
+    
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const docs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setNews(docs.sort((a, b) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0)));
+      setLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
 
   return (
     <Layout>

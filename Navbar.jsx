@@ -6,36 +6,47 @@ export default function Navbar() {
   const [isMoreOpen, setIsMoreOpen] = useState(false);
 
   return (
-    <header className="bg-white/90 backdrop-blur-md sticky top-0 z-50 border-b border-slate-200 shadow-sm">
+    <header className="bg-white/80 backdrop-blur-lg sticky top-0 z-50 border-b border-white/20 shadow-sm transition-all duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
+        <div className="flex items-center justify-between h-24">
+          {/* Premium Logo Layout */}
           <Link to="/" className="flex items-center gap-3">
-            <img src="https://i.ibb.co/7d4mTQVT/image.png" alt="Ansar English School Logo" className="h-12 w-auto object-contain" />
-            <div className="hidden sm:block">
-              <span className="block font-bold text-slate-900 text-lg leading-tight">Ansar English School</span>
-              <span className="block text-slate-500 text-xs font-medium uppercase tracking-wider">Perumpilavu</span>
+            <img 
+              src="https://i.ibb.co/7d4mTQVT/image.png" 
+              alt="Ansar English School Logo" 
+              className="h-14 w-auto object-contain contrast-125 brightness-105" 
+              style={{ imageRendering: '-webkit-optimize-contrast', transform: 'translateZ(0)', backfaceVisibility: 'hidden' }}
+            />
+            <div className="hidden sm:flex flex-col border-l-2 border-emerald-600/20 pl-3 ml-1">
+              <span className="block font-extrabold text-slate-900 text-lg leading-tight tracking-tight">Ansar English School</span>
+              <div className="flex items-center gap-2 mt-0.5">
+                <span className="block text-emerald-700 text-[10px] font-bold uppercase tracking-widest">Perumpilavu</span>
+                <span className="block bg-amber-100 text-amber-800 text-[9px] font-bold px-1.5 py-0.5 rounded-sm uppercase tracking-widest">NABET Accredited</span>
+              </div>
             </div>
           </Link>
           
+          {/* Fluid Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-6">
-            <Link to="/" className="text-slate-600 hover:text-emerald-600 font-semibold transition-colors">Home</Link>
-            <Link to="/about" className="text-slate-600 hover:text-emerald-600 font-semibold transition-colors">About</Link>
-            <Link to="/academics" className="text-slate-600 hover:text-emerald-600 font-semibold transition-colors">Academics</Link>
-            <Link to="/admission" className="text-slate-600 hover:text-emerald-600 font-semibold transition-colors">Admission</Link>
-            <Link to="/contact" className="text-slate-600 hover:text-emerald-600 font-semibold transition-colors">Contact</Link>
+            {['Home', 'About', 'Academics', 'Admission', 'News', 'Events', 'Contact'].map((item) => (
+              <Link key={item} to={item === 'Home' ? '/' : `/${item.toLowerCase()}`} className="relative text-sm font-bold text-slate-700 hover:text-emerald-700 transition-colors py-2 group">
+                {item}
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-emerald-600 transition-all duration-300 ease-out group-hover:w-full rounded-full"></span>
+              </Link>
+            ))}
             
             {/* "More Options" Dropdown relocating the Login mechanism */}
             <div className="relative">
               <button 
                 onClick={() => setIsMoreOpen(!isMoreOpen)}
-                className="flex items-center gap-1 text-slate-600 hover:text-emerald-600 font-semibold transition-colors"
+                className="flex items-center gap-1 text-sm font-bold text-slate-700 hover:text-emerald-700 transition-colors py-2"
               >
-                More Options
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                Explore
+                <svg className={`w-4 h-4 transition-transform duration-300 ${isMoreOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
               </button>
               
               {isMoreOpen && (
-                <div className="absolute right-0 mt-2 w-56 bg-white border border-slate-100 rounded-xl shadow-lg py-2 flex flex-col max-h-96 overflow-y-auto z-50 custom-scrollbar">
+                <div className="absolute right-0 mt-4 w-64 bg-white/95 backdrop-blur-xl border border-white/40 rounded-2xl shadow-2xl py-3 flex flex-col max-h-96 overflow-y-auto z-50 custom-scrollbar ring-1 ring-black/5">
                   <Link to="/ansar-sports" className="px-4 py-2 text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">Ansar Sports</Link>
                   <Link to="/atl" className="px-4 py-2 text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">ATL</Link>
                   <Link to="/ansar-sprouts" className="px-4 py-2 text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">Ansar Sprouts</Link>
@@ -47,7 +58,6 @@ export default function Navbar() {
                   <Link to="/gallery" className="px-4 py-2 text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">Gallery</Link>
                   <Link to="/sop" className="px-4 py-2 text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">SOP</Link>
                   <Link to="/mandatory-public-disclosure" className="px-4 py-2 text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">Mandatory Disclosure</Link>
-                  <Link to="/news" className="px-4 py-2 text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">News & Events</Link>
                   <div className="border-t border-slate-100 my-1"></div>
                   <Link to="/admin" className="px-4 py-2 text-sm font-bold text-emerald-700 hover:bg-emerald-50 transition-colors">Login / Account</Link>
                 </div>
@@ -76,6 +86,8 @@ export default function Navbar() {
           <Link to="/about" className="block text-slate-700 font-semibold hover:text-emerald-600">About</Link>
           <Link to="/academics" className="block text-slate-700 font-semibold hover:text-emerald-600">Academics</Link>
           <Link to="/admission" className="block text-slate-700 font-semibold hover:text-emerald-600">Admission</Link>
+          <Link to="/news" className="block text-slate-700 font-semibold hover:text-emerald-600">News</Link>
+          <Link to="/events" className="block text-slate-700 font-semibold hover:text-emerald-600">Events</Link>
           <Link to="/gallery" className="block text-slate-700 font-semibold hover:text-emerald-600">Gallery</Link>
           <Link to="/life-at-ansar" className="block text-slate-700 font-semibold hover:text-emerald-600">Life at Ansar</Link>
           <Link to="/contact" className="block text-slate-700 font-semibold hover:text-emerald-600">Contact</Link>

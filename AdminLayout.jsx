@@ -1,9 +1,23 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 
-export default function AdminLayout({ children, currentModule, user, onLogout }) {
+export default function AdminLayout({ children, user, onLogout }) {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const path = location.pathname;
+
+  const getModuleTitle = () => {
+    if (path.includes('/pages')) return 'Pages';
+    if (path.includes('/updates')) return 'News & Events';
+    if (path.includes('/achievements')) return 'Achievements';
+    if (path.includes('/gallery')) return 'Gallery';
+    if (path.includes('/notices')) return 'Notices';
+    if (path.includes('/settings')) return 'Settings';
+    return 'Dashboard';
+  };
+
+  const currentModule = getModuleTitle();
 
   return (
     <div className="min-h-screen flex bg-slate-50 font-sans">
@@ -26,9 +40,9 @@ export default function AdminLayout({ children, currentModule, user, onLogout })
         <nav className="p-4 space-y-1">
           <Link to="/admin/dashboard" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'Dashboard' ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>Dashboard</Link>
           <Link to="/admin/pages" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'Pages' ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>Pages</Link>
-          <Link to="/admin/news" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'News' ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>News & Events</Link>
+          <Link to="/admin/updates" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'News & Events' ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>News & Events</Link>
+          <Link to="/admin/achievements" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'Achievements' ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>Achievements</Link>
           <Link to="/admin/gallery" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'Gallery' ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>Gallery</Link>
-          <Link to="/admin/carousel" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'Carousel' ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>Carousel</Link>
           <Link to="/admin/notices" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'Notices' ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>Notices</Link>
           <Link to="/admin/settings" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'Settings' ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>Settings</Link>
         </nav>

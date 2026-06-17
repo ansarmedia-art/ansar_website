@@ -11,6 +11,12 @@ export default function Footer() {
             A CBSE-affiliated, NABET accredited school shaped by the Ansari Charitable Trust commitment to education, healthcare, and social welfare.
           </p>
           <p className="text-sm text-slate-400">Perumpilavu, Thrissur, Kerala</p>
+          
+          {/* Media Contact Badge */}
+          <div className="mt-8 inline-flex items-center gap-3 bg-emerald-900/50 px-5 py-3 rounded-xl border border-emerald-700/50 hover:border-amber-400/50 transition-colors group">
+            <svg className="w-5 h-5 text-amber-400 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+            <a href="mailto:ansarmedia@ansarschool.in" className="text-sm font-bold tracking-wide text-emerald-50 hover:text-amber-400 transition-colors">ansarmedia@ansarschool.in</a>
+          </div>
         </div>
         
         <div>
@@ -43,8 +49,8 @@ export default function Footer() {
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 pt-8 border-t border-slate-800 text-xs text-slate-500 flex flex-col sm:flex-row justify-between items-center">
         <p>© {new Date().getFullYear()} Ansar English School. All rights reserved.</p>
-        <div className="flex gap-4 mt-4 sm:mt-0">
-          <Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
+        <div className="flex flex-col sm:flex-row items-center gap-4 mt-4 sm:mt-0">
+          <p>This website was developed and deployed by <a href="https://d3ztudio-main.web.app" target="_blank" rel="noopener noreferrer" className="text-amber-500 font-bold hover:text-amber-400 hover:underline transition-colors tracking-wide">D3ZTUDIO</a></p>
         </div>
       </div>
     </footer>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { BrowserRouter as Router, Routes, Route, useParams } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useParams, Navigate } from 'react-router-dom';
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { auth } from './firebase-init';
 import { useFirestoreCollection } from './useFirestoreCollection';
@@ -12,7 +12,11 @@ import Academics from './Academics';
 import Admission from './Admission';
 import News from './News';
 import Events from './Events';
+import Contact from './Contact';
 import Gallery from './Gallery';
+import AdminPages from './AdminPages';
+import AdminUpdates from './AdminUpdates';
+import AdminAchievements from './AdminAchievements';
 
 // --- AUTHORIZED ADMIN EMAILS ---
 const ADMIN_EMAILS = [
@@ -21,8 +25,9 @@ const ADMIN_EMAILS = [
   'ansarschooloffice@gmail.com'
 ];
 
-function DynamicPage() {
-  const { slug } = useParams();
+function DynamicPage({ slug: propSlug }) {
+  const params = useParams();
+  const slug = propSlug || params.slug;
   const { data: pages, loading } = useFirestoreCollection('pages');
   
   const page = pages.find(p => p.slug === slug);
@@ -132,11 +137,13 @@ function AdminLogin() {
 
 export default function App() {
   const [user, setUser] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
 
   useEffect(() => {
     // Instantly sync Firebase Auth session state with the React application
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
+      setAuthLoading(false);
     });
     return () => unsubscribe();
   }, []);
@@ -151,6 +158,7 @@ export default function App() {
         <Route path="/admission" element={<Admission />} />
         <Route path="/news" element={<News />} />
         <Route path="/events" element={<Events />} />
+        <Route path="/contact" element={<Contact />} />
         <Route path="/gallery" element={<Gallery />} />
         <Route path="/sports-page" element={<DynamicPage slug="sports-page" />} />
         <Route path="/atl" element={<DynamicPage slug="atl" />} />
@@ -170,24 +178,38 @@ export default function App() {
 
         {/* Admin Dashboard Routes */}
         <Route path="/admin/*" element={
-          user ? (
+          authLoading ? (
+            <div className="min-h-screen flex items-center justify-center bg-slate-900">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
+            </div>
+          ) : user ? (
             ADMIN_EMAILS.includes(user.email) ? (
-              <AdminLayout currentModule="Dashboard" user={user} onLogout={() => signOut(auth)}>
-                <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100 mb-8">
-                  <h2 className="text-2xl font-bold mb-2">Welcome back, Admin</h2>
-                  <p className="text-slate-600">Select a module from the sidebar to manage the school website content.</p>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  <div className="bg-white p-6 rounded-xl border border-slate-100 hover:shadow-md transition-shadow">
-                    <h3 className="font-bold text-lg text-slate-800 mb-1">Pages Management</h3>
-                    <p className="text-sm text-slate-500">Edit dynamic website pages and update SEO metadata.</p>
-                  </div>
-                  <div className="bg-white p-6 rounded-xl border border-slate-100 hover:shadow-md transition-shadow">
-                    <h3 className="font-bold text-lg text-slate-800 mb-1">News & Events</h3>
-                    <p className="text-sm text-slate-500">Post announcements and schedule upcoming school events.</p>
-                  </div>
-                </div>
+              <AdminLayout user={user} onLogout={() => signOut(auth)}>
+                <Routes>
+                  <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />
+                  <Route path="/dashboard" element={
+                    <>
+                      <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100 mb-8">
+                        <h2 className="text-2xl font-bold mb-2">Welcome back, Admin</h2>
+                        <p className="text-slate-600">Select a module from the sidebar to manage the school website content.</p>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div className="bg-white p-6 rounded-xl border border-slate-100 hover:shadow-md transition-shadow">
+                          <h3 className="font-bold text-lg text-slate-800 mb-1">Pages Management</h3>
+                          <p className="text-sm text-slate-500">Edit dynamic website pages and update SEO metadata.</p>
+                        </div>
+                      </div>
+                    </>
+                  } />
+                  {/* Fallbacks to prevent white screens on empty routes */}
+                  <Route path="/pages" element={<AdminPages />} />
+                  <Route path="/updates" element={<AdminUpdates />} />
+                  <Route path="/achievements" element={<AdminAchievements />} />
+                  <Route path="/gallery" element={<div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100"><h2 className="text-xl font-bold">Gallery</h2><p className="text-slate-500">Module under construction.</p></div>} />
+                  <Route path="/notices" element={<div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100"><h2 className="text-xl font-bold">Notices</h2><p className="text-slate-500">Module under construction.</p></div>} />
+                  <Route path="/settings" element={<div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100"><h2 className="text-xl font-bold">Settings</h2><p className="text-slate-500">Module under construction.</p></div>} />
+                  <Route path="*" element={<div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100 border-t-4 border-red-500"><h2 className="text-xl font-bold text-slate-800">Module Not Found</h2><p className="text-slate-500">Select a valid module from the sidebar.</p></div>} />
+                </Routes>
               </AdminLayout>
             ) : (
               <div className="min-h-screen flex items-center justify-center bg-slate-900 px-4">
