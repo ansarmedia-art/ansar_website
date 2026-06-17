@@ -52,21 +52,21 @@ const FALLBACK_PAGES = {
     title: 'Welcome to Ansar English School Perumpilavu',
     category: 'About us',
     subtitle: 'A CBSE-affiliated, NABET accredited school shaped by the Ansari Charitable Trust commitment to education, healthcare, and social welfare.',
-    heroImageUrl: 'https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=1400&q=80',
+    heroImageUrl: 'https://ibb.co/5gkMgmgB',
     bodyHtml: '<h2>Our Vision</h2><p>Nurture students to thrive as creative and value-driven citizens in a diverse and rapidly changing world.</p><h2>Our Mission</h2><ul><li>Provide an inclusive learning environment that ensures sustained academic growth.</li><li>Empower students with skills, values, and character.</li><li>Conduct programmes that build 21st century skills.</li></ul>'
   },
   academics: {
     title: 'Academics',
     category: 'Learning',
     subtitle: 'Academic excellence supported by digital classrooms, enrichment programmes, foundational literacy, and future-ready skills.',
-    heroImageUrl: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1400&q=80',
+    heroImageUrl: 'https://ibb.co/5gkMgmgB',
     bodyHtml: '<p>Use the admin panel to add curriculum details, departments, exam information, annual reports, and academic resources.</p>'
   },
   admission: {
     title: 'Admission',
     category: 'Admissions',
     subtitle: 'Publish procedures, fee structure, prospectus links, TC queries, and admission FAQs directly from the admin panel.',
-    heroImageUrl: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1400&q=80',
+    heroImageUrl: 'https://ibb.co/5gkMgmgB',
     bodyHtml: '<p>This page is ready for updated admission content from the admin panel.</p>'
   }
 };
@@ -277,7 +277,7 @@ async function loadHome() {
   const updates = [...news.map(item => ({ ...item, kind: 'News' })), ...events.map(item => ({ ...item, kind: 'Event' }))].slice(0, 6);
   document.querySelector('[data-latest-grid]').innerHTML = updates.length ? updates.map(item => `
     <article class="content-card">
-      <img src="${text(item.image || item.imageUrl || 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=900&q=80')}" alt="">
+      <img src="${text(item.image || item.imageUrl || 'https://ibb.co/5gkMgmgB')}" alt="">
       <div><span>${text(item.kind)}</span><h3>${text(item.title || 'School update')}</h3><p>${text(item.excerpt || item.description || item.content || '')}</p></div>
     </article>`).join('') : '<p>Latest updates will appear here after they are published from the admin panel.</p>';
 

@@ -51,7 +51,7 @@ const PAGE_SEEDS = [
     title: 'Welcome to Ansar English School Perumpilavu',
     subtitle: 'Founded in 1982 as the flagship project of Ansari Charitable Trust, the school serves 5000+ learners with value-driven CBSE education.',
     category: 'About',
-    heroImageUrl: 'https://ansarschool.in/wp-content/uploads/2025/07/hero-school.jpg',
+    heroImageUrl: 'https://ibb.co/5gkMgmgB',
     bodyHtml: '<h2>Our Vision</h2><p>Nurture students to thrive as creative and value-driven citizens in a diverse and rapidly changing world.</p><h2>Our Mission</h2><ul><li>Provide an inclusive learning environment for sustained academic growth.</li><li>Empower students with skills, values, and character.</li><li>Conduct programmes that build 21st century skills.</li></ul>',
     published: true,
     order: 1
@@ -61,7 +61,7 @@ const PAGE_SEEDS = [
     title: 'Academics',
     subtitle: 'A student-centric CBSE learning pathway supported by digital classrooms, enrichment programmes, labs, and regular skill-building activities.',
     category: 'Academics',
-    heroImageUrl: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1400&q=80',
+    heroImageUrl: 'https://ibb.co/5gkMgmgB',
     bodyHtml: '<p>Ansar English School combines academic rigor with strong values, foundational literacy, digital proficiency, and opportunities in STEAM, literature, sports, and leadership.</p>',
     published: true,
     order: 2
@@ -71,7 +71,7 @@ const PAGE_SEEDS = [
     title: 'Admission',
     subtitle: 'Admissions information, procedures, fee details, prospectus updates, and TC queries can be maintained from this admin panel.',
     category: 'Admission',
-    heroImageUrl: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1400&q=80',
+    heroImageUrl: 'https://ibb.co/5gkMgmgB',
     bodyHtml: '<p>Use this page to publish admission procedures, eligibility, important dates, downloadable prospectus links, and frequently asked questions.</p>',
     published: true,
     order: 3
@@ -81,11 +81,48 @@ const PAGE_SEEDS = [
     title: 'Life at Ansar',
     subtitle: 'A living-learning community with co-curricular clubs, student publications, sports, leadership, and service programmes.',
     category: 'Campus Life',
-    heroImageUrl: 'https://images.unsplash.com/photo-1523580846011-d3a5bc25702b?auto=format&fit=crop&w=1400&q=80',
+    heroImageUrl: 'https://ibb.co/5gkMgmgB',
     bodyHtml: '<p>Students discover interests beyond the classroom through clubs, competitions, publications, sports, assemblies, and community service.</p>',
     published: true,
     order: 4
   }
+];
+
+const SPORTS_FIELDS = [
+  ['title', 'Title', 'text', true],
+  ['content', 'Content', 'textarea'],
+  ['imageUrl', 'Image URL', 'url'],
+  ['published', 'Published', 'checkbox']
+];
+
+const ANSAR_TIMES_FIELDS = [
+  ['title', 'Edition Title', 'text', true],
+  ['fileUrl', 'PDF File URL', 'url', true],
+  ['coverImageUrl', 'Cover Image URL', 'url'],
+  ['date', 'Publication Date', 'date'],
+  ['published', 'Published', 'checkbox']
+];
+
+const ACHIEVEMENTS_FIELDS = [
+  ['title', 'Achievement Title', 'text', true],
+  ['description', 'Description', 'textarea'],
+  ['imageUrl', 'Image URL', 'url'],
+  ['date', 'Date of Achievement', 'date'],
+  ['studentName', 'Student(s) Name', 'text'],
+  ['published', 'Published', 'checkbox']
+];
+
+const DYNAMIC_PAGE_FIELDS = [
+  ['title', 'Title', 'text', true],
+  ['slug', 'Slug', 'text', true],
+  ['subtitle', 'Subtitle', 'textarea'],
+  ['category', 'Category', 'text'],
+  ['heroImageUrl', 'Hero Image URL', 'url'],
+  ['virtualTourUrl', 'Virtual Tour URL', 'url'],
+  ['virtualTourText', 'Virtual Tour Button Text', 'text'],
+  ['bodyHtml', 'Page Body HTML', 'textarea'],
+  ['order', 'Display Order', 'number'],
+  ['published', 'Published', 'checkbox']
 ];
 
 const COLLECTIONS = {
@@ -95,13 +132,7 @@ const COLLECTIONS = {
     add: 'addPageBtn',
     fields: [
       ['title', 'Title', 'text', true],
-      ['slug', 'Slug', 'text', true],
-      ['subtitle', 'Subtitle', 'textarea'],
-      ['category', 'Category', 'text'],
-      ['heroImageUrl', 'Hero Image URL', 'url'],
-      ['bodyHtml', 'Page Body HTML', 'textarea'],
-      ['order', 'Display Order', 'number'],
-      ['published', 'Published', 'checkbox']
+      ...DYNAMIC_PAGE_FIELDS.slice(1)
     ]
   },
   news: {
@@ -173,6 +204,35 @@ const COLLECTIONS = {
       ['buttonUrl', 'Button URL', 'url'],
       ['duration', 'Duration Seconds', 'number'],
       ['active', 'Active', 'checkbox']
+    ]
+  },
+  sports: {
+    title: 'Sports',
+    list: 'sportsList',
+    add: 'addSportsBtn',
+    fields: SPORTS_FIELDS
+  },
+  ansarTimes: {
+    title: 'Ansar Times',
+    list: 'ansarTimesList',
+    add: 'addAnsarTimesBtn',
+    fields: ANSAR_TIMES_FIELDS
+  },
+  achievements: {
+    title: 'Achievements',
+    list: 'achievementsList',
+    add: 'addAchievementsBtn',
+    fields: ACHIEVEMENTS_FIELDS
+  },
+  publicDisclosure: {
+    title: 'Public Disclosure',
+    list: 'publicDisclosureList',
+    add: 'addPublicDisclosureBtn',
+    fields: [
+      ['title', 'Document Title', 'text', true],
+      ['fileUrl', 'File URL', 'url', true],
+      ['date', 'Date', 'date'],
+      ['published', 'Published', 'checkbox']
     ]
   }
 };

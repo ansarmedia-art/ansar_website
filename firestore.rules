@@ -38,8 +38,9 @@ service cloud.firestore {
     // OR match the hardcoded initialization emails.
     function isAdmin() {
       return isAuthenticated() && (
-        request.auth.token.email in ['d3ztudio@gmail.com', 'ansarmedia@ansarschool.in', 'ansarschooloffice@gmail.com'] ||
-        exists(/databases/$(database)/documents/admins/$(request.auth.token.email))
+        request.auth.token.admin == true ||
+        (request.auth.token.email != null && request.auth.token.email in ['d3ztudio@gmail.com', 'ansarmedia@ansarschool.in', 'ansarschooloffice@gmail.com']) ||
+        (request.auth.token.email != null && exists(/databases/$(database)/documents/admins/$(request.auth.token.email)))
       );
     }
 
@@ -212,14 +213,42 @@ service cloud.firestore {
              isOptionalTimestamp('updatedAt');
     }
 
+    function isValidSport() {
+      return hasOnlyAllowedFields(['title', 'content', 'imageUrl', 'published', 'createdAt', 'updatedAt']) &&
+             isValidStringLength('title', 1, 200) &&
+             isValidOptionalString('content', 0, 50000) &&
+             isValidUrl('imageUrl') &&
+             isOptionalBool('published') &&
+             isOptionalTimestamp('createdAt') &&
+             isOptionalTimestamp('updatedAt');
+    }
+
+    function isValidAnsarTimes() {
+        return hasOnlyAllowedFields(['title', 'fileUrl', 'coverImageUrl', 'date', 'published', 'createdAt', 'updatedAt']) &&
+               isValidStringLength('title', 1, 200) &&
+               isValidUrl('fileUrl') &&
+               isValidUrl('coverImageUrl') &&
+               isValidDateString('date') &&
+               isOptionalBool('published') &&
+               isOptionalTimestamp('createdAt') &&
+               isOptionalTimestamp('updatedAt');
+    }
+
+    function isValidAchievement() {
+        return hasOnlyAllowedFields(['title', 'description', 'imageUrl', 'date', 'studentName', 'published', 'createdAt', 'updatedAt']) &&
+               isValidStringLength('title', 1, 200) &&
+               isValidOptionalString('description', 0, 10000) &&
+               isValidUrl('imageUrl') &&
+               isValidDateString('date') &&
+               isValidOptionalString('studentName', 0, 500) &&
+               isOptionalBool('published') &&
+               isOptionalTimestamp('createdAt') &&
+               isOptionalTimestamp('updatedAt');
+    }
+
     // ===============================================================
     // Access Rules
     // ===============================================================
-
-    // Deny access by default
-    match /{document=**} {
-      allow read, write: if false;
-    }
 
     // Security rules for the Administrators list
     // Strictly restricted to prevent privilege escalation
@@ -229,7 +258,7 @@ service cloud.firestore {
     }
 
     // Public Pages
-    match /pages/{pageId} {
+    match /pages/{pageSlug} {
       allow read: if true;
       allow create: if isAdmin() && isValidPage();
       allow update: if isAdmin() && isValidPage() && isImmutable('createdAt');
@@ -290,6 +319,35 @@ service cloud.firestore {
       allow create: if isAdmin() && isValidSettings();
       allow update: if isAdmin() && isValidSettings() && isImmutable('createdAt');
       allow delete: if false; // Settings documents should not be deleted, only updated
+    }
+
+    // Sports Page Content
+    match /sports/{sportId} {
+      allow read: if true;
+      allow create: if isAdmin() && isValidSport();
+      allow update: if isAdmin() && isValidSport() && isImmutable('createdAt');
+      allow delete: if isAdmin();
+    }
+
+    // Ansar Times (PDFs)
+    match /ansarTimes/{timeId} {
+      allow read: if true;
+      allow create: if isAdmin() && isValidAnsarTimes();
+      allow update: if isAdmin() && isValidAnsarTimes() && isImmutable('createdAt');
+      allow delete: if isAdmin();
+    }
+
+    // Achievements
+    match /achievements/{achievementId} {
+      allow read: if true;
+      allow create: if isAdmin() && isValidAchievement();
+      allow update: if isAdmin() && isValidAchievement() && isImmutable('createdAt');
+      allow delete: if isAdmin();
+    }
+
+    match /publicDisclosure/{docId} {
+        allow read: if true;
+        allow write: if isAdmin();
     }
   }
 }
