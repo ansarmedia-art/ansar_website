@@ -17,6 +17,10 @@ import Gallery from './Gallery';
 import AdminPages from './AdminPages';
 import AdminUpdates from './AdminUpdates';
 import AdminAchievements from './AdminAchievements';
+import AdminNotices from './AdminNotices';
+import ArticleView from './ArticleView';
+import AdminSettings from './AdminSettings';
+import { SettingsProvider } from './SettingsContext';
 
 // --- AUTHORIZED ADMIN EMAILS ---
 const ADMIN_EMAILS = [
@@ -149,6 +153,7 @@ export default function App() {
   }, []);
 
   return (
+    <SettingsProvider>
     <Router>
       <Routes>
         {/* Public Website Routes */}
@@ -173,8 +178,7 @@ export default function App() {
         <Route path="/:slug" element={<DynamicPage />} />
         
         {/* Placeholder detail routes for News/Events cards */}
-        <Route path="/news/:id" element={<Layout><div className="py-24 text-center"><h2 className="text-2xl font-bold text-slate-900">Article View Coming Soon</h2></div></Layout>} />
-        <Route path="/events/:id" element={<Layout><div className="py-24 text-center"><h2 className="text-2xl font-bold text-slate-900">Event View Coming Soon</h2></div></Layout>} />
+        <Route path="/news/:id" element={<ArticleView />} />
 
         {/* Admin Dashboard Routes */}
         <Route path="/admin/*" element={
@@ -206,8 +210,8 @@ export default function App() {
                   <Route path="/updates" element={<AdminUpdates />} />
                   <Route path="/achievements" element={<AdminAchievements />} />
                   <Route path="/gallery" element={<div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100"><h2 className="text-xl font-bold">Gallery</h2><p className="text-slate-500">Module under construction.</p></div>} />
-                  <Route path="/notices" element={<div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100"><h2 className="text-xl font-bold">Notices</h2><p className="text-slate-500">Module under construction.</p></div>} />
-                  <Route path="/settings" element={<div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100"><h2 className="text-xl font-bold">Settings</h2><p className="text-slate-500">Module under construction.</p></div>} />
+                  <Route path="/notices" element={<AdminNotices />} />
+                  <Route path="/settings" element={<AdminSettings />} />
                   <Route path="*" element={<div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100 border-t-4 border-red-500"><h2 className="text-xl font-bold text-slate-800">Module Not Found</h2><p className="text-slate-500">Select a valid module from the sidebar.</p></div>} />
                 </Routes>
               </AdminLayout>
@@ -230,5 +234,6 @@ export default function App() {
         } />
       </Routes>
     </Router>
+    </SettingsProvider>
   );
 }

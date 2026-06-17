@@ -1,8 +1,10 @@
 import React from 'react';
+import { useSettings } from './SettingsContext';
 
 export default function Hero({ imageUrl, title, subtitle }) {
-  // Fallback to the new ImgBB Ansar logo if no specific hero image is provided
-  const graphicUrl = imageUrl || 'https://i.ibb.co/7d4mTQVT/image.png';
+  const settings = useSettings();
+  const graphicUrl = imageUrl || settings?.logoUrl || 'https://i.ibb.co/7d4mTQVT/image.png';
+  const displayTitle = title || settings?.heroTitle || "Welcome to Ansar English School";
 
   return (
     <div className="relative w-full rounded-2xl md:rounded-[2.5rem] overflow-hidden shadow-2xl bg-emerald-950 border border-emerald-900/50 mt-4 lg:mt-6">
@@ -19,7 +21,7 @@ export default function Hero({ imageUrl, title, subtitle }) {
             Ansar English School
           </span>
           <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold text-white mb-8 leading-[1.1] tracking-tight">
-            {title || "Welcome to Ansar English School"}
+            {displayTitle}
           </h1>
           <p className="text-lg sm:text-xl text-emerald-50/80 max-w-2xl font-light leading-relaxed mb-10">
             {subtitle || "Nurturing creative and value-driven citizens in a rapidly changing world."}

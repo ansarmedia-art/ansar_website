@@ -1,18 +1,20 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useSettings } from './SettingsContext';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isMoreOpen, setIsMoreOpen] = useState(false);
+  const settings = useSettings();
 
   return (
-    <header className="bg-white/80 backdrop-blur-lg sticky top-0 z-50 border-b border-white/20 shadow-sm transition-all duration-300">
+    <header className="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-white/20 shadow-sm transition-all duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-24">
           {/* Premium Logo Layout */}
           <Link to="/" className="flex items-center gap-3">
             <img 
-              src="https://i.ibb.co/7d4mTQVT/image.png" 
+              src={settings?.logoUrl || "https://i.ibb.co/7d4mTQVT/image.png"} 
               alt="Ansar English School Logo" 
               className="h-14 w-auto object-contain contrast-125 brightness-105" 
               style={{ imageRendering: '-webkit-optimize-contrast', transform: 'translateZ(0)', backfaceVisibility: 'hidden' }}

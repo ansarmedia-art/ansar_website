@@ -7,6 +7,7 @@ const cleanImageUrl = (url) => {
   if (!url || typeof url !== 'string') return '';
   
   const trimmedUrl = url.trim();
+  if (!trimmedUrl) return '';
   
   try {
     const urlObj = new URL(trimmedUrl);
@@ -14,8 +15,9 @@ const cleanImageUrl = (url) => {
     // Intercept Google Images redirect URLs
     if (urlObj.hostname.includes('google.com') && urlObj.pathname.includes('/imgres')) {
       const imgUrlParam = urlObj.searchParams.get('imgurl');
-      // URLSearchParams automatically handles decodeURIComponent behind the scenes
-      if (imgUrlParam) return imgUrlParam; 
+      if (imgUrlParam) {
+        return decodeURIComponent(imgUrlParam); 
+      }
     }
     return trimmedUrl;
   } catch (e) {
@@ -27,7 +29,7 @@ export default function AdminUpdates() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   
-  const initialFormState = { category: 'News', title: '', description: '', date: '', imageUrl: '', imageUrls: [''], published: true };
+  const initialFormState = { category: 'News', title: '', description: '', date: '', coverImageUrl: '', eventImages: [''], published: true };
   const [formData, setFormData] = useState(initialFormState);
   const [editingId, setEditingId] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -46,16 +48,16 @@ export default function AdminUpdates() {
     setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
   };
 
-  const handleImageUrlChange = (index, value) => {
-    const newImageUrls = [...formData.imageUrls];
-    newImageUrls[index] = value;
-    setFormData(prev => ({ ...prev, imageUrls: newImageUrls }));
+  const handleEventImageChange = (index, value) => {
+    const newEventImages = [...formData.eventImages];
+    newEventImages[index] = value;
+    setFormData(prev => ({ ...prev, eventImages: newEventImages }));
   };
 
-  const addImageUrlField = () => setFormData(prev => ({ ...prev, imageUrls: [...prev.imageUrls, ''] }));
-  const removeImageUrlField = (index) => {
-    if (formData.imageUrls.length <= 1) return;
-    setFormData(prev => ({ ...prev, imageUrls: prev.imageUrls.filter((_, i) => i !== index) }));
+  const addEventImageField = () => setFormData(prev => ({ ...prev, eventImages: [...prev.eventImages, ''] }));
+  const removeEventImageField = (index) => {
+    if (formData.eventImages.length <= 1) return;
+    setFormData(prev => ({ ...prev, eventImages: prev.eventImages.filter((_, i) => i !== index) }));
   };
 
   const handleEdit = (item) => {
@@ -65,8 +67,8 @@ export default function AdminUpdates() {
       title: item.title || '', 
       description: item.description || '', 
       date: item.date || '',
-      imageUrl: item.imageUrl || '',
-      imageUrls: Array.isArray(item.imageUrls) && item.imageUrls.length > 0 ? item.imageUrls : [''],
+      coverImageUrl: item.coverImageUrl || item.imageUrl || '',
+      eventImages: Array.isArray(item.eventImages) && item.eventImages.length > 0 ? item.eventImages : (Array.isArray(item.imageUrls) && item.imageUrls.length > 0 ? item.imageUrls : ['']),
       published: item.published !== false 
     });
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -79,18 +81,23 @@ export default function AdminUpdates() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isSubmitting) return; // Prevent double-clicks triggering infinite loops
     setIsSubmitting(true);
+
     try {
-      const cleanedImageUrl = cleanImageUrl(formData.imageUrl);
-      // Map, clean, and filter out any empty string entries before saving
-      const cleanedImageUrls = (Array.isArray(formData.imageUrls) ? formData.imageUrls : [])
+      const cleanedCoverImageUrl = cleanImageUrl(formData.coverImageUrl);
+      const cleanedEventImages = (Array.isArray(formData.eventImages) ? formData.eventImages : [])
         .map(url => cleanImageUrl(url))
-        .filter(url => url.trim() !== '');
+        .filter(url => url !== '');
 
       const payload = {
-        ...formData,
-        imageUrl: cleanedImageUrl,
-        imageUrls: cleanedImageUrls,
+        category: formData.category || 'News',
+        title: formData.title || '',
+        description: formData.description || '',
+        date: formData.date || '',
+        coverImageUrl: cleanedCoverImageUrl,
+        eventImages: cleanedEventImages,
+        published: !!formData.published,
         updatedAt: serverTimestamp()
       };
 
@@ -116,7 +123,8 @@ export default function AdminUpdates() {
 
   return (
     <div className="max-w-6xl mx-auto">
-      <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 mb-8">
+      {/* Premium Admin Form styling */}
+      <div className="bg-white p-8 rounded-2xl shadow-xl border border-emerald-100 mb-8">
         <h2 className="text-xl font-bold mb-6 text-slate-800">{editingId ? 'Edit Publication' : 'Add News / Event'}</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -144,22 +152,52 @@ export default function AdminUpdates() {
               <textarea name="description" value={formData.description} onChange={handleChange} className="w-full p-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none h-24" />
             </div>
             
-            <div className="md:col-span-2 space-y-3 p-4 bg-slate-50 border border-slate-100 rounded-lg">
-              {formData.category === 'News' ? (
-                <div>
-                  <label className="block text-sm font-bold text-slate-700 mb-1">News Cover Image URL</label>
-                  <input name="imageUrl" type="url" value={formData.imageUrl} onChange={handleChange} placeholder="https://example.com/cover.jpg" className="w-full p-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" />
-                </div>
-              ) : (
+            <div className="md:col-span-2 space-y-3 p-5 bg-emerald-50/50 border border-emerald-100 rounded-xl">
+              <div>
+                <label className="block text-sm font-bold text-slate-700 mb-1">Cover Image URL (Primary Thumbnail)</label>
+                <input name="coverImageUrl" type="url" value={formData.coverImageUrl} onChange={handleChange} placeholder="https://example.com/cover.jpg" className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" />
+              <div className="mt-3 w-full h-40 bg-slate-100 border border-slate-200 rounded-lg overflow-hidden relative flex items-center justify-center">
+                {!formData.coverImageUrl ? (
+                  <div className="flex flex-col items-center text-slate-400">
+                    <svg className="w-8 h-8 mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    <span className="text-xs font-bold uppercase tracking-wider">No Image Provided</span>
+                  </div>
+                ) : (
+                  <>
+                    <img src={formData.coverImageUrl} alt="Preview" className="absolute inset-0 w-full h-full object-cover z-10" onError={(e) => { e.target.style.display = 'none'; e.target.nextElementSibling.style.display = 'flex'; }} />
+                    <div className="absolute inset-0 hidden flex-col items-center justify-center text-slate-500 bg-slate-100 z-0">
+                      <svg className="w-8 h-8 mb-2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                      <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Invalid Link Format</span>
+                    </div>
+                  </>
+                )}
+              </div>
+              </div>
+
+              {formData.category === 'Events' && (
                 <div>
                   <label className="block text-sm font-bold text-slate-700 mb-2">Event Image URLs (Carousel)</label>
-                  {Array.isArray(formData.imageUrls) && formData.imageUrls.map((url, index) => (
-                    <div key={index} className="flex items-center gap-2 mb-2">
-                      <input type="url" value={url} onChange={(e) => handleImageUrlChange(index, e.target.value)} placeholder="https://example.com/image.jpg" className="w-full p-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" />
-                      <button type="button" onClick={() => removeImageUrlField(index)} disabled={formData.imageUrls.length <= 1} className="p-2 text-red-500 hover:bg-red-50 rounded-full disabled:opacity-50">✕</button>
+                  {Array.isArray(formData.eventImages) && formData.eventImages.map((url, index) => (
+                    <div key={index} className="flex flex-col gap-2 mb-4 bg-white p-3 rounded-lg border border-slate-100 shadow-sm">
+                      <div className="flex items-center gap-2">
+                        <input type="url" value={url} onChange={(e) => handleEventImageChange(index, e.target.value)} placeholder="https://example.com/image.jpg" className="w-full p-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" />
+                        <button type="button" onClick={() => removeEventImageField(index)} disabled={formData.eventImages.length <= 1} className="p-2 text-red-500 hover:bg-red-50 rounded-full disabled:opacity-50">✕</button>
+                      </div>
+                    <div className="w-full h-32 bg-slate-50 border border-slate-200 rounded-md overflow-hidden relative flex items-center justify-center">
+                      {!url ? (
+                        <span className="text-xs font-bold uppercase text-slate-400">Blank Slot</span>
+                      ) : (
+                        <>
+                          <img src={url} alt="Preview" className="absolute inset-0 w-full h-full object-cover z-10" onError={(e) => { e.target.style.display = 'none'; e.target.nextElementSibling.style.display = 'flex'; }} />
+                          <div className="absolute inset-0 hidden flex-col items-center justify-center text-slate-500 bg-slate-100 z-0">
+                            <span className="text-xs font-bold uppercase text-slate-500">Invalid Link</span>
+                          </div>
+                        </>
+                      )}
+                    </div>
                     </div>
                   ))}
-                  <button type="button" onClick={addImageUrlField} className="text-sm font-bold text-emerald-600 hover:bg-emerald-50 py-1 px-3 rounded-lg transition-colors">+ Add Another Event Image</button>
+                  <button type="button" onClick={addEventImageField} className="text-sm font-bold text-emerald-600 hover:bg-emerald-50 py-2 px-4 rounded-lg transition-colors border border-emerald-100">+ Add Another Image</button>
                 </div>
               )}
             </div>
@@ -183,23 +221,23 @@ export default function AdminUpdates() {
       <div className="space-y-4">
         <h3 className="font-bold text-lg text-slate-800 mb-4">Current Publications</h3>
         {loading ? <p className="text-slate-500">Loading...</p> : items.map(item => (
-          <div key={item.id} className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm flex items-center gap-4 hover:border-emerald-200 transition-colors">
+          <div key={item.id} className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm flex items-center gap-4 hover:border-emerald-300 hover:shadow-md transition-all duration-300">
             
             {/* Defensive Thumbnail Rendering */}
             <div className="flex-shrink-0 w-16 h-16 bg-slate-100 rounded-lg overflow-hidden border border-slate-200 flex items-center justify-center">
-              {item.category === 'News' && item.imageUrl ? (
+              {(item.coverImageUrl || item.imageUrl) ? (
                 <img 
-                  src={item.imageUrl} 
+                  src={item.coverImageUrl || item.imageUrl} 
                   alt="Thumbnail" 
                   className="w-full h-full object-cover" 
-                  onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/100x100/e2e8f0/94a3b8?text=Error'; }} 
+                  onError={(e) => { e.target.onerror = null; e.target.src = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23f1f5f9'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='12' font-weight='bold' fill='%2394a3b8'%3EError%3C/text%3E%3C/svg%3E"; }} 
                 />
-              ) : item.category === 'Events' && Array.isArray(item.imageUrls) && item.imageUrls.length > 0 ? (
+              ) : item.category === 'Events' && Array.isArray(item.eventImages) && item.eventImages.length > 0 ? (
                 <img 
-                  src={item.imageUrls[0]} 
+                  src={item.eventImages[0]} 
                   alt="Thumbnail" 
                   className="w-full h-full object-cover" 
-                  onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/100x100/e2e8f0/94a3b8?text=Error'; }} 
+                  onError={(e) => { e.target.onerror = null; e.target.src = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23f1f5f9'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='12' font-weight='bold' fill='%2394a3b8'%3EError%3C/text%3E%3C/svg%3E"; }} 
                 />
               ) : (
                 <svg className="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>

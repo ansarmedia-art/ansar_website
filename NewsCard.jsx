@@ -1,8 +1,9 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-export default function NewsCard({ id, title, excerpt, imageUrl, date, type = 'news' }) {
+export default function NewsCard({ id, title, excerpt, coverImageUrl, imageUrl, date, type = 'news' }) {
   const navigate = useNavigate();
+  const targetImage = coverImageUrl || imageUrl;
 
   return (
     <div 
@@ -11,18 +12,28 @@ export default function NewsCard({ id, title, excerpt, imageUrl, date, type = 'n
     >
       {/* Image with fallback skeleton */}
       <div className="relative h-56 w-full bg-slate-100 overflow-hidden flex-shrink-0">
-        {imageUrl ? (
-          <img 
-            src={imageUrl} 
-            alt={title} 
-            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-            loading="lazy"
-            onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/600x400/e2e8f0/94a3b8?text=Image+Unavailable'; }}
-          />
+        {targetImage ? (
+          <>
+            <img 
+              src={targetImage} 
+              alt={title} 
+              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+              loading="lazy"
+              onError={(e) => { 
+                // If the URL fails to load as a direct asset, trigger a graceful fallback block
+                e.currentTarget.style.display = 'none';
+                e.currentTarget.nextSibling.style.display = 'flex';
+              }}
+            />
+            <div className="hidden flex-col items-center justify-center h-full w-full bg-slate-100 text-slate-400 absolute inset-0">
+              <svg className="w-12 h-12 mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Image Unavailable</span>
+            </div>
+          </>
         ) : (
-          <div className="flex items-center justify-center h-full w-full text-slate-300">
-            {/* Clean SVG skeleton placeholder */}
-            <svg className="w-16 h-16 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+          <div className="flex flex-col items-center justify-center h-full w-full bg-slate-100 text-slate-400 absolute inset-0">
+            <svg className="w-12 h-12 mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Image Unavailable</span>
           </div>
         )}
       </div>

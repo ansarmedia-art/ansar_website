@@ -75,7 +75,7 @@ service cloud.firestore {
              request.resource.data[field] == "" ||
              (request.resource.data[field] is string &&
               request.resource.data[field].size() < 1000 &&
-             (request.resource.data[field].matches("^https://.*") || request.resource.data[field].matches("^http://.*")));
+             (request.resource.data[field].matches("^https?://.*") || request.resource.data[field].matches("^/.*")));
     }
 
     // Validate URL List (for Event image carousels)
@@ -88,8 +88,7 @@ service cloud.firestore {
     function isValidDateString(field) {
       return !(field in request.resource.data) ||
              request.resource.data[field] == "" ||
-             (request.resource.data[field] is string &&
-              request.resource.data[field].matches("^\\\\d{4}-\\\\d{2}-\\\\d{2}$"));
+             (request.resource.data[field] is string && request.resource.data[field].size() <= 50);
     }
 
     function isOptionalBool(field) {
@@ -102,8 +101,8 @@ service cloud.firestore {
 
     // Protect immutable fields like createdAt
     function isImmutable(field) {
-      return !(field in request.resource.data) || 
-             (field in resource.data && request.resource.data[field] == resource.data[field]);
+      return !(field in resource.data) || 
+             (field in request.resource.data && request.resource.data[field] == resource.data[field]);
     }
 
     // ===============================================================
@@ -161,12 +160,14 @@ service cloud.firestore {
     }
 
     function isValidUpdate() {
-      return hasOnlyAllowedFields(['category', 'title', 'description', 'imageUrl', 'imageUrls', 'date', 'published', 'createdAt', 'updatedAt']) &&
+      return hasOnlyAllowedFields(['category', 'title', 'description', 'imageUrl', 'imageUrls', 'coverImageUrl', 'eventImages', 'date', 'published', 'createdAt', 'updatedAt']) &&
              request.resource.data.category in ['News', 'Events'] &&
              isValidStringLength('title', 1, 200) &&
              isValidOptionalString('description', 0, 50000) &&
              isValidUrl('imageUrl') &&
              isOptionalUrlList('imageUrls', 20) &&
+             isValidUrl('coverImageUrl') &&
+             isOptionalUrlList('eventImages', 20) &&
              isValidDateString('date') &&
              isOptionalBool('published') &&
              isOptionalTimestamp('createdAt') &&
@@ -210,14 +211,18 @@ service cloud.firestore {
     }
 
     function isValidSettings() {
-      return hasOnlyAllowedFields(['schoolName', 'email', 'phone', 'address', 'logoUrl', 'siteDescription', 'siteKeywords', 'createdAt', 'updatedAt']) &&
+      return hasOnlyAllowedFields(['schoolName', 'email', 'phone', 'address', 'logoUrl', 'siteDescription', 'siteKeywords', 'heroTitle', 'facebookUrl', 'instagramUrl', 'youtubeUrl', 'createdAt', 'updatedAt']) &&
              isValidOptionalString('schoolName', 0, 200) &&
              isValidOptionalString('email', 0, 200) &&
              isValidOptionalString('phone', 0, 50) &&
              isValidOptionalString('address', 0, 500) &&
              isValidOptionalString('siteDescription', 0, 1000) &&
              isValidOptionalString('siteKeywords', 0, 1000) &&
+             isValidOptionalString('heroTitle', 0, 500) &&
              isValidUrl('logoUrl') &&
+             isValidUrl('facebookUrl') &&
+             isValidUrl('instagramUrl') &&
+             isValidUrl('youtubeUrl') &&
              isOptionalTimestamp('createdAt') &&
              isOptionalTimestamp('updatedAt');
     }
@@ -263,6 +268,15 @@ service cloud.firestore {
                isValidOptionalString('studentName', 0, 500) &&
                isOptionalNumber('order') &&
                isOptionalBool('published') &&
+               isOptionalTimestamp('createdAt') &&
+               isOptionalTimestamp('updatedAt');
+    }
+
+    function isValidPublicDisclosure() {
+        return hasOnlyAllowedFields(['title', 'documentUrl', 'fileUrl', 'createdAt', 'updatedAt']) &&
+               isValidOptionalString('title', 0, 300) &&
+               isValidOptionalString('documentUrl', 0, 1000) &&
+               isValidOptionalString('fileUrl', 0, 1000) &&
                isOptionalTimestamp('createdAt') &&
                isOptionalTimestamp('updatedAt');
     }
@@ -376,7 +390,9 @@ service cloud.firestore {
 
     match /publicDisclosure/{docId} {
         allow read: if true;
-        allow write: if isAdmin();
+        allow create: if isAdmin() && isValidPublicDisclosure();
+        allow update: if isAdmin() && isValidPublicDisclosure() && isImmutable('createdAt');
+        allow delete: if isAdmin();
     }
   }
 }
