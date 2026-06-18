@@ -1,11 +1,17 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSettings } from './SettingsContext';
+import { useFirestoreCollection } from './useFirestoreCollection';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isMoreOpen, setIsMoreOpen] = useState(false);
   const settings = useSettings();
+  
+  // Fetch all custom pages to dynamically build the navigation menu
+  const { data: pages } = useFirestoreCollection('pages', 'order', 'asc');
+  const mainNavSlugs = ['about', 'academics', 'admission'];
+  const explorePages = pages.filter(p => p.published !== false && !mainNavSlugs.includes(p.slug));
 
   return (
     <header className="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-white/20 shadow-sm transition-all duration-300">
@@ -49,17 +55,10 @@ export default function Navbar() {
               
               {isMoreOpen && (
                 <div className="absolute right-0 mt-4 w-64 bg-white/95 backdrop-blur-xl border border-white/40 rounded-2xl shadow-2xl py-3 flex flex-col max-h-96 overflow-y-auto z-50 custom-scrollbar ring-1 ring-black/5">
-                  <Link to="/ansar-sports" className="px-4 py-2 text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">Ansar Sports</Link>
-                  <Link to="/atl" className="px-4 py-2 text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">ATL</Link>
-                  <Link to="/ansar-sprouts" className="px-4 py-2 text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">Ansar Sprouts</Link>
-                  <Link to="/extension-services" className="px-4 py-2 text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">Extension Services</Link>
-                  <Link to="/life-at-ansar" className="px-4 py-2 text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">Life at Ansar</Link>
-                  <Link to="/ansar-times" className="px-4 py-2 text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">Ansar Times</Link>
-                  <Link to="/alumni" className="px-4 py-2 text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">Alumni</Link>
-                  <Link to="/achievements" className="px-4 py-2 text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">Achievements</Link>
+                  {explorePages.map(page => (
+                    <Link key={page.id} to={`/${page.slug}`} onClick={() => setIsMoreOpen(false)} className="px-4 py-2 text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">{page.title}</Link>
+                  ))}
                   <Link to="/gallery" className="px-4 py-2 text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">Gallery</Link>
-                  <Link to="/sop" className="px-4 py-2 text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">SOP</Link>
-                  <Link to="/mandatory-public-disclosure" className="px-4 py-2 text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">Mandatory Disclosure</Link>
                   <div className="border-t border-slate-100 my-1"></div>
                   <Link to="/admin" className="px-4 py-2 text-sm font-bold text-emerald-700 hover:bg-emerald-50 transition-colors">Login / Account</Link>
                 </div>
@@ -103,7 +102,9 @@ export default function Navbar() {
           <Link to="/news" onClick={() => setIsOpen(false)} className="block text-lg text-slate-700 font-bold hover:text-emerald-600">News</Link>
           <Link to="/events" onClick={() => setIsOpen(false)} className="block text-lg text-slate-700 font-bold hover:text-emerald-600">Events</Link>
           <Link to="/gallery" onClick={() => setIsOpen(false)} className="block text-lg text-slate-700 font-bold hover:text-emerald-600">Gallery</Link>
-          <Link to="/life-at-ansar" onClick={() => setIsOpen(false)} className="block text-lg text-slate-700 font-bold hover:text-emerald-600">Life at Ansar</Link>
+          {explorePages.map(page => (
+            <Link key={page.id} to={`/${page.slug}`} onClick={() => setIsOpen(false)} className="block text-lg text-slate-700 font-bold hover:text-emerald-600">{page.title}</Link>
+          ))}
           <Link to="/contact" onClick={() => setIsOpen(false)} className="block text-lg text-slate-700 font-bold hover:text-emerald-600">Contact Us</Link>
           <div className="border-t border-slate-100 pt-4 mt-2">
             <Link to="/admin" onClick={() => setIsOpen(false)} className="block text-lg text-emerald-700 font-extrabold hover:text-emerald-800">Login / Account</Link>

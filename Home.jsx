@@ -25,10 +25,10 @@ const FALLBACK_FEATURES = [
 ];
 
 const FALLBACK_LEADERS = [
-  { name: 'Shyny Hamza', role: 'Principal', detail: 'MSc, MA, B.Ed, CIDTT, SET' },
-  { name: 'Sajidha Razack', role: 'Junior Principal', detail: 'Senior Secondary Section' },
-  { name: 'Ravya K R', role: 'Junior Principal', detail: 'Secondary Section' },
+  { name: 'Dr. Najeeb Mohamad', role: 'Director', detail: 'MSc, MA, B.Ed, CIDTT, SET' },
+  { name: 'Sajidha Razack', role: 'Principal in Charge', detail: 'Senior Secondary Section' },
   { name: 'Fareeda E Mohammed', role: 'Junior Principal', detail: 'Middle Section' },
+  { name: 'Ravya K R', role: 'Junior Principal', detail: 'Secondary Section' },
   { name: 'Saleena Kader', role: 'Junior Principal', detail: 'Primary Section' },
   { name: 'Babitha KN', role: 'Junior Principal', detail: 'Sprouts' }
 ];
@@ -127,17 +127,17 @@ function VisionMissionLoop({ vision, mission }) {
     return () => clearInterval(timer);
   }, []);
   return (
-    <div className="relative w-full h-48 overflow-hidden">
+    <div className="relative w-full h-72 sm:h-64 overflow-hidden">
       <AnimatePresence mode="wait">
         {showVision ? (
           <motion.div key="vision" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="absolute inset-0 flex flex-col justify-center">
             <h3 className="text-3xl font-extrabold mb-4">Our Vision</h3>
-            <p className="text-emerald-50/80 text-xl leading-relaxed font-light border-l-4 border-amber-400 pl-6 line-clamp-4">{vision}</p>
+            <p className="text-emerald-50/80 text-xl leading-relaxed font-light border-l-4 border-amber-400 pl-6 whitespace-pre-wrap">{vision}</p>
           </motion.div>
         ) : (
           <motion.div key="mission" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="absolute inset-0 flex flex-col justify-center">
             <h3 className="text-3xl font-extrabold mb-4">Our Mission</h3>
-            <p className="text-emerald-50/80 text-lg leading-relaxed font-light border-l-4 border-amber-400 pl-6 line-clamp-4">{mission}</p>
+            <p className="text-emerald-50/80 text-lg leading-relaxed font-light border-l-4 border-amber-400 pl-6 whitespace-pre-wrap">{mission}</p>
           </motion.div>
         )}
       </AnimatePresence>

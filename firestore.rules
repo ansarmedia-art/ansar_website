@@ -110,13 +110,15 @@ service cloud.firestore {
     // ===============================================================
     
     function isValidPage() {
-      return hasOnlyAllowedFields(['title', 'slug', 'subtitle', 'category', 'heroImageUrl', 'bodyHtml', 'order', 'published', 'href', 'metaDescription', 'keywords', 'createdAt', 'updatedAt']) &&
+      return hasOnlyAllowedFields(['title', 'slug', 'subtitle', 'category', 'heroImageUrl', 'bodyHtml', 'virtualTourUrl', 'virtualTourText', 'order', 'published', 'href', 'metaDescription', 'keywords', 'createdAt', 'updatedAt']) &&
              isValidStringLength('title', 1, 200) &&
              isValidStringLength('slug', 1, 200) &&
              isValidOptionalString('subtitle', 0, 1000) &&
              isValidOptionalString('category', 0, 100) &&
              isValidOptionalString('bodyHtml', 0, 100000) && // Limit HTML body to ~100KB
              isValidUrl('heroImageUrl') &&
+             isValidOptionalString('virtualTourUrl', 0, 1000) &&
+             isValidOptionalString('virtualTourText', 0, 200) &&
              isValidOptionalString('href', 0, 500) &&
              isValidOptionalString('metaDescription', 0, 1000) &&
              isValidOptionalString('keywords', 0, 500) &&
@@ -220,7 +222,7 @@ service cloud.firestore {
                'schoolName', 'email', 'phone', 'address', 'logoUrl', 
                'siteDescription', 'siteKeywords', 'heroTitle', 
                'facebookUrl', 'instagramUrl', 'youtubeUrl', 'twitterUrl', 'whatsappChannelUrl', 
-               'premisesImages', 'kgImages', 'visionText', 'missionText', 
+               'premisesImages', 'kgImages', 'visionText', 'missionText', 'feeStructurePdfUrl',
                'sustainabilityTitle', 'sustainabilityDesc', 'sustainabilityLogoUrl', 
                'createdAt', 'updatedAt'
              ]) &&
@@ -231,6 +233,7 @@ service cloud.firestore {
              isValidOptionalString('sustainabilityTitle', 0, 500) &&
              isValidOptionalString('sustainabilityDesc', 0, 5000) &&
              isValidOptionalString('sustainabilityLogoUrl', 0, 1000) &&
+             isValidOptionalString('feeStructurePdfUrl', 0, 1000) &&
              isValidOptionalString('schoolName', 0, 200) &&
              isValidOptionalString('email', 0, 200) &&
              isValidOptionalString('phone', 0, 50) &&
@@ -312,6 +315,13 @@ service cloud.firestore {
                isValidOptionalString('fileUrl', 0, 1000) &&
                isOptionalTimestamp('createdAt') &&
                isOptionalTimestamp('updatedAt');
+    }
+
+    function isValidUserTracking() {
+        return hasOnlyAllowedFields(['email', 'createdAt', 'lastLogin']) &&
+               isValidOptionalString('email', 0, 200) &&
+               isValidOptionalString('createdAt', 0, 100) &&
+               isOptionalTimestamp('lastLogin');
     }
 
     // ===============================================================
@@ -433,6 +443,13 @@ service cloud.firestore {
         allow read: if true;
         allow create: if isAdmin() && isValidPublicDisclosure();
         allow update: if isAdmin() && isValidPublicDisclosure() && isImmutable('createdAt');
+        allow delete: if isAdmin();
+    }
+
+    // User Metrics & Activity Tracking
+    match /users/{userId} {
+        allow read: if isAdmin();
+        allow create, update: if isAuthenticated() && request.auth.uid == userId && isValidUserTracking();
         allow delete: if isAdmin();
     }
   }

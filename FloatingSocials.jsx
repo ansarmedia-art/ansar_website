@@ -1,14 +1,33 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSettings } from './SettingsContext';
 
 export default function FloatingSocials() {
   const settings = useSettings();
+  const [isScrolledPast, setIsScrolledPast] = useState(false);
+  const [showBackToTop, setShowBackToTop] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      // Show back to top after 400px
+      setShowBackToTop(scrollY > 400);
+      // Hide floating socials on mobile after scrolling past hero/vision blocks (approx 700px)
+      setIsScrolledPast(scrollY > 700);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
-    <div className="fixed right-0 top-1/2 -translate-y-1/2 z-40">
-      {/* Prevent inner rendering until settings are fully loaded to eliminate icon layout glitching & FOUC */}
-      {settings?._isLoaded && (
-        <div className="floating-panel-container flex flex-col items-center justify-center gap-3 p-3 bg-white/90 backdrop-blur-md shadow-[0_10px_40px_-15px_rgba(0,0,0,0.3)] rounded-l-2xl border border-r-0 border-emerald-100">
+    <>
+      <div className={`fixed right-0 top-1/2 -translate-y-1/2 z-40 transition-all duration-500 ease-in-out ${isScrolledPast ? 'max-md:opacity-0 max-md:translate-x-full max-md:pointer-events-none' : 'max-md:opacity-100 max-md:translate-x-0'}`}>
+        {/* Prevent inner rendering until settings are fully loaded to eliminate icon layout glitching & FOUC */}
+        {settings?._isLoaded && (
+          <div className="floating-panel-container flex flex-col items-center justify-center gap-3 p-3 bg-white/90 backdrop-blur-md shadow-[0_10px_40px_-15px_rgba(0,0,0,0.3)] rounded-l-2xl border border-r-0 border-emerald-100">
       {settings?.whatsappChannelUrl && (
         <a href={settings.whatsappChannelUrl} target="_blank" rel="noopener noreferrer" className="group relative flex items-center justify-center p-2.5 text-slate-400 hover:text-white bg-white hover:bg-[#25D366] rounded-xl transition-all duration-300 shadow-sm hover:shadow-lg">
           <span className="absolute inset-0 rounded-xl bg-[#25D366] animate-[ping_5s_cubic-bezier(0.4,0,0.2,1)_infinite] opacity-20"></span>
@@ -31,8 +50,18 @@ export default function FloatingSocials() {
         <span className="absolute inset-0 rounded-xl bg-[#000000] animate-[ping_5s_cubic-bezier(0.4,0,0.2,1)_infinite] opacity-20"></span>
         <svg className="w-5 h-5 relative z-10 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
       </a>
-        </div>
-      )}
-    </div>
+          </div>
+        )}
+      </div>
+
+      {/* Back to Top Button */}
+      <button 
+        onClick={scrollToTop}
+        className={`back-to-top-btn ${showBackToTop ? 'visible' : ''}`}
+        aria-label="Back to top"
+      >
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 15l7-7 7 7"></path></svg>
+      </button>
+    </>
   );
 }

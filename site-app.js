@@ -39,10 +39,10 @@ const FALLBACK_FEATURES = [
 ];
 
 const FALLBACK_LEADERS = [
-  ['Shyny Hamza', 'Principal', 'MSc, MA, B.Ed, CIDTT, SET'],
+  ['Dr. Najeeb Mohamad', 'Director', 'MSc, MA, B.Ed, CIDTT, SET'],
   ['Sajidha Razack', 'Junior Principal', 'Senior Secondary Section'],
-  ['Ravya K R', 'Junior Principal', 'Secondary Section'],
   ['Fareeda E Mohammed', 'Junior Principal', 'Middle Section'],
+  ['Ravya K R', 'Junior Principal', 'Secondary Section'],
   ['Saleena Kader', 'Junior Principal', 'Primary Section'],
   ['Babitha KN', 'Junior Principal', 'Sprouts']
 ];
@@ -53,7 +53,7 @@ const FALLBACK_PAGES = {
     category: 'About us',
     subtitle: 'A CBSE-affiliated, NABET accredited school shaped by the Ansari Charitable Trust commitment to education, healthcare, and social welfare.',
     heroImageUrl: 'https://ibb.co/5gkMgmgB',
-    bodyHtml: '<h2>Our Vision</h2><p>Nurture students to thrive as creative and value-driven citizens in a diverse and rapidly changing world.</p><h2>Our Mission</h2><ul><li>Provide an inclusive learning environment that ensures sustained academic growth.</li><li>Empower students with skills, values, and character.</li><li>Conduct programmes that build 21st century skills.</li></ul>'
+    bodyHtml: '<h2>Our Vision</h2><p>To empower students with academic rigor, skill and ethical leadership to serve society.</p><h2>Our Mission</h2><ol><li>Provide an inclusive learning environment that ensures sustained academic growth.</li><li>To empower students with skills, values and character, enabling them to make meaningful contributions to the society.</li><li>Conduct various programmes that will empower the students with 21st century skills.</li></ol>'
   },
   academics: {
     title: 'Academics',

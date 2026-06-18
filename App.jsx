@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, useParams, Navigate } from 'react-router-dom';
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
-import { auth } from './firebase-init';
+import { doc, setDoc, serverTimestamp, collection, query, orderBy, onSnapshot } from 'firebase/firestore';
+import { auth, db } from './firebase-init';
 import { useFirestoreCollection } from './useFirestoreCollection';
 
 import Layout from './Layout';
@@ -19,6 +20,7 @@ import AdminUpdates from './AdminUpdates';
 import AdminAchievements from './AdminAchievements';
 import AdminLeadership from './AdminLeadership';
 import AdminNotices from './AdminNotices';
+import AdminAcademics from './AdminAcademics';
 import ArticleView from './ArticleView';
 import AdminSettings from './AdminSettings';
 import { SettingsProvider } from './SettingsContext';
@@ -140,14 +142,118 @@ function AdminLogin() {
   );
 }
 
+// --- ADMIN DASHBOARD (ANALYTICS & METRICS) ---
+function AdminDashboard() {
+  const [users, setUsers] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  useEffect(() => {
+    const q = query(collection(db, 'users'), orderBy('lastLogin', 'desc'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      setUsers(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const filteredUsers = users.filter(u => (u.email || '').toLowerCase().includes(searchTerm.toLowerCase()));
+  
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  const activeUsersCount = users.filter(u => u.lastLogin?.toMillis() > sevenDaysAgo.getTime()).length;
+
+  const exportCSV = () => {
+    const headers = ["User Email", "Account Creation Date", "Last Sign-in Timestamp"];
+    const rows = filteredUsers.map(u => [
+      u.email || 'N/A',
+      u.createdAt || 'N/A',
+      u.lastLogin ? new Date(u.lastLogin.toMillis()).toLocaleString() : 'N/A'
+    ]);
+    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map(e => `"${e.join('","')}"`)].join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "ansar_users_export.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-center">
+          <span className="text-slate-500 font-bold uppercase tracking-wider text-xs mb-2">Total Registered Users</span>
+          <strong className="text-4xl font-extrabold text-emerald-950">{users.length}</strong>
+        </div>
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-center">
+          <span className="text-slate-500 font-bold uppercase tracking-wider text-xs mb-2">Active Users (7-Day Metric)</span>
+          <strong className="text-4xl font-extrabold text-emerald-950">{activeUsersCount}</strong>
+        </div>
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-center">
+          <span className="text-slate-500 font-bold uppercase tracking-wider text-xs mb-2">Platform Status</span>
+          <strong className="text-xl font-extrabold text-emerald-600 flex items-center gap-2">
+            <span className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span> Online & Syncing
+          </strong>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+        <div className="p-6 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <h3 className="font-bold text-xl text-slate-800">Last Login Activity Feed</h3>
+          <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+            <input type="text" placeholder="Search by email..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none w-full sm:w-64" />
+            <button onClick={exportCSV} className="bg-slate-900 hover:bg-slate-800 text-white font-bold px-5 py-2.5 rounded-lg transition-colors whitespace-nowrap flex items-center justify-center gap-2">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+              Export CSV
+            </button>
+          </div>
+        </div>
+        <div className="overflow-x-auto max-h-96">
+          <table className="w-full text-left border-collapse">
+            <thead className="sticky top-0 bg-slate-50 z-10">
+              <tr className="text-slate-500 text-xs uppercase tracking-wider">
+                <th className="p-4 font-bold border-b border-slate-100">User Email</th>
+                <th className="p-4 font-bold border-b border-slate-100">Account Creation Date</th>
+                <th className="p-4 font-bold border-b border-slate-100">Last Sign-in Timestamp</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {filteredUsers.length ? filteredUsers.map(u => (
+                <tr key={u.id} className="hover:bg-slate-50/50 transition-colors">
+                  <td className="p-4 font-semibold text-slate-800">{u.email}</td>
+                  <td className="p-4 text-slate-600 text-sm">{u.createdAt || 'N/A'}</td>
+                  <td className="p-4 text-slate-600 text-sm">{u.lastLogin ? new Date(u.lastLogin.toMillis()).toLocaleString() : 'N/A'}</td>
+                </tr>
+              )) : (
+                <tr><td colSpan="3" className="p-8 text-center text-slate-500">No users found matching criteria.</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
   const [user, setUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
 
   useEffect(() => {
     // Instantly sync Firebase Auth session state with the React application
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
+      if (currentUser) {
+        try {
+          await setDoc(doc(db, 'users', currentUser.uid), {
+            email: currentUser.email,
+            createdAt: currentUser.metadata.creationTime,
+            lastLogin: serverTimestamp()
+          }, { merge: true });
+        } catch (error) {
+          console.error("Error updating user tracking:", error);
+        }
+      }
       setAuthLoading(false);
     });
     return () => unsubscribe();
@@ -193,25 +299,13 @@ export default function App() {
               <AdminLayout user={user} onLogout={() => signOut(auth)}>
                 <Routes>
                   <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />
-                  <Route path="/dashboard" element={
-                    <>
-                      <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100 mb-8">
-                        <h2 className="text-2xl font-bold mb-2">Welcome back, Admin</h2>
-                        <p className="text-slate-600">Select a module from the sidebar to manage the school website content.</p>
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <div className="bg-white p-6 rounded-xl border border-slate-100 hover:shadow-md transition-shadow">
-                          <h3 className="font-bold text-lg text-slate-800 mb-1">Pages Management</h3>
-                          <p className="text-sm text-slate-500">Edit dynamic website pages and update SEO metadata.</p>
-                        </div>
-                      </div>
-                    </>
-                  } />
+                  <Route path="/dashboard" element={<AdminDashboard />} />
                   {/* Fallbacks to prevent white screens on empty routes */}
                   <Route path="/pages" element={<AdminPages />} />
                   <Route path="/updates" element={<AdminUpdates />} />
                   <Route path="/achievements" element={<AdminAchievements />} />
                   <Route path="/leadership" element={<AdminLeadership />} />
+                  <Route path="/academics" element={<AdminAcademics />} />
                   <Route path="/gallery" element={<div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100"><h2 className="text-xl font-bold">Gallery</h2><p className="text-slate-500">Module under construction.</p></div>} />
                   <Route path="/notices" element={<AdminNotices />} />
                   <Route path="/settings" element={<AdminSettings />} />

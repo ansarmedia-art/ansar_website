@@ -43,6 +43,44 @@ export default function NoticePopup() {
   };
 
   return (
+    <>
+      <style>{`
+        .notice-popup-overlay {
+          position: fixed;
+          top: 0; left: 0; width: 100vw; height: 100vh;
+          background: rgba(0, 0, 0, 0.88);
+          display: flex; align-items: center; justify-content: center;
+          z-index: 9999;
+          backdrop-filter: blur(8px);
+        }
+        .notice-container-fluid {
+          position: relative;
+          width: 90vw;
+          max-width: 1000px; /* Designed to lock into widescreen landscape banner limits perfectly */
+          height: auto;
+          display: flex; flex-direction: column;
+          box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+          border-radius: 12px;
+        }
+        .notice-popup-img {
+          width: 100%;
+          height: auto;
+          object-fit: contain; /* Keeps widescreen posters perfectly uncropped and clear */
+          border-radius: 12px;
+          image-rendering: -webkit-optimize-contrast; 
+          image-rendering: crisp-edges;               
+          transform: translateZ(0);                    
+        }
+        .notice-overlay-content {
+          position: absolute;
+          bottom: 0; left: 0; width: 100%;
+          background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0) 100%);
+          padding: 24px;
+          border-radius: 0 0 12px 12px;
+          display: flex; justify-content: space-between; align-items: center;
+          box-sizing: border-box;
+        }
+      `}</style>
     <AnimatePresence>
       {isVisible && (
         <motion.div
@@ -63,7 +101,7 @@ export default function NoticePopup() {
             {/* Floating Close Button */}
             <button 
               onClick={() => setIsVisible(false)} 
-              className="absolute -top-12 right-0 sm:-right-4 z-50 text-white/70 hover:text-white p-2 transition-colors"
+              className="absolute -top-12 right-0 z-50 text-white/70 hover:text-white p-2 transition-colors"
               aria-label="Close Notice"
             >
               <svg className="w-8 h-8 sm:w-10 sm:h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -72,18 +110,18 @@ export default function NoticePopup() {
             </button>
             
             {notice.imageUrl ? (
-              <div className="relative w-full h-full flex flex-col rounded-xl overflow-hidden shadow-2xl bg-black/80 ring-1 ring-white/10">
+              <div className="relative w-full h-full flex flex-col rounded-xl overflow-hidden bg-black/80 ring-1 ring-white/10">
               <img 
                 src={notice.imageUrl} 
                 alt={notice.title || "Notice Banner"} 
                   className="notice-popup-img"
               />
-                <div className="notice-overlay-content flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-5">
-                  <h3 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-white leading-tight drop-shadow-lg text-left flex-grow">
+                <div className="notice-overlay-content">
+                  <h3 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-white leading-tight drop-shadow-lg text-left pr-4">
                     {notice.title}
                   </h3>
                   {notice.buttonUrl && (
-                    <button onClick={handleClick} className="flex-shrink-0 bg-amber-400 hover:bg-amber-300 text-slate-900 font-bold py-3 px-6 sm:py-3.5 sm:px-8 rounded-full transition-transform hover:scale-105 shadow-[0_0_20px_rgba(251,191,36,0.4)] whitespace-nowrap w-full sm:w-auto text-sm sm:text-base">
+                    <button onClick={handleClick} className="flex-shrink-0 bg-amber-400 hover:bg-amber-300 text-slate-900 font-bold py-3 px-6 rounded-full transition-transform hover:scale-105 shadow-[0_0_20px_rgba(251,191,36,0.4)] whitespace-nowrap">
                       {notice.buttonText || "Learn More"}
                     </button>
                   )}
@@ -91,7 +129,7 @@ export default function NoticePopup() {
                 <motion.div initial={{ width: '100%' }} animate={{ width: '0%' }} transition={{ duration: 10, ease: 'linear' }} className="absolute bottom-0 left-0 h-1.5 bg-amber-400 z-10" />
               </div>
             ) : (
-              <div className="p-8 sm:p-12 relative bg-white rounded-2xl shadow-2xl max-w-lg w-full text-center">
+              <div className="p-8 sm:p-12 relative bg-white rounded-2xl shadow-2xl max-w-lg mx-auto w-full text-center">
                 <p className="text-sm font-black tracking-widest text-amber-500 uppercase mb-3">New Update</p>
                 <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-4 leading-tight">{notice.title}</h3>
                 {notice.buttonUrl && (
@@ -107,5 +145,6 @@ export default function NoticePopup() {
         </motion.div>
       )}
     </AnimatePresence>
+    </>
   );
 }
