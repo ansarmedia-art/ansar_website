@@ -8,16 +8,20 @@ export default function NewsCard({ id, title, excerpt, coverImageUrl, imageUrl, 
   return (
     <div 
       onClick={() => navigate(`/${type}/${id}`)}
-      className="cursor-pointer bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-slate-100 group flex flex-col h-full transform hover:-translate-y-1"
+      className="relative cursor-pointer bg-white rounded-xl shadow-sm hover:shadow-2xl hover:shadow-emerald-500/10 transition-all duration-500 overflow-hidden border border-slate-100 group flex flex-col h-full transform hover:-translate-y-2"
     >
+      {/* Liquid Flow Animation Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-tr from-emerald-50 to-teal-50/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-10" />
+      
       {/* Image with fallback skeleton */}
-      <div className="relative h-56 w-full bg-slate-100 overflow-hidden flex-shrink-0">
+      <div className="relative w-full bg-[#f7f9fa] overflow-hidden flex-shrink-0 border-b border-slate-100" style={{ minHeight: '224px' }}>
         {targetImage ? (
           <>
             <img 
               src={targetImage} 
               alt={title} 
-              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+              style={{ width: '100%', height: 'auto', maxHeight: '750px', objectFit: 'contain', backgroundColor: '#f7f9fa', display: 'block', margin: '0 auto' }}
+              className="transition-transform duration-300 group-hover:scale-105"
               loading="lazy"
               onError={(e) => { 
                 // If the URL fails to load as a direct asset, trigger a graceful fallback block
@@ -43,6 +47,9 @@ export default function NewsCard({ id, title, excerpt, coverImageUrl, imageUrl, 
         <span className="text-xs font-bold text-emerald-600 tracking-wider uppercase mb-2">{date}</span>
         <h3 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-emerald-700 transition-colors line-clamp-2">{title}</h3>
         <p className="text-slate-600 text-sm flex-grow line-clamp-3 leading-relaxed">{excerpt}</p>
+        <button className="mt-5 w-full bg-emerald-50 hover:bg-emerald-600 text-emerald-700 hover:text-white font-bold py-2.5 rounded-lg transition-colors duration-300">
+          Read More
+        </button>
       </div>
     </div>
   );

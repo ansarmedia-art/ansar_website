@@ -61,18 +61,18 @@ export default function AdminAchievements() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto">
-      <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 mb-8">
+    <div className="max-w-5xl mx-auto">
+      <div className="bg-white p-8 rounded-2xl shadow-xl border border-emerald-100 mb-8">
         <h2 className="text-xl font-bold mb-6 text-slate-800">{editingId ? 'Edit Achievement' : 'Add New Achievement'}</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="md:col-span-2">
               <label className="block text-sm font-bold text-slate-700 mb-1">Achievement Title *</label>
-              <input name="title" value={formData.title} onChange={handleChange} required className="w-full p-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" />
+              <input name="title" value={formData.title} onChange={handleChange} required className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" />
             </div>
             <div>
               <label className="block text-sm font-bold text-slate-700 mb-1">Display Order</label>
-              <input name="order" type="number" value={formData.order} onChange={handleChange} className="w-full p-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" />
+              <input name="order" type="number" value={formData.order} onChange={handleChange} className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" />
             </div>
           </div>
           <div className="flex items-center justify-between mt-6 pt-4 border-t border-slate-100">
@@ -81,8 +81,8 @@ export default function AdminAchievements() {
               Published (Visible on website)
             </label>
             <div className="flex gap-3">
-              {editingId && <button type="button" onClick={resetForm} className="px-4 py-2 text-slate-600 font-bold hover:bg-slate-100 rounded-lg transition-colors">Cancel</button>}
-              <button type="submit" disabled={isSubmitting} className="px-6 py-2 bg-emerald-600 text-white font-bold rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50">
+              {editingId && <button type="button" onClick={resetForm} className="px-5 py-2.5 text-slate-600 font-bold hover:bg-slate-100 rounded-lg transition-colors">Cancel</button>}
+              <button type="submit" disabled={isSubmitting} className="px-6 py-2.5 bg-emerald-600 text-white font-bold rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50">
                 {isSubmitting ? 'Saving...' : (editingId ? 'Update Achievement' : 'Save Achievement')}
               </button>
             </div>

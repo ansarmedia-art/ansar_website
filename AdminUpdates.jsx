@@ -29,7 +29,7 @@ export default function AdminUpdates() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   
-  const initialFormState = { category: 'News', title: '', description: '', date: '', coverImageUrl: '', eventImages: [''], published: true };
+  const initialFormState = { category: 'News', title: '', description: '', date: '', coverImageUrl: '', eventImages: [''], instagramUrl: '', facebookUrl: '', youtubeUrl: '', published: true };
   const [formData, setFormData] = useState(initialFormState);
   const [editingId, setEditingId] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -69,6 +69,9 @@ export default function AdminUpdates() {
       date: item.date || '',
       coverImageUrl: item.coverImageUrl || item.imageUrl || '',
       eventImages: Array.isArray(item.eventImages) && item.eventImages.length > 0 ? item.eventImages : (Array.isArray(item.imageUrls) && item.imageUrls.length > 0 ? item.imageUrls : ['']),
+      instagramUrl: item.instagramUrl || '',
+      facebookUrl: item.facebookUrl || '',
+      youtubeUrl: item.youtubeUrl || '',
       published: item.published !== false 
     });
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -97,6 +100,9 @@ export default function AdminUpdates() {
         date: formData.date || '',
         coverImageUrl: cleanedCoverImageUrl,
         eventImages: cleanedEventImages,
+        instagramUrl: formData.instagramUrl || '',
+        facebookUrl: formData.facebookUrl || '',
+        youtubeUrl: formData.youtubeUrl || '',
         published: !!formData.published,
         updatedAt: serverTimestamp()
       };
@@ -122,7 +128,7 @@ export default function AdminUpdates() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto">
+    <div className="max-w-5xl mx-auto">
       {/* Premium Admin Form styling */}
       <div className="bg-white p-8 rounded-2xl shadow-xl border border-emerald-100 mb-8">
         <h2 className="text-xl font-bold mb-6 text-slate-800">{editingId ? 'Edit Publication' : 'Add News / Event'}</h2>
@@ -131,7 +137,7 @@ export default function AdminUpdates() {
             
             <div>
               <label className="block text-sm font-bold text-slate-700 mb-1">Category (News or Event) *</label>
-              <select name="category" value={formData.category} onChange={handleChange} required className="w-full p-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none">
+              <select name="category" value={formData.category} onChange={handleChange} required className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none">
                 <option value="News">News</option>
                 <option value="Events">Events</option>
               </select>
@@ -139,17 +145,17 @@ export default function AdminUpdates() {
 
             <div>
               <label className="block text-sm font-bold text-slate-700 mb-1">Title *</label>
-              <input name="title" value={formData.title} onChange={handleChange} required className="w-full p-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" />
+              <input name="title" value={formData.title} onChange={handleChange} required className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" />
             </div>
             
             <div>
               <label className="block text-sm font-bold text-slate-700 mb-1">Date (e.g., 24 JUN 2024)</label>
-              <input name="date" value={formData.date} onChange={handleChange} className="w-full p-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" />
+              <input name="date" value={formData.date} onChange={handleChange} className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" />
             </div>
             
             <div className="md:col-span-2">
               <label className="block text-sm font-bold text-slate-700 mb-1">Description / Content</label>
-              <textarea name="description" value={formData.description} onChange={handleChange} className="w-full p-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none h-24" />
+              <textarea name="description" value={formData.description} onChange={handleChange} className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none h-24" />
             </div>
             
             <div className="md:col-span-2 space-y-3 p-5 bg-emerald-50/50 border border-emerald-100 rounded-xl">
@@ -180,7 +186,7 @@ export default function AdminUpdates() {
                   {Array.isArray(formData.eventImages) && formData.eventImages.map((url, index) => (
                     <div key={index} className="flex flex-col gap-2 mb-4 bg-white p-3 rounded-lg border border-slate-100 shadow-sm">
                       <div className="flex items-center gap-2">
-                        <input type="url" value={url} onChange={(e) => handleEventImageChange(index, e.target.value)} placeholder="https://example.com/image.jpg" className="w-full p-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" />
+                        <input type="url" value={url} onChange={(e) => handleEventImageChange(index, e.target.value)} placeholder="https://example.com/image.jpg" className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" />
                         <button type="button" onClick={() => removeEventImageField(index)} disabled={formData.eventImages.length <= 1} className="p-2 text-red-500 hover:bg-red-50 rounded-full disabled:opacity-50">✕</button>
                       </div>
                     <div className="w-full h-32 bg-slate-50 border border-slate-200 rounded-md overflow-hidden relative flex items-center justify-center">
@@ -202,6 +208,24 @@ export default function AdminUpdates() {
               )}
             </div>
 
+            <div className="md:col-span-2 space-y-4 p-5 bg-slate-50 border border-slate-100 rounded-xl">
+              <h3 className="font-extrabold text-slate-900 mb-2">Optional Social Links</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-bold text-slate-700 mb-1">Instagram Post Link</label>
+                  <input name="instagramUrl" type="url" value={formData.instagramUrl} onChange={handleChange} placeholder="https://instagram.com/..." className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-slate-700 mb-1">Facebook Post Link</label>
+                  <input name="facebookUrl" type="url" value={formData.facebookUrl} onChange={handleChange} placeholder="https://facebook.com/..." className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-slate-700 mb-1">YouTube Video Link</label>
+                  <input name="youtubeUrl" type="url" value={formData.youtubeUrl} onChange={handleChange} placeholder="https://youtube.com/..." className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" />
+                </div>
+              </div>
+            </div>
+
           </div>
           <div className="flex items-center justify-between mt-6 pt-4 border-t border-slate-100">
             <label className="flex items-center gap-2 cursor-pointer font-medium text-slate-700">
@@ -209,8 +233,8 @@ export default function AdminUpdates() {
               Published
             </label>
             <div className="flex gap-3">
-              {editingId && <button type="button" onClick={resetForm} className="px-4 py-2 text-slate-600 font-bold hover:bg-slate-100 rounded-lg transition-colors">Cancel</button>}
-              <button type="submit" disabled={isSubmitting} className="px-6 py-2 bg-emerald-600 text-white font-bold rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50">
+              {editingId && <button type="button" onClick={resetForm} className="px-5 py-2.5 text-slate-600 font-bold hover:bg-slate-100 rounded-lg transition-colors">Cancel</button>}
+              <button type="submit" disabled={isSubmitting} className="px-6 py-2.5 bg-emerald-600 text-white font-bold rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50">
                 {isSubmitting ? 'Saving...' : (editingId ? 'Update Post' : 'Publish')}
               </button>
             </div>

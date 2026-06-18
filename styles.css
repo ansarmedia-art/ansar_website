@@ -24,6 +24,16 @@ body {
 }
 
 img { max-width: 100%; display: block; }
+
+/* Website-Wide Image & Poster Clarity Optimization */
+img, .notice-popup-img, .carousel-image, .news-media-wrapper img {
+  image-rendering: -webkit-optimize-contrast; /* Safari crispness override */
+  image-rendering: crisp-edges;               /* Standard high-contrast sharpness */
+  image-rendering: pixelated;                 /* Prevent smoothing blur on high-res scales */
+  transform: translateZ(0);                   /* Force hardware acceleration for pixel clarity */
+  backface-visibility: hidden;
+}
+
 a { color: inherit; text-decoration: none; }
 button, input, textarea { font: inherit; }
 
@@ -616,4 +626,91 @@ button, input, textarea { font: inherit; }
     scroll-behavior: auto !important;
     transition-duration: .01ms !important;
   }
+}
+
+/* ========================================================
+   UI/UX MODERN OVERRIDES & MICRO-INTERACTIONS
+   ======================================================== */
+
+/* Smooth Hover & Subtle Scale Bounce */
+a, button, .feature-card, .content-card, .leader-card, .group, .transition-all {
+  transition: var(--transition-bounce) !important;
+}
+
+.feature-card:hover, .content-card:hover, .leader-card:hover {
+  transform: translateY(-6px) scale(1.015);
+  box-shadow: 0 24px 48px -8px rgba(11, 60, 93, 0.15) !important;
+  border-color: transparent !important;
+}
+
+/* Form Input Glowing Focus States */
+input, textarea, select {
+  border-radius: 12px !important;
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none !important;
+  border-color: var(--gold) !important;
+  box-shadow: 0 0 0 4px rgba(255, 184, 26, 0.25) !important;
+}
+
+/* Elevated Primary Buttons */
+.primary-button, .btn-primary, button[type="submit"] {
+  border-radius: 12px !important;
+}
+
+.primary-button:hover, .btn-primary:hover, button[type="submit"]:hover:not(:disabled) {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 20px -4px rgba(255, 184, 26, 0.4) !important;
+}
+
+/* ========================================================
+   FLOATING PANEL ANIMATIONS
+   ======================================================== */
+@keyframes slideInPanel {
+  0% { transform: translateX(120%); opacity: 0; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+.floating-panel-container {
+  opacity: 0; /* Prevent FOUC before animation starts */
+  animation: slideInPanel 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ========================================================
+   NOTICE POPUP FULL-SCREEN OVERLAY
+   ======================================================== */
+.notice-popup-overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  background: rgba(0, 0, 0, 0.88);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 9999;
+  backdrop-filter: blur(8px);
+}
+.notice-container-fluid {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  max-width: 95vw;
+  max-height: 85vh;
+}
+@media (min-width: 640px) {
+  .notice-container-fluid { max-width: 90vw; }
+}
+.notice-popup-img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 85vh;
+  object-fit: contain; /* Preserves every universal layout format perfectly */
+  border-radius: 12px;
+}
+.notice-overlay-content {
+  position: absolute;
+  bottom: 0; left: 0; right: 0; width: 100%;
+  background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.6) 60%, rgba(0,0,0,0) 100%);
+  padding: 48px 24px 24px 24px;
+  border-radius: 0 0 12px 12px;
+  box-sizing: border-box;
 }

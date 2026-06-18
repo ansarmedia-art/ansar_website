@@ -6,7 +6,7 @@ export default function AdminNotices() {
   const [notices, setNotices] = useState([]);
   const [loading, setLoading] = useState(true);
   
-  const [formData, setFormData] = useState({ title: '', message: '', active: false, targetType: 'internal', buttonUrl: '/news' });
+  const [formData, setFormData] = useState({ title: '', message: '', imageUrl: '', active: false, targetType: 'internal', buttonUrl: '/news' });
   const [editingId, setEditingId] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -30,6 +30,7 @@ export default function AdminNotices() {
     setFormData({ 
       title: item.title || '', 
       message: item.message || '', 
+      imageUrl: item.imageUrl || '', 
       active: !!item.active,
       targetType: isInternal ? 'internal' : 'external',
       buttonUrl: item.buttonUrl || '/news'
@@ -39,7 +40,7 @@ export default function AdminNotices() {
 
   const resetForm = () => {
     setEditingId(null);
-    setFormData({ title: '', message: '', active: false, targetType: 'internal', buttonUrl: '/news' });
+    setFormData({ title: '', message: '', imageUrl: '', active: false, targetType: 'internal', buttonUrl: '/news' });
   };
 
   const handleSubmit = async (e) => {
@@ -51,6 +52,7 @@ export default function AdminNotices() {
       const payload = {
         title: formData.title,
         message: formData.message,
+        imageUrl: formData.imageUrl || '',
         buttonUrl: formData.buttonUrl,
         active: formData.active,
         updatedAt: serverTimestamp()
@@ -88,6 +90,10 @@ export default function AdminNotices() {
           <div>
             <label className="block text-sm font-bold text-slate-700 mb-2">Notice Message *</label>
             <textarea name="message" value={formData.message} onChange={handleChange} required className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none h-28 resize-none" placeholder="Enter the brief details here..." />
+          </div>
+          <div>
+            <label className="block text-sm font-bold text-slate-700 mb-2">Notice Image URL (Optional Banner)</label>
+            <input name="imageUrl" type="url" value={formData.imageUrl} onChange={handleChange} placeholder="https://example.com/poster.jpg" className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-5 bg-emerald-50/50 border border-emerald-100 rounded-xl">
             <div>

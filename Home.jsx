@@ -7,6 +7,9 @@ import NewsCard from './NewsCard';
 import PrincipalCard from './PrincipalCard';
 import AchievementsTicker from './AchievementsTicker';
 import NoticePopup from './NoticePopup';
+import { useSettings } from './SettingsContext';
+import { useFirestoreCollection } from './useFirestoreCollection';
+import { motion, AnimatePresence } from 'framer-motion';
 
 // Transformed into a Bento Layout configuration using Lucide-style SVG icons
 const FALLBACK_FEATURES = [
@@ -14,7 +17,7 @@ const FALLBACK_FEATURES = [
   { span: 'md:col-span-2 md:row-span-1 bg-gradient-to-r from-white to-emerald-50', text: 'Spacious classrooms with smart boards', icon: <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="3" rx="2" strokeWidth="2"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 21h8"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 17v4"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m10 8 6 4-6 4Z"/></svg> },
   { span: 'md:col-span-1 md:row-span-1', text: 'Qualified support staff', icon: <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4" strokeWidth="2"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M22 21v-2a4 4 0 0 0-3-3.87"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> },
   { span: 'md:col-span-2 md:row-span-1', text: 'Digital classrooms', icon: <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9m16 0H4m16 0 1.28 2.55a1 1 0 0 1-.9 1.45H3.62a1 1 0 0 1-.9-1.45L4 16"/></svg> },
-  { span: 'md:col-span-1 md:row-span-1 bg-amber-50', text: 'Special play area', icon: <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" strokeWidth="2"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" x2="9.01" y1="9" y2="9" strokeWidth="2"/><line x1="15" x2="15.01" y1="9" y2="9" strokeWidth="2"/></svg> },
+  { span: 'md:col-span-1 md:row-span-1', text: 'Special play area', icon: <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" strokeWidth="2"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" x2="9.01" y1="9" y2="9" strokeWidth="2"/><line x1="15" x2="15.01" y1="9" y2="9" strokeWidth="2"/></svg> },
   { span: 'md:col-span-1 md:row-span-1', text: 'Purpose-built advanced labs', icon: <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 2v7.31L2 20.5A2 2 0 0 0 3.5 24h17a2 2 0 0 0 1.5-3.5L14 9.31V2"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.5 2h7"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 9.31V6"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 9.31V6"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 14h12"/></svg> },
   { span: 'md:col-span-2 md:row-span-1', text: 'Multi-sports play area', icon: <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 22h16"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14.66V17c0 1.1-.9 2-2 2H4"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 14.66V17c0 1.1.9 2 2 2h4"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18 4c0 3-2 5.5-5 5.5h-2c-3 0-5-2.5-5-5.5V2h12z"/></svg> },
   { span: 'md:col-span-1 md:row-span-1', text: 'Wi-Fi enabled learning environment', icon: <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 12.55a11 11 0 0 1 14.08 0"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M1.42 9a16 16 0 0 1 21.16 0"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" x2="12.01" y1="20" y2="20" strokeWidth="2"/></svg> },
@@ -80,17 +83,86 @@ function AnimatedCounter({ target, suffix = "" }) {
   return <span ref={ref}>{count}{suffix}</span>;
 }
 
+function VerticalCarousel({ images, onImageClick }) {
+  const [index, setIndex] = useState(0);
+  const validImages = (images || []).filter(img => img && img.trim() !== '');
+
+  useEffect(() => {
+    if (validImages.length <= 1) return;
+    const timer = setInterval(() => setIndex(prev => (prev + 1) % validImages.length), 4000);
+    return () => clearInterval(timer);
+  }, [validImages.length]);
+
+  if (validImages.length === 0) return <div className="w-full h-full bg-slate-100 flex items-center justify-center text-slate-400">Media Pending</div>;
+
+  return (
+    <div className="relative w-full h-full bg-slate-900 group">
+      <AnimatePresence initial={false}>
+        <motion.img
+          key={index}
+          src={validImages[index]}
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -50 }}
+          transition={{ duration: 0.8, ease: "easeInOut" }}
+          className="absolute inset-0 w-full h-full object-cover cursor-pointer opacity-80 group-hover:opacity-100 transition-opacity"
+          onClick={() => onImageClick(validImages[index])}
+        />
+      </AnimatePresence>
+      {validImages.length > 1 && (
+        <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-2 z-10">
+          {validImages.map((_, i) => (
+            <button key={i} onClick={() => setIndex(i)} className={`w-2.5 h-2.5 rounded-full transition-all shadow-md ${i === index ? 'bg-amber-400 scale-125' : 'bg-white/50 hover:bg-white/80'}`} aria-label={`Go to slide ${i + 1}`} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function VisionMissionLoop({ vision, mission }) {
+  const [showVision, setShowVision] = useState(true);
+  useEffect(() => {
+    const timer = setInterval(() => setShowVision(prev => !prev), 5000);
+    return () => clearInterval(timer);
+  }, []);
+  return (
+    <div className="relative w-full h-48 overflow-hidden">
+      <AnimatePresence mode="wait">
+        {showVision ? (
+          <motion.div key="vision" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="absolute inset-0 flex flex-col justify-center">
+            <h3 className="text-3xl font-extrabold mb-4">Our Vision</h3>
+            <p className="text-emerald-50/80 text-xl leading-relaxed font-light border-l-4 border-amber-400 pl-6 line-clamp-4">{vision}</p>
+          </motion.div>
+        ) : (
+          <motion.div key="mission" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="absolute inset-0 flex flex-col justify-center">
+            <h3 className="text-3xl font-extrabold mb-4">Our Mission</h3>
+            <p className="text-emerald-50/80 text-lg leading-relaxed font-light border-l-4 border-amber-400 pl-6 line-clamp-4">{mission}</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
 export default function Home() {
   const [updates, setUpdates] = useState([]);
+  const settings = useSettings();
+  const [lightboxImage, setLightboxImage] = useState(null);
+  const { data: leadershipData } = useFirestoreCollection('leadership', 'order', 'asc');
   
-  // Real-time fetching of Unified 'updates' collection
+  // Real-time fetching of Unified 'updates' collection extended limit for separation
   useEffect(() => {
-    const q = query(collection(db, 'updates'), orderBy('createdAt', 'desc'), limit(6));
+    const q = query(collection(db, 'updates'), orderBy('createdAt', 'desc'), limit(12));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       setUpdates(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
     });
     return () => unsubscribe();
   }, []);
+
+  const homeNews = updates.filter(item => item.category === 'News' || !item.category).slice(0, 3);
+  const homeEvents = updates.filter(item => item.category === 'Events').slice(0, 3);
+  const activeLeaders = leadershipData.length ? leadershipData.filter(l => l.published !== false) : FALLBACK_LEADERS;
 
   return (
     <Layout isHome={true}>
@@ -119,18 +191,38 @@ export default function Home() {
       {/* Achievements Ticker */}
       <AchievementsTicker />
 
-      <AnimatedSection className="mt-32 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+      <AnimatedSection className="mt-32 grid grid-cols-1 lg:grid-cols-2 gap-16 items-stretch">
         <div className="flex flex-col justify-center">
           <div className="inline-block w-16 h-1.5 bg-amber-400 rounded-full mb-6"></div>
           <p className="text-emerald-600 font-black uppercase tracking-widest text-sm mb-3">About us</p>
           <h2 className="text-4xl lg:text-5xl font-extrabold text-emerald-950 mb-6 leading-tight">Welcome to Ansar English School Perumpilavu</h2>
           <p className="text-slate-600 text-lg leading-relaxed mb-6 font-medium">Founded by Ansari Charitable Trust, Ansar English School is a CBSE-affiliated institution focused on academic growth, inclusive learning, and values-led leadership.</p>
         </div>
-        <div className="bg-emerald-950 p-12 md:p-16 rounded-[2.5rem] shadow-2xl text-white flex flex-col justify-center relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl -mr-20 -mt-20 group-hover:bg-amber-500/20 transition-colors duration-700"></div>
-          <h3 className="text-3xl font-extrabold mb-6 relative z-10">Our Vision</h3>
-          <p className="text-emerald-50/80 text-xl leading-relaxed font-light relative z-10 border-l-4 border-amber-400 pl-6">To empower students with academic rigor, skill and ethical leadership to serve society.</p>
+        <div className="relative h-[400px] lg:h-[500px] rounded-[2.5rem] overflow-hidden shadow-2xl">
+           <VerticalCarousel images={settings?.premisesImages || []} onImageClick={setLightboxImage} />
         </div>
+      </AnimatedSection>
+
+      <AnimatedSection className="mt-16 grid grid-cols-1 lg:grid-cols-2 gap-16 items-stretch">
+        <div className="bg-emerald-950 p-12 md:p-16 rounded-[2.5rem] shadow-2xl text-white flex flex-col justify-center relative overflow-hidden group order-2 lg:order-1">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl -mr-20 -mt-20 group-hover:bg-amber-500/20 transition-colors duration-700"></div>
+          <VisionMissionLoop vision={settings?.visionText} mission={settings?.missionText} />
+        </div>
+        <div className="relative h-[400px] lg:h-[500px] rounded-[2.5rem] overflow-hidden shadow-2xl order-1 lg:order-2">
+           <VerticalCarousel images={settings?.kgImages || []} onImageClick={setLightboxImage} />
+        </div>
+      </AnimatedSection>
+
+      <AnimatedSection className="mt-16 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-[2.5rem] p-10 lg:p-16 shadow-sm border border-emerald-100 flex flex-col md:flex-row items-center gap-10">
+         <div className="flex-1 text-center md:text-left">
+            <h3 className="text-3xl lg:text-4xl font-extrabold text-emerald-950 mb-4 leading-tight">{settings?.sustainabilityTitle || 'Year of Sustainability 2026–2027'}</h3>
+            <p className="text-lg text-slate-700 leading-relaxed">{settings?.sustainabilityDesc || 'At our school, the Year of Sustainability is dedicated to nurturing environmentally responsible and socially conscious learners. Through awareness, action, and innovation, we encourage students to embrace sustainable practices and become active contributors to a greener future.'}</p>
+         </div>
+         {settings?.sustainabilityLogoUrl && (
+           <div className="w-48 h-48 lg:w-64 lg:h-64 flex-shrink-0 bg-white p-4 rounded-3xl shadow-lg border border-slate-100">
+             <img src={settings.sustainabilityLogoUrl} className="w-full h-full object-contain" alt="Sustainability Logo" />
+           </div>
+         )}
       </AnimatedSection>
 
       <AnimatedSection className="mt-32">
@@ -157,9 +249,21 @@ export default function Home() {
           <h2 className="text-4xl lg:text-5xl font-extrabold text-emerald-950">Latest News</h2>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {updates.length ? updates.map(item => (
+          {homeNews.length ? homeNews.map(item => (
             <NewsCard key={item.id} id={item.id} title={item.title} excerpt={item.excerpt || item.description || item.content} date={item.date} coverImageUrl={item.coverImageUrl} imageUrl={item.image || item.imageUrl} type={item.category ? item.category.toLowerCase() : 'news'} />
-          )) : <p className="col-span-full text-center text-slate-500">Latest updates will appear here once published from the admin panel.</p>}
+          )) : <p className="col-span-full text-center text-slate-500">Latest news will appear here once published.</p>}
+        </div>
+      </AnimatedSection>
+
+      <AnimatedSection className="mt-20">
+        <div className="text-center mb-12">
+          <p className="text-emerald-600 font-black uppercase tracking-widest text-sm mb-3">Calendar</p>
+          <h2 className="text-4xl lg:text-5xl font-extrabold text-emerald-950">Upcoming Events</h2>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          {homeEvents.length ? homeEvents.map(item => (
+            <NewsCard key={item.id} id={item.id} title={item.title} excerpt={item.description || item.excerpt || item.content} date={item.date} coverImageUrl={item.coverImageUrl} imageUrl={item.eventImages?.[0] || item.imageUrls?.[0] || item.imageUrl} type="events" />
+          )) : <p className="col-span-full text-center text-slate-500">Upcoming events will appear here once scheduled.</p>}
         </div>
       </AnimatedSection>
 
@@ -188,11 +292,40 @@ export default function Home() {
           <h2 className="text-4xl lg:text-5xl font-extrabold text-emerald-950">Guiding visionaries behind our success</h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {FALLBACK_LEADERS.map((leader, i) => (
-            <PrincipalCard key={i} name={leader.name} role={leader.role} qualification={leader.detail} />
+          {activeLeaders.map((leader, i) => (
+            <PrincipalCard key={i} name={leader.name} role={leader.role} qualification={leader.qualification || leader.detail} imageUrl={leader.imageUrl} />
           ))}
         </div>
       </AnimatedSection>
+
+      <AnimatePresence>
+        {lightboxImage && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[9999] bg-black/95 flex flex-col items-center justify-center p-4 sm:p-8"
+            onClick={() => setLightboxImage(null)}
+          >
+            <button 
+              className="absolute top-6 right-6 text-white/70 hover:text-white p-2 z-50 bg-white/10 rounded-full backdrop-blur-sm transition-colors"
+              onClick={() => setLightboxImage(null)}
+            >
+              <svg className="w-6 h-6 sm:w-8 sm:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <motion.img 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              src={lightboxImage}
+              alt="Fullscreen View"
+              className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </Layout>
   );
 }

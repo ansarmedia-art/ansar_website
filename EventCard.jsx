@@ -5,14 +5,18 @@ export default function EventCard({ title, description, date, coverImageUrl, ima
   const [imgError, setImgError] = useState(false);
 
   return (
-    <div className="bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-slate-100 group flex flex-col h-full transform hover:-translate-y-1">
+    <div className="relative bg-white rounded-xl shadow-sm hover:shadow-2xl hover:shadow-emerald-500/10 transition-all duration-500 overflow-hidden border border-slate-100 group flex flex-col h-full transform hover:-translate-y-2">
+      {/* Liquid Flow Animation Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-tr from-emerald-50/80 to-teal-50/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-10" />
+
       {/* Image Grid Presentation */}
-      <div className="relative h-56 w-full bg-slate-100 overflow-hidden flex-shrink-0">
+      <div className="relative w-full bg-[#f7f9fa] overflow-hidden flex-shrink-0 border-b border-slate-100" style={{ minHeight: '224px' }}>
         {primaryImage && !imgError ? (
           <img
             src={primaryImage}
             alt={title}
-            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            style={{ width: '100%', height: 'auto', maxHeight: '750px', objectFit: 'contain', backgroundColor: '#f7f9fa', display: 'block', margin: '0 auto' }}
+            className="transition-transform duration-700 group-hover:scale-105"
             loading="lazy"
             onError={() => setImgError(true)}
           />
@@ -29,6 +33,9 @@ export default function EventCard({ title, description, date, coverImageUrl, ima
         {date && <span className="text-xs font-bold text-emerald-600 tracking-wider uppercase mb-2">{date}</span>}
         <h3 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-emerald-700 transition-colors line-clamp-2">{title}</h3>
         <p className="text-slate-600 text-sm flex-grow line-clamp-3 leading-relaxed">{description}</p>
+        <button className="mt-5 w-full bg-emerald-50 hover:bg-emerald-600 text-emerald-700 hover:text-white font-bold py-2.5 rounded-lg transition-colors duration-300">
+          Read More
+        </button>
       </div>
     </div>
   );

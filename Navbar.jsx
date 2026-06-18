@@ -16,7 +16,7 @@ export default function Navbar() {
             <img 
               src={settings?.logoUrl || "https://i.ibb.co/7d4mTQVT/image.png"} 
               alt="Ansar English School Logo" 
-              className="h-14 w-auto object-contain contrast-125 brightness-105" 
+              className="h-14 w-auto object-contain contrast-125 brightness-105 transition-all duration-300 hover:scale-[1.03] hover:drop-shadow-[0_0_15px_rgba(5,150,105,0.4)]" 
               style={{ imageRendering: '-webkit-optimize-contrast', transform: 'translateZ(0)', backfaceVisibility: 'hidden' }}
             />
             <div className="hidden sm:flex flex-col border-l-2 border-emerald-600/20 pl-3 ml-1">
@@ -81,23 +81,35 @@ export default function Navbar() {
         </div>
       </div>
       
-      {/* Mobile Hamburger Menu */}
-      {isOpen && (
-        <div className="md:hidden bg-white border-t border-slate-100 px-4 py-4 space-y-3 shadow-inner max-h-[70vh] overflow-y-auto">
-          <Link to="/" className="block text-slate-700 font-semibold hover:text-emerald-600">Home</Link>
-          <Link to="/about" className="block text-slate-700 font-semibold hover:text-emerald-600">About</Link>
-          <Link to="/academics" className="block text-slate-700 font-semibold hover:text-emerald-600">Academics</Link>
-          <Link to="/admission" className="block text-slate-700 font-semibold hover:text-emerald-600">Admission</Link>
-          <Link to="/news" className="block text-slate-700 font-semibold hover:text-emerald-600">News</Link>
-          <Link to="/events" className="block text-slate-700 font-semibold hover:text-emerald-600">Events</Link>
-          <Link to="/gallery" className="block text-slate-700 font-semibold hover:text-emerald-600">Gallery</Link>
-          <Link to="/life-at-ansar" className="block text-slate-700 font-semibold hover:text-emerald-600">Life at Ansar</Link>
-          <Link to="/contact" className="block text-slate-700 font-semibold hover:text-emerald-600">Contact</Link>
-          <div className="border-t border-slate-100 pt-3">
-            <Link to="/admin" className="block text-emerald-700 font-bold hover:text-emerald-800">Login / Account</Link>
+      {/* Mobile Sliding Navigation Drawer */}
+      <div 
+        className={`fixed inset-0 z-40 bg-slate-900/60 backdrop-blur-sm transition-opacity duration-300 md:hidden ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`} 
+        onClick={() => setIsOpen(false)} 
+      />
+      <div 
+        className={`fixed inset-y-0 right-0 z-50 w-64 bg-white shadow-2xl flex flex-col md:hidden ${isOpen ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0 pointer-events-none'}`}
+        style={{ transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease' }}
+      >
+        <div className="p-4 border-b border-slate-100 flex justify-end">
+          <button onClick={() => setIsOpen(false)} className="p-2 text-slate-500 hover:text-emerald-600 transition-colors">
+            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+          </button>
+        </div>
+        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          <Link to="/" onClick={() => setIsOpen(false)} className="block text-lg text-slate-700 font-bold hover:text-emerald-600">Home</Link>
+          <Link to="/about" onClick={() => setIsOpen(false)} className="block text-lg text-slate-700 font-bold hover:text-emerald-600">About Us</Link>
+          <Link to="/admission" onClick={() => setIsOpen(false)} className="block text-lg text-slate-700 font-bold hover:text-emerald-600">Admissions</Link>
+          <Link to="/academics" onClick={() => setIsOpen(false)} className="block text-lg text-slate-700 font-bold hover:text-emerald-600">Academics</Link>
+          <Link to="/news" onClick={() => setIsOpen(false)} className="block text-lg text-slate-700 font-bold hover:text-emerald-600">News</Link>
+          <Link to="/events" onClick={() => setIsOpen(false)} className="block text-lg text-slate-700 font-bold hover:text-emerald-600">Events</Link>
+          <Link to="/gallery" onClick={() => setIsOpen(false)} className="block text-lg text-slate-700 font-bold hover:text-emerald-600">Gallery</Link>
+          <Link to="/life-at-ansar" onClick={() => setIsOpen(false)} className="block text-lg text-slate-700 font-bold hover:text-emerald-600">Life at Ansar</Link>
+          <Link to="/contact" onClick={() => setIsOpen(false)} className="block text-lg text-slate-700 font-bold hover:text-emerald-600">Contact Us</Link>
+          <div className="border-t border-slate-100 pt-4 mt-2">
+            <Link to="/admin" onClick={() => setIsOpen(false)} className="block text-lg text-emerald-700 font-extrabold hover:text-emerald-800">Login / Account</Link>
           </div>
         </div>
-      )}
+      </div>
     </header>
   );
 }

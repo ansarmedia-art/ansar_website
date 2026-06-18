@@ -160,7 +160,7 @@ service cloud.firestore {
     }
 
     function isValidUpdate() {
-      return hasOnlyAllowedFields(['category', 'title', 'description', 'imageUrl', 'imageUrls', 'coverImageUrl', 'eventImages', 'date', 'published', 'createdAt', 'updatedAt']) &&
+      return hasOnlyAllowedFields(['category', 'title', 'description', 'imageUrl', 'imageUrls', 'coverImageUrl', 'eventImages', 'date', 'facebookUrl', 'instagramUrl', 'youtubeUrl', 'published', 'createdAt', 'updatedAt']) &&
              request.resource.data.category in ['News', 'Events'] &&
              isValidStringLength('title', 1, 200) &&
              isValidOptionalString('description', 0, 50000) &&
@@ -169,6 +169,9 @@ service cloud.firestore {
              isValidUrl('coverImageUrl') &&
              isOptionalUrlList('eventImages', 20) &&
              isValidDateString('date') &&
+             isValidUrl('facebookUrl') &&
+             isValidUrl('instagramUrl') &&
+             isValidUrl('youtubeUrl') &&
              isOptionalBool('published') &&
              isOptionalTimestamp('createdAt') &&
              isOptionalTimestamp('updatedAt');
@@ -199,11 +202,12 @@ service cloud.firestore {
     }
 
     function isValidNotice() {
-      return hasOnlyAllowedFields(['title', 'message', 'buttonText', 'buttonUrl', 'duration', 'active', 'createdAt', 'updatedAt']) &&
-             isValidStringLength('title', 1, 200) &&
-             isValidStringLength('message', 1, 2000) &&
+      return hasOnlyAllowedFields(['title', 'message', 'imageUrl', 'buttonText', 'buttonUrl', 'duration', 'active', 'createdAt', 'updatedAt']) &&
+             isValidOptionalString('title', 0, 200) &&
+             isValidOptionalString('message', 0, 2000) &&
+             isValidOptionalString('imageUrl', 0, 1000) &&
              isValidOptionalString('buttonText', 0, 100) &&
-             isValidUrl('buttonUrl') &&
+             isValidOptionalString('buttonUrl', 0, 1000) &&
              isOptionalNumber('duration') &&
              isOptionalBool('active') &&
              isOptionalTimestamp('createdAt') &&
@@ -211,7 +215,22 @@ service cloud.firestore {
     }
 
     function isValidSettings() {
-      return hasOnlyAllowedFields(['schoolName', 'email', 'phone', 'address', 'logoUrl', 'siteDescription', 'siteKeywords', 'heroTitle', 'facebookUrl', 'instagramUrl', 'youtubeUrl', 'createdAt', 'updatedAt']) &&
+      // 'twitterUrl' remains allowed to prevent schema validation failures on legacy documents
+      return hasOnlyAllowedFields([
+               'schoolName', 'email', 'phone', 'address', 'logoUrl', 
+               'siteDescription', 'siteKeywords', 'heroTitle', 
+               'facebookUrl', 'instagramUrl', 'youtubeUrl', 'twitterUrl', 'whatsappChannelUrl', 
+               'premisesImages', 'kgImages', 'visionText', 'missionText', 
+               'sustainabilityTitle', 'sustainabilityDesc', 'sustainabilityLogoUrl', 
+               'createdAt', 'updatedAt'
+             ]) &&
+             isOptionalUrlList('premisesImages', 50) &&
+             isOptionalUrlList('kgImages', 50) &&
+             isValidOptionalString('visionText', 0, 5000) &&
+             isValidOptionalString('missionText', 0, 5000) &&
+             isValidOptionalString('sustainabilityTitle', 0, 500) &&
+             isValidOptionalString('sustainabilityDesc', 0, 5000) &&
+             isValidOptionalString('sustainabilityLogoUrl', 0, 1000) &&
              isValidOptionalString('schoolName', 0, 200) &&
              isValidOptionalString('email', 0, 200) &&
              isValidOptionalString('phone', 0, 50) &&
@@ -223,6 +242,8 @@ service cloud.firestore {
              isValidUrl('facebookUrl') &&
              isValidUrl('instagramUrl') &&
              isValidUrl('youtubeUrl') &&
+             isValidUrl('twitterUrl') &&
+             isValidUrl('whatsappChannelUrl') &&
              isOptionalTimestamp('createdAt') &&
              isOptionalTimestamp('updatedAt');
     }
@@ -254,6 +275,18 @@ service cloud.firestore {
                isValidUrl('fileUrl') &&
                isValidUrl('coverImageUrl') &&
                isValidDateString('date') &&
+               isOptionalBool('published') &&
+               isOptionalTimestamp('createdAt') &&
+               isOptionalTimestamp('updatedAt');
+    }
+
+    function isValidLeadership() {
+        return hasOnlyAllowedFields(['name', 'role', 'qualification', 'imageUrl', 'order', 'published', 'createdAt', 'updatedAt']) &&
+               isValidStringLength('name', 1, 200) &&
+               isValidStringLength('role', 1, 200) &&
+               isValidOptionalString('qualification', 0, 500) &&
+               isValidOptionalString('imageUrl', 0, 1000) &&
+               isOptionalNumber('order') &&
                isOptionalBool('published') &&
                isOptionalTimestamp('createdAt') &&
                isOptionalTimestamp('updatedAt');
@@ -385,6 +418,14 @@ service cloud.firestore {
       allow read: if true;
       allow create: if isAdmin() && isValidAchievement();
       allow update: if isAdmin() && isValidAchievement() && isImmutable('createdAt');
+      allow delete: if isAdmin();
+    }
+
+    // Leadership
+    match /leadership/{leaderId} {
+      allow read: if true;
+      allow create: if isAdmin() && isValidLeadership();
+      allow update: if isAdmin() && isValidLeadership() && isImmutable('createdAt');
       allow delete: if isAdmin();
     }
 

@@ -8,7 +8,16 @@ export default function AdminSettings() {
     logoUrl: '',
     facebookUrl: '',
     instagramUrl: '',
-    youtubeUrl: ''
+    youtubeUrl: '',
+    twitterUrl: '',
+    whatsappChannelUrl: '',
+    premisesImages: [''],
+    kgImages: [''],
+    visionText: '',
+    missionText: '',
+    sustainabilityTitle: '',
+    sustainabilityDesc: '',
+    sustainabilityLogoUrl: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState('');
@@ -26,6 +35,19 @@ export default function AdminSettings() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleArrayChange = (field, index, value) => {
+    const newArr = [...formData[field]];
+    newArr[index] = value;
+    setFormData(prev => ({ ...prev, [field]: newArr }));
+  };
+  const addArrayItem = (field) => {
+    setFormData(prev => ({ ...prev, [field]: [...prev[field], ''] }));
+  };
+  const removeArrayItem = (field, index) => {
+    if (formData[field].length <= 1) return;
+    setFormData(prev => ({ ...prev, [field]: prev[field].filter((_, i) => i !== index) }));
   };
 
   const handleSubmit = async (e) => {
@@ -72,9 +94,63 @@ export default function AdminSettings() {
           </div>
 
           <div className="space-y-4 p-5 bg-slate-50 border border-slate-100 rounded-xl">
+            <h3 className="font-extrabold text-slate-900 mb-2">Homepage Layout Content</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-bold text-slate-700 mb-1">Our Vision Text</label>
+                <textarea name="visionText" value={formData.visionText} onChange={handleChange} className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none h-24" />
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-slate-700 mb-1">Our Mission Text</label>
+                <textarea name="missionText" value={formData.missionText} onChange={handleChange} className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none h-24" />
+              </div>
+              <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-slate-200">
+                <div>
+                  <label className="block text-sm font-bold text-slate-700 mb-2">School Premises Vertical Carousel</label>
+                  {(formData.premisesImages || ['']).map((url, index) => (
+                    <div key={`prem-${index}`} className="flex items-center gap-2 mb-2">
+                      <input type="url" value={url} onChange={(e) => handleArrayChange('premisesImages', index, e.target.value)} placeholder="Image URL..." className="w-full p-2 border border-slate-200 rounded-lg outline-none" />
+                      <button type="button" onClick={() => removeArrayItem('premisesImages', index)} disabled={formData.premisesImages.length <= 1} className="p-2 text-red-500 hover:bg-red-50 rounded-full disabled:opacity-50">✕</button>
+                    </div>
+                  ))}
+                  <button type="button" onClick={() => addArrayItem('premisesImages')} className="text-sm font-bold text-emerald-600 hover:bg-emerald-50 py-1 px-3 mt-1 rounded-lg">+ Add Image</button>
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-slate-700 mb-2">KG Section Vertical Carousel</label>
+                  {(formData.kgImages || ['']).map((url, index) => (
+                    <div key={`kg-${index}`} className="flex items-center gap-2 mb-2">
+                      <input type="url" value={url} onChange={(e) => handleArrayChange('kgImages', index, e.target.value)} placeholder="Image URL..." className="w-full p-2 border border-slate-200 rounded-lg outline-none" />
+                      <button type="button" onClick={() => removeArrayItem('kgImages', index)} disabled={formData.kgImages.length <= 1} className="p-2 text-red-500 hover:bg-red-50 rounded-full disabled:opacity-50">✕</button>
+                    </div>
+                  ))}
+                  <button type="button" onClick={() => addArrayItem('kgImages')} className="text-sm font-bold text-emerald-600 hover:bg-emerald-50 py-1 px-3 mt-1 rounded-lg">+ Add Image</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-4 p-5 bg-slate-50 border border-slate-100 rounded-xl">
+            <h3 className="font-extrabold text-slate-900 mb-2">Sustainability Section</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-bold text-slate-700 mb-2">Section Title</label>
+                <input name="sustainabilityTitle" value={formData.sustainabilityTitle} onChange={handleChange} className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" />
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-slate-700 mb-2">Logo PNG URL</label>
+                <input name="sustainabilityLogoUrl" type="url" value={formData.sustainabilityLogoUrl} onChange={handleChange} className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" />
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-sm font-bold text-slate-700 mb-2">Sustainability Description</label>
+                <textarea name="sustainabilityDesc" value={formData.sustainabilityDesc} onChange={handleChange} className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none h-24" />
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-4 p-5 bg-slate-50 border border-slate-100 rounded-xl">
             <h3 className="font-extrabold text-slate-900 mb-2">Social Media Handles</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {['facebookUrl', 'instagramUrl', 'youtubeUrl'].map(network => (
+              {['facebookUrl', 'instagramUrl', 'youtubeUrl', 'twitterUrl', 'whatsappChannelUrl'].map(network => (
                 <div key={network}>
                   <label className="block text-sm font-bold text-slate-700 mb-2 capitalize">{network.replace('Url', '')}</label>
                   <input name={network} type="url" value={formData[network]} onChange={handleChange} className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" />

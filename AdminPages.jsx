@@ -65,34 +65,34 @@ export default function AdminPages() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto">
-      <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 mb-8">
+    <div className="max-w-5xl mx-auto">
+      <div className="bg-white p-8 rounded-2xl shadow-xl border border-emerald-100 mb-8">
         <h2 className="text-xl font-bold mb-6 text-slate-800">{editingId ? 'Edit Page' : 'Add New Custom Page'}</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-bold text-slate-700 mb-1">Page Title *</label>
-              <input name="title" value={formData.title} onChange={handleChange} required className="w-full p-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" />
+              <input name="title" value={formData.title} onChange={handleChange} required className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" />
             </div>
             <div>
               <label className="block text-sm font-bold text-slate-700 mb-1">URL Slug (e.g., 'sports-page')</label>
-              <input name="slug" value={formData.slug} onChange={handleChange} placeholder="Leaves blank to auto-generate" disabled={!!editingId} className="w-full p-2 border border-slate-200 rounded-lg bg-slate-50 focus:ring-2 focus:ring-emerald-500 outline-none disabled:opacity-60" />
+              <input name="slug" value={formData.slug} onChange={handleChange} placeholder="Leaves blank to auto-generate" disabled={!!editingId} className="w-full p-3 border border-slate-200 rounded-lg bg-slate-50 focus:ring-2 focus:ring-emerald-500 outline-none disabled:opacity-60" />
             </div>
             <div className="md:col-span-2">
               <label className="block text-sm font-bold text-slate-700 mb-1">Subtitle / Excerpt</label>
-              <textarea name="subtitle" value={formData.subtitle} onChange={handleChange} className="w-full p-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none h-16" />
+              <textarea name="subtitle" value={formData.subtitle} onChange={handleChange} className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none h-16" />
             </div>
             <div>
               <label className="block text-sm font-bold text-slate-700 mb-1">Hero Image URL</label>
-              <input name="heroImageUrl" type="url" value={formData.heroImageUrl} onChange={handleChange} className="w-full p-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" />
+              <input name="heroImageUrl" type="url" value={formData.heroImageUrl} onChange={handleChange} className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" />
             </div>
             <div>
               <label className="block text-sm font-bold text-slate-700 mb-1">Category (Optional)</label>
-              <input name="category" value={formData.category} onChange={handleChange} className="w-full p-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" />
+              <input name="category" value={formData.category} onChange={handleChange} className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" />
             </div>
             <div className="md:col-span-2">
               <label className="block text-sm font-bold text-slate-700 mb-1">Page Body (HTML allowed) *</label>
-              <textarea name="bodyHtml" value={formData.bodyHtml} onChange={handleChange} required className="w-full p-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none h-48 font-mono text-sm" placeholder="<h2>Your heading</h2><p>Your content...</p>" />
+              <textarea name="bodyHtml" value={formData.bodyHtml} onChange={handleChange} required className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none h-48 font-mono text-sm" placeholder="<h2>Your heading</h2><p>Your content...</p>" />
             </div>
           </div>
           <div className="flex items-center justify-between mt-6 pt-4 border-t border-slate-100">
@@ -101,8 +101,8 @@ export default function AdminPages() {
               Published (Visible to public)
             </label>
             <div className="flex gap-3">
-              {editingId && <button type="button" onClick={resetForm} className="px-4 py-2 text-slate-600 font-bold hover:bg-slate-100 rounded-lg transition-colors">Cancel</button>}
-              <button type="submit" disabled={isSubmitting} className="px-6 py-2 bg-emerald-600 text-white font-bold rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50">
+              {editingId && <button type="button" onClick={resetForm} className="px-5 py-2.5 text-slate-600 font-bold hover:bg-slate-100 rounded-lg transition-colors">Cancel</button>}
+              <button type="submit" disabled={isSubmitting} className="px-6 py-2.5 bg-emerald-600 text-white font-bold rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50">
                 {isSubmitting ? 'Saving...' : (editingId ? 'Update Page' : 'Save Page')}
               </button>
             </div>

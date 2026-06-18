@@ -17,6 +17,7 @@ import Gallery from './Gallery';
 import AdminPages from './AdminPages';
 import AdminUpdates from './AdminUpdates';
 import AdminAchievements from './AdminAchievements';
+import AdminLeadership from './AdminLeadership';
 import AdminNotices from './AdminNotices';
 import ArticleView from './ArticleView';
 import AdminSettings from './AdminSettings';
@@ -179,6 +180,7 @@ export default function App() {
         
         {/* Placeholder detail routes for News/Events cards */}
         <Route path="/news/:id" element={<ArticleView />} />
+        <Route path="/events/:id" element={<ArticleView />} />
 
         {/* Admin Dashboard Routes */}
         <Route path="/admin/*" element={
@@ -209,6 +211,7 @@ export default function App() {
                   <Route path="/pages" element={<AdminPages />} />
                   <Route path="/updates" element={<AdminUpdates />} />
                   <Route path="/achievements" element={<AdminAchievements />} />
+                  <Route path="/leadership" element={<AdminLeadership />} />
                   <Route path="/gallery" element={<div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100"><h2 className="text-xl font-bold">Gallery</h2><p className="text-slate-500">Module under construction.</p></div>} />
                   <Route path="/notices" element={<AdminNotices />} />
                   <Route path="/settings" element={<AdminSettings />} />
