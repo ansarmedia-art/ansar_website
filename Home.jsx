@@ -126,18 +126,19 @@ function VisionMissionLoop({ vision, mission }) {
     const timer = setInterval(() => setShowVision(prev => !prev), 5000);
     return () => clearInterval(timer);
   }, []);
+  const panelClassName = "absolute inset-0 flex flex-col justify-center";
   return (
-    <div className="relative w-full h-72 sm:h-64 overflow-hidden">
+    <div className="relative w-full h-[22rem] sm:h-64 overflow-hidden">
       <AnimatePresence mode="wait">
         {showVision ? (
-          <motion.div key="vision" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="absolute inset-0 flex flex-col justify-center">
-            <h3 className="text-3xl font-extrabold mb-4">Our Vision</h3>
-            <p className="text-emerald-50/80 text-xl leading-relaxed font-light border-l-4 border-amber-400 pl-6 whitespace-pre-wrap">{vision}</p>
+          <motion.div key="vision" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className={panelClassName}>
+            <h3 className="text-2xl sm:text-3xl font-extrabold mb-4">Our Vision</h3>
+            <p className="text-emerald-50/80 text-base sm:text-xl leading-relaxed font-light border-l-4 border-amber-400 pl-4 sm:pl-6 whitespace-pre-wrap">{vision}</p>
           </motion.div>
         ) : (
-          <motion.div key="mission" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="absolute inset-0 flex flex-col justify-center">
-            <h3 className="text-3xl font-extrabold mb-4">Our Mission</h3>
-            <p className="text-emerald-50/80 text-lg leading-relaxed font-light border-l-4 border-amber-400 pl-6 whitespace-pre-wrap">{mission}</p>
+          <motion.div key="mission" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className={panelClassName}>
+            <h3 className="text-2xl sm:text-3xl font-extrabold mb-4">Our Mission</h3>
+            <p className="text-emerald-50/80 text-base sm:text-lg leading-relaxed font-light border-l-4 border-amber-400 pl-4 sm:pl-6 whitespace-pre-wrap">{mission}</p>
           </motion.div>
         )}
       </AnimatePresence>
@@ -204,7 +205,7 @@ export default function Home() {
       </AnimatedSection>
 
       <AnimatedSection className="mt-16 grid grid-cols-1 lg:grid-cols-2 gap-16 items-stretch">
-        <div className="bg-emerald-950 p-12 md:p-16 rounded-[2.5rem] shadow-2xl text-white flex flex-col justify-center relative overflow-hidden group order-2 lg:order-1">
+        <div className="bg-emerald-950 p-8 sm:p-12 md:p-16 rounded-[2.5rem] shadow-2xl text-white flex flex-col justify-center relative overflow-hidden group order-2 lg:order-1">
           <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl -mr-20 -mt-20 group-hover:bg-amber-500/20 transition-colors duration-700"></div>
           <VisionMissionLoop vision={settings?.visionText} mission={settings?.missionText} />
         </div>
@@ -258,12 +259,12 @@ export default function Home() {
       <AnimatedSection className="mt-20">
         <div className="text-center mb-12">
           <p className="text-emerald-600 font-black uppercase tracking-widest text-sm mb-3">Calendar</p>
-          <h2 className="text-4xl lg:text-5xl font-extrabold text-emerald-950">Upcoming Events</h2>
+          <h2 className="text-4xl lg:text-5xl font-extrabold text-emerald-950">Events</h2>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {homeEvents.length ? homeEvents.map(item => (
             <NewsCard key={item.id} id={item.id} title={item.title} excerpt={item.description || item.excerpt || item.content} date={item.date} coverImageUrl={item.coverImageUrl} imageUrl={item.eventImages?.[0] || item.imageUrls?.[0] || item.imageUrl} type="events" />
-          )) : <p className="col-span-full text-center text-slate-500">Upcoming events will appear here once scheduled.</p>}
+          )) : <p className="col-span-full text-center text-slate-500">Events will appear here once scheduled.</p>}
         </div>
       </AnimatedSection>
 

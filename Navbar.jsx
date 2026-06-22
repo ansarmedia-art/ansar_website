@@ -14,7 +14,7 @@ export default function Navbar() {
   const explorePages = pages.filter(p => p.published !== false && !mainNavSlugs.includes(p.slug));
 
   return (
-    <header className="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-white/20 shadow-sm transition-all duration-300">
+    <header className="relative bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-white/20 shadow-sm transition-all duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-24">
           {/* Premium Logo Layout */}
@@ -80,37 +80,27 @@ export default function Navbar() {
         </div>
       </div>
       
-      {/* Mobile Sliding Navigation Drawer */}
-      <div 
-        className={`fixed inset-0 z-40 bg-slate-900/60 backdrop-blur-sm transition-opacity duration-300 md:hidden ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`} 
-        onClick={() => setIsOpen(false)} 
-      />
-      <div 
-        className={`fixed inset-y-0 right-0 z-50 w-64 bg-white shadow-2xl flex flex-col md:hidden ${isOpen ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0 pointer-events-none'}`}
-        style={{ transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease' }}
-      >
-        <div className="p-4 border-b border-slate-100 flex justify-end">
-          <button onClick={() => setIsOpen(false)} className="p-2 text-slate-500 hover:text-emerald-600 transition-colors">
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-          </button>
-        </div>
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
-          <Link to="/" onClick={() => setIsOpen(false)} className="block text-lg text-slate-700 font-bold hover:text-emerald-600">Home</Link>
-          <Link to="/about" onClick={() => setIsOpen(false)} className="block text-lg text-slate-700 font-bold hover:text-emerald-600">About Us</Link>
-          <Link to="/admission" onClick={() => setIsOpen(false)} className="block text-lg text-slate-700 font-bold hover:text-emerald-600">Admissions</Link>
-          <Link to="/academics" onClick={() => setIsOpen(false)} className="block text-lg text-slate-700 font-bold hover:text-emerald-600">Academics</Link>
-          <Link to="/news" onClick={() => setIsOpen(false)} className="block text-lg text-slate-700 font-bold hover:text-emerald-600">News</Link>
-          <Link to="/events" onClick={() => setIsOpen(false)} className="block text-lg text-slate-700 font-bold hover:text-emerald-600">Events</Link>
-          <Link to="/gallery" onClick={() => setIsOpen(false)} className="block text-lg text-slate-700 font-bold hover:text-emerald-600">Gallery</Link>
-          {explorePages.map(page => (
-            <Link key={page.id} to={`/${page.slug}`} onClick={() => setIsOpen(false)} className="block text-lg text-slate-700 font-bold hover:text-emerald-600">{page.title}</Link>
-          ))}
-          <Link to="/contact" onClick={() => setIsOpen(false)} className="block text-lg text-slate-700 font-bold hover:text-emerald-600">Contact Us</Link>
-          <div className="border-t border-slate-100 pt-4 mt-2">
-            <Link to="/admin" onClick={() => setIsOpen(false)} className="block text-lg text-emerald-700 font-extrabold hover:text-emerald-800">Login / Account</Link>
+      {/* Mobile Navigation Dropdown */}
+      {isOpen && (
+        <div className="absolute left-0 right-0 top-full z-50 max-h-[calc(100vh-6rem)] overflow-y-auto border-t border-slate-100 bg-white shadow-xl md:hidden">
+          <div className="mx-auto grid w-full max-w-7xl gap-1 px-4 py-4">
+            <Link to="/" onClick={() => setIsOpen(false)} className="block rounded-lg px-4 py-3 text-base text-slate-700 font-bold hover:bg-emerald-50 hover:text-emerald-600">Home</Link>
+            <Link to="/about" onClick={() => setIsOpen(false)} className="block rounded-lg px-4 py-3 text-base text-slate-700 font-bold hover:bg-emerald-50 hover:text-emerald-600">About Us</Link>
+            <Link to="/admission" onClick={() => setIsOpen(false)} className="block rounded-lg px-4 py-3 text-base text-slate-700 font-bold hover:bg-emerald-50 hover:text-emerald-600">Admissions</Link>
+            <Link to="/academics" onClick={() => setIsOpen(false)} className="block rounded-lg px-4 py-3 text-base text-slate-700 font-bold hover:bg-emerald-50 hover:text-emerald-600">Academics</Link>
+            <Link to="/news" onClick={() => setIsOpen(false)} className="block rounded-lg px-4 py-3 text-base text-slate-700 font-bold hover:bg-emerald-50 hover:text-emerald-600">News</Link>
+            <Link to="/events" onClick={() => setIsOpen(false)} className="block rounded-lg px-4 py-3 text-base text-slate-700 font-bold hover:bg-emerald-50 hover:text-emerald-600">Events</Link>
+            <Link to="/gallery" onClick={() => setIsOpen(false)} className="block rounded-lg px-4 py-3 text-base text-slate-700 font-bold hover:bg-emerald-50 hover:text-emerald-600">Gallery</Link>
+            {explorePages.map(page => (
+              <Link key={page.id} to={`/${page.slug}`} onClick={() => setIsOpen(false)} className="block rounded-lg px-4 py-3 text-base text-slate-700 font-bold hover:bg-emerald-50 hover:text-emerald-600">{page.title}</Link>
+            ))}
+            <Link to="/contact" onClick={() => setIsOpen(false)} className="block rounded-lg px-4 py-3 text-base text-slate-700 font-bold hover:bg-emerald-50 hover:text-emerald-600">Contact Us</Link>
+            <div className="mt-2 border-t border-slate-100 pt-2">
+              <Link to="/admin" onClick={() => setIsOpen(false)} className="block rounded-lg px-4 py-3 text-base text-emerald-700 font-extrabold hover:bg-emerald-50 hover:text-emerald-800">Login / Account</Link>
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </header>
   );
 }

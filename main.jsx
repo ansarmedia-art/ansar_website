@@ -10,7 +10,7 @@ if (!viewportMeta) {
   viewportMeta.name = "viewport";
   document.head.appendChild(viewportMeta);
 }
-viewportMeta.content = "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no";
+viewportMeta.content = "width=device-width, initial-scale=1.0";
 
 // This mounts the React application into the <div id="root"></div> in your index.html
 ReactDOM.createRoot(document.getElementById('root')).render(
