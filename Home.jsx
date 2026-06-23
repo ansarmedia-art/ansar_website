@@ -159,19 +159,20 @@ export default function Home() {
       setUpdates(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
     });
     return () => unsubscribe();
-  }, []);
+  }, []); 
 
-  const homeNews = updates.filter(item => item.category === 'News' || !item.category).slice(0, 3);
-  const homeEvents = updates.filter(item => item.category === 'Events').slice(0, 3);
+  const publishedUpdates = updates.filter(item => item.published !== false);
+  const homeNews = publishedUpdates.filter(item => item.category === 'News' || !item.category).slice(0, 3);
+  const homeEvents = publishedUpdates.filter(item => item.category === 'Events').slice(0, 3);
   const activeLeaders = leadershipData.length ? leadershipData.filter(l => l.published !== false) : FALLBACK_LEADERS;
 
   return (
     <Layout isHome={true}>
       <NoticePopup />
       <Hero 
-        title="Shaping Bright Futures Through Education" 
-        subtitle="Quality learning, nurturing care, and strong values help Ansar students grow into responsible citizens."
-        // We REMOVED the imageUrl override here, so it ALWAYS defaults to your School Logo!
+        title="Empowering Minds, Enriching Futures" 
+        subtitle="At Ansar English School, we nurture curious learners, ethical leaders, and responsible global citizens prepared to thrive in an ever-evolving world."
+        imageUrl="https://i.ibb.co/vxgCJ415/image.png"
       />
 
       <AnimatedSection className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-20 max-w-6xl mx-auto -mt-12 px-4 sm:px-0">

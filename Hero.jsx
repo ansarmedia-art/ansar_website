@@ -13,7 +13,7 @@ export default function Hero({ imageUrl, title, subtitle }) {
       <div className="absolute top-0 right-0 -mr-32 -mt-32 w-[600px] h-[600px] rounded-full bg-emerald-500/20 blur-[100px] pointer-events-none" />
       <div className="absolute bottom-0 left-0 -ml-32 -mb-32 w-[400px] h-[400px] rounded-full bg-amber-500/10 blur-[80px] pointer-events-none" />
 
-      <div className="relative z-10 flex flex-col-reverse lg:flex-row items-center justify-between px-8 py-20 sm:px-16 sm:py-28 lg:py-36 gap-16 lg:gap-8">
+      <div className="relative z-10 flex flex-col-reverse lg:flex-row items-center justify-between px-8 py-16 sm:px-16 sm:py-20 lg:py-24 gap-12 lg:gap-8">
         
         {/* Left Side: Prominent Text */}
         <div className="w-full lg:w-3/5 flex flex-col items-center lg:items-start text-center lg:text-left">
@@ -37,11 +37,12 @@ export default function Hero({ imageUrl, title, subtitle }) {
 
         {/* Right Side: Contained Featured Graphic */}
         <div className="w-full lg:w-2/5 flex justify-center lg:justify-end">
-          <div className="relative w-72 h-72 sm:w-96 sm:h-96 bg-gradient-to-tr from-emerald-800/40 to-white/10 p-8 rounded-[3rem] border border-white/20 backdrop-blur-2xl shadow-2xl flex items-center justify-center group hover:rotate-2 hover:scale-105 transition-all duration-700 ease-out">
+          <div className="relative flex w-full max-w-[27rem] aspect-square items-center justify-center p-3 sm:p-4 group">
+            <div className="absolute inset-6 rounded-full bg-white/8 blur-3xl transition-opacity duration-700 group-hover:opacity-80" />
             <img 
               src={graphicUrl} 
               alt="Featured graphic" 
-              className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-700 ease-out drop-shadow-2xl contrast-125 brightness-105"
+              className="relative z-10 max-h-full max-w-full object-contain transition-transform duration-700 ease-out group-hover:scale-[1.03] drop-shadow-2xl contrast-125 brightness-105"
               style={{ imageRendering: '-webkit-optimize-contrast', transform: 'translateZ(0)', backfaceVisibility: 'hidden' }}
               loading="eager"
             />

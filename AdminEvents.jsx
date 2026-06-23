@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { collection, addDoc, updateDoc, deleteDoc, doc, serverTimestamp } from 'firebase/firestore';
 import { db } from './firebase-init';
 import { useFirestoreCollection } from './useFirestoreCollection';
+import ImgBbUrlImporter from './ImgBbUrlImporter';
 
 export default function AdminEvents() {
   const { data: items, loading } = useFirestoreCollection('events', 'date', 'desc');
@@ -24,6 +25,13 @@ export default function AdminEvents() {
 
   const addImageUrlField = () => {
     setFormData(prev => ({ ...prev, imageUrls: [...prev.imageUrls, ''] }));
+  };
+
+  const appendImageUrls = (urls) => {
+    setFormData(prev => {
+      const existing = Array.isArray(prev.imageUrls) ? prev.imageUrls.filter(url => url.trim() !== '') : [];
+      return { ...prev, imageUrls: [...existing, ...urls] };
+    });
   };
 
   const removeImageUrlField = (index) => {
@@ -90,15 +98,22 @@ export default function AdminEvents() {
               <input name="title" value={formData.title} onChange={handleChange} required className="w-full p-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" />
             </div>
             <div>
-              <label className="block text-sm font-bold text-slate-700 mb-1">Event Date (e.g., 24 JUN 2024)</label>
-              <input name="date" value={formData.date} onChange={handleChange} className="w-full p-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" />
+              <label className="block text-sm font-bold text-slate-700 mb-1">Event Date</label>
+              <input name="date" type="date" value={formData.date} onChange={handleChange} className="w-full p-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" />
             </div>
             <div className="md:col-span-2">
               <label className="block text-sm font-bold text-slate-700 mb-1">Description</label>
               <textarea name="description" value={formData.description} onChange={handleChange} className="w-full p-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none h-24" />
             </div>
             <div className="md:col-span-2 space-y-3">
-              <label className="block text-sm font-bold text-slate-700">Image URLs</label>
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <label className="block text-sm font-bold text-slate-700">Image URLs</label>
+                <ImgBbUrlImporter
+                  multiple
+                  label="Extract Multiple ImgBB URLs"
+                  onExtracted={appendImageUrls}
+                />
+              </div>
               {formData.imageUrls.map((url, index) => (
                 <div key={index} className="flex items-center gap-2">
                   <input 

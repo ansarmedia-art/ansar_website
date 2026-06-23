@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import { collection, addDoc, updateDoc, deleteDoc, doc, serverTimestamp } from 'firebase/firestore';
 import { db } from './firebase-init';
 import { useFirestoreCollection } from './useFirestoreCollection';
+import ImgBbUrlImporter from './ImgBbUrlImporter';
 
 export default function AdminAchievements() {
   const { data: items, loading } = useFirestoreCollection('achievements', 'order', 'asc');
   
-  const [formData, setFormData] = useState({ title: '', order: 0, published: true });
+  const initialFormState = { title: '', description: '', imageUrl: '', date: '', studentName: '', order: 0, published: true };
+  const [formData, setFormData] = useState(initialFormState);
   const [editingId, setEditingId] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -19,6 +21,10 @@ export default function AdminAchievements() {
     setEditingId(item.id);
     setFormData({ 
       title: item.title || '',
+      description: item.description || '',
+      imageUrl: item.imageUrl || '',
+      date: item.date || '',
+      studentName: item.studentName || '',
       order: item.order || 0, 
       published: item.published !== false 
     });
@@ -27,7 +33,7 @@ export default function AdminAchievements() {
 
   const resetForm = () => {
     setEditingId(null);
-    setFormData({ title: '', order: 0, published: true });
+    setFormData(initialFormState);
   };
 
   const handleSubmit = async (e) => {
@@ -71,6 +77,27 @@ export default function AdminAchievements() {
               <input name="title" value={formData.title} onChange={handleChange} required className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" />
             </div>
             <div>
+              <label className="block text-sm font-bold text-slate-700 mb-1">Date</label>
+              <input name="date" type="date" value={formData.date} onChange={handleChange} className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" />
+            </div>
+            <div>
+              <label className="block text-sm font-bold text-slate-700 mb-1">Student / Team Name</label>
+              <input name="studentName" value={formData.studentName} onChange={handleChange} className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" />
+            </div>
+            <div className="md:col-span-2">
+              <label className="block text-sm font-bold text-slate-700 mb-1">Image URL</label>
+              <div className="space-y-2">
+                <input name="imageUrl" type="url" value={formData.imageUrl} onChange={handleChange} placeholder="https://example.com/achievement.jpg" className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" />
+                <ImgBbUrlImporter
+                  onExtracted={(url) => setFormData(prev => ({ ...prev, imageUrl: url }))}
+                />
+              </div>
+            </div>
+            <div className="md:col-span-2">
+              <label className="block text-sm font-bold text-slate-700 mb-1">Description</label>
+              <textarea name="description" value={formData.description} onChange={handleChange} className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none h-24" />
+            </div>
+            <div>
               <label className="block text-sm font-bold text-slate-700 mb-1">Display Order</label>
               <input name="order" type="number" value={formData.order} onChange={handleChange} className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" />
             </div>
@@ -96,7 +123,7 @@ export default function AdminAchievements() {
           <div key={item.id} className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm flex items-center justify-between hover:border-emerald-200 transition-colors">
             <div>
               <h4 className="font-bold text-slate-900">{item.title}</h4>
-              <p className="text-sm text-slate-500">Order: {item.order} | {item.published ? 'Published' : 'Draft'}</p>
+              <p className="text-sm text-slate-500">{item.date || 'No date'} | Order: {item.order} | {item.published ? 'Published' : 'Draft'}</p>
             </div>
             <div className="flex items-center gap-2 flex-shrink-0">
               <button onClick={() => handleEdit(item)} className="px-3 py-1.5 text-sm font-bold text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors">Edit</button>

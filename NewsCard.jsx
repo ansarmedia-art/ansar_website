@@ -1,9 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import ShareButton from './ShareButton';
 
 export default function NewsCard({ id, title, excerpt, coverImageUrl, imageUrl, date, type = 'news' }) {
   const navigate = useNavigate();
   const targetImage = coverImageUrl || imageUrl;
+  const shareUrl = `${window.location.origin}/${type}/${id}`;
 
   return (
     <div 
@@ -50,6 +52,12 @@ export default function NewsCard({ id, title, excerpt, coverImageUrl, imageUrl, 
         <button className="mt-5 w-full bg-emerald-50 hover:bg-emerald-600 text-emerald-700 hover:text-white font-bold py-2.5 rounded-lg transition-colors duration-300">
           Read More
         </button>
+        <ShareButton
+          url={shareUrl}
+          title={title}
+          text={excerpt}
+          className="mt-3 w-full border border-slate-200 bg-white px-4 py-2.5 text-slate-700 hover:bg-slate-50"
+        />
       </div>
     </div>
   );

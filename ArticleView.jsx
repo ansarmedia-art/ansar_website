@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from './firebase-init';
 import Layout from './Layout';
 import { useSettings } from './SettingsContext';
 import { motion, AnimatePresence } from 'framer-motion';
+import ShareButton from './ShareButton';
 
 const variants = {
   enter: (direction) => ({
@@ -27,9 +28,13 @@ const fallbackImageSvg = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://
 
 export default function ArticleView() {
   const { id } = useParams();
+  const location = useLocation();
   const [article, setArticle] = useState(null);
   const [loading, setLoading] = useState(true);
   const settings = useSettings();
+  const isAchievement = location.pathname.startsWith('/achievements/');
+  const collectionName = isAchievement ? 'achievements' : 'updates';
+  const shareUrl = `${window.location.origin}${location.pathname}`;
 
   const [[page, direction], setPage] = useState([0, 0]);
 
@@ -38,7 +43,7 @@ export default function ArticleView() {
       if (!id) return;
       setLoading(true);
       try {
-        const docRef = doc(db, 'updates', id);
+        const docRef = doc(db, collectionName, id);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
           setArticle({ id: docSnap.id, ...docSnap.data() });
@@ -52,7 +57,7 @@ export default function ArticleView() {
       }
     };
     fetchArticle();
-  }, [id]);
+  }, [id, collectionName]);
 
   // Safely extract valid images even during the loading state
   const fallbackImage = article?.coverImageUrl || article?.imageUrl;
@@ -82,7 +87,7 @@ export default function ArticleView() {
     return <Layout><div className="text-center py-24 font-bold text-xl">Loading Article...</div></Layout>;
   }
 
-  if (!article) {
+  if (!article || article.published === false) {
     return <Layout><div className="text-center py-24 font-bold text-xl text-red-600">Article not found.</div></Layout>;
   }
 
@@ -121,7 +126,17 @@ export default function ArticleView() {
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path fillRule="evenodd" d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z" clipRule="evenodd" /></svg>
             </a>
           )}
+          <ShareButton
+            url={shareUrl}
+            title={article.title}
+            text={article.description}
+            className="bg-slate-900 px-5 py-2.5 text-sm text-white hover:bg-slate-800"
+          />
         </div>
+
+        {article.studentName && (
+          <p className="text-base font-bold text-emerald-700 mb-4">{article.studentName}</p>
+        )}
 
         {article.description && (
           <p className="text-lg text-slate-700 leading-relaxed whitespace-pre-wrap mb-10">{article.description}</p>

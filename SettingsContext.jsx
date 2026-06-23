@@ -8,7 +8,7 @@ export const useSettings = () => useContext(SettingsContext);
 
 export const SettingsProvider = ({ children }) => {
   const [settings, setSettings] = useState({
-    heroTitle: 'Shaping Bright Futures Through Education',
+    heroTitle: 'Empowering Minds, Enriching Futures',
     logoUrl: 'https://i.ibb.co/7d4mTQVT/image.png',
     facebookUrl: 'https://facebook.com',
     instagramUrl: 'https://instagram.com',

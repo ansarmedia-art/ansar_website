@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Layout from './Layout';
+import ContentPageLayout from './ContentPageLayout';
 import { useFirestoreCollection } from './useFirestoreCollection';
 import { useSettings } from './SettingsContext';
 
@@ -24,12 +25,7 @@ export default function Admission() {
   if (page) {
     return (
       <Layout>
-        <div className="max-w-4xl mx-auto py-12 lg:py-20 px-4">
-          <h1 className="text-4xl lg:text-5xl font-extrabold text-slate-900 mb-6">{page.title}</h1>
-          {page.subtitle && <p className="text-xl text-slate-600 mb-12 font-light">{page.subtitle}</p>}
-          {page.heroImageUrl && <img src={page.heroImageUrl} alt={page.title} className="w-full h-64 sm:h-80 object-cover rounded-xl shadow-md mb-12" />}
-          <div className="prose prose-slate prose-lg sm:prose-xl max-w-none prose-a:text-emerald-600 prose-headings:text-slate-900" dangerouslySetInnerHTML={{ __html: page.bodyHtml }}></div>
-        </div>
+        <ContentPageLayout page={page} eyebrow="Admissions" />
       </Layout>
     );
   }

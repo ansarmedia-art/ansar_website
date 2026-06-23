@@ -10,7 +10,7 @@ export default function News() {
 
   useEffect(() => {
     // Strict category filtering + Real-time listeners
-    const q = query(collection(db, 'updates'), where('category', '==', 'News'));
+    const q = query(collection(db, 'updates'), where('category', '==', 'News'), where('published', '==', true));
     
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const docs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));

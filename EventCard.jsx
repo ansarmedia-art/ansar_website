@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import ShareButton from './ShareButton';
 
-export default function EventCard({ title, description, date, coverImageUrl, imageUrl, eventImages, imageUrls }) {
+export default function EventCard({ id, title, description, date, coverImageUrl, imageUrl, eventImages, imageUrls, type = 'events' }) {
   const primaryImage = coverImageUrl || imageUrl || (eventImages && eventImages[0]) || (imageUrls && imageUrls[0]) || null;
   const [imgError, setImgError] = useState(false);
+  const shareUrl = `${window.location.origin}/${type}/${id}`;
 
   return (
     <div className="relative bg-white rounded-xl shadow-sm hover:shadow-2xl hover:shadow-emerald-500/10 transition-all duration-500 overflow-hidden border border-slate-100 group flex flex-col h-full transform hover:-translate-y-2">
@@ -36,6 +38,12 @@ export default function EventCard({ title, description, date, coverImageUrl, ima
         <button className="mt-5 w-full bg-emerald-50 hover:bg-emerald-600 text-emerald-700 hover:text-white font-bold py-2.5 rounded-lg transition-colors duration-300">
           Read More
         </button>
+        <ShareButton
+          url={shareUrl}
+          title={title}
+          text={description}
+          className="mt-3 w-full border border-slate-200 bg-white px-4 py-2.5 text-slate-700 hover:bg-slate-50"
+        />
       </div>
     </div>
   );

@@ -32,7 +32,7 @@ ${formData.message}`;
     const encodedPayload = encodeURIComponent(payload);
     
     // 3. Open WhatsApp in a new tab
-    const whatsappUrl = `https://wa.me/919744945567?text=${encodedPayload}`;
+    const whatsappUrl = `https://wa.me/918129808051?text=${encodedPayload}`;
     window.open(whatsappUrl, '_blank');
   };
 
@@ -82,7 +82,7 @@ ${formData.message}`;
                   </div>
                   <div className="ml-4">
                     <h4 className="text-lg font-medium">Call Us</h4>
-                    <p className="mt-1 text-slate-300">+91 97449 45567</p>
+                    <p className="mt-1 text-slate-300">+91 81298 08051</p>
                   </div>
                 </div>
               </div>
@@ -125,11 +125,10 @@ ${formData.message}`;
               </div>
 
               <button type="submit" className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-emerald-600 text-white font-bold rounded-lg hover:bg-emerald-700 transition-colors shadow-md hover:shadow-lg group">
-                <svg className="w-5 h-5 group-hover:-translate-y-0.5 transition-transform" fill="currentColor" viewBox="0 0 24 24">
-                   {/* WhatsApp Logo Path */}
-                  <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.327.101.144.447.708.924 1.122.613.535 1.161.701 1.305.787.144.087.231.072.318-.029l.361-.412c.116-.144.231-.116.361-.072.13.043.824.39 1.055.506.231.116.39.173.448.274.057.101.057.593-.087.998zm-.392-12.416c-3.791 0-6.865 3.076-6.866 6.867 0 1.21.314 2.396.915 3.44l-1.08 3.96 4.05-.1.05c1.01.558 2.14.851 3.28.852 3.79 0 6.864-3.075 6.866-6.866 0-3.791-3.075-6.867-6.865-6.867zm0 12.355c-1.042-.001-2.062-.28-2.956-.807l-.212-.125-2.197.577.587-2.143-.137-.218c-.58-.921-.886-1.99-.885-3.09.002-3.046 2.477-5.522 5.524-5.522 3.048 0 5.523 2.476 5.523 5.522-.001 3.048-2.476 5.524-5.523 5.524z"/>
+                <svg className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 12h14m-6-6 6 6-6 6" />
                 </svg>
-                Submit via WhatsApp
+                Submit
               </button>
             </form>
           </div>

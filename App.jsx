@@ -13,6 +13,7 @@ import Academics from './Academics';
 import Admission from './Admission';
 import News from './News';
 import Events from './Events';
+import Achievements from './Achievements';
 import Contact from './Contact';
 import Gallery from './Gallery';
 import AdminPages from './AdminPages';
@@ -23,14 +24,64 @@ import AdminNotices from './AdminNotices';
 import AdminAcademics from './AdminAcademics';
 import ArticleView from './ArticleView';
 import AdminSettings from './AdminSettings';
+import ContentPageLayout from './ContentPageLayout';
 import { SettingsProvider } from './SettingsContext';
 
 // --- AUTHORIZED ADMIN EMAILS ---
 const ADMIN_EMAILS = [
   'd3ztudio@gmail.com',
   'ansarmedia@ansarschool.in',
+  'shafeeqpulikkal32@gmail.com',
   'ansarschooloffice@gmail.com'
 ];
+
+const SAMPLE_PAGES = {
+  'sports-page': {
+    title: 'Sports',
+    subtitle: 'Athletics, games, fitness, and team spirit at Ansar English School.',
+    sections: ['Sports Programmes', 'Facilities', 'Training & Events', 'Student Highlights']
+  },
+  atl: {
+    title: 'ATL',
+    subtitle: 'Innovation, tinkering, STEM exploration, and student-led problem solving.',
+    sections: ['Lab Overview', 'Student Projects', 'Innovation Challenges', 'Gallery']
+  },
+  'ansar-sprouts': {
+    title: 'Ansar Sprouts',
+    subtitle: 'A joyful early learning environment for foundational growth.',
+    sections: ['Learning Approach', 'Daily Activities', 'Parent Connect', 'Classroom Moments']
+  },
+  'extension-services': {
+    title: 'Extension Services',
+    subtitle: 'Community outreach, student service, and support initiatives.',
+    sections: ['Service Areas', 'Programmes', 'Community Impact', 'How We Participate']
+  },
+  'life-at-ansar': {
+    title: 'Life at Ansar',
+    subtitle: 'A look into campus culture, clubs, celebrations, and student life.',
+    sections: ['Campus Life', 'Clubs & Activities', 'Celebrations', 'Student Voices']
+  },
+  'ansar-times': {
+    title: 'Ansar Times',
+    subtitle: 'School publications, newsletters, and featured stories.',
+    sections: ['Latest Issue', 'Archives', 'Student Contributions', 'Editorial Team']
+  },
+  alumni: {
+    title: 'Alumni',
+    subtitle: 'Stories, connections, and achievements from the Ansar alumni community.',
+    sections: ['Alumni Network', 'Success Stories', 'Events', 'Get Connected']
+  },
+  sop: {
+    title: 'SOP',
+    subtitle: 'Standard operating procedures and essential school guidelines.',
+    sections: ['General Guidelines', 'Student Safety', 'Academic Procedures', 'Campus Protocols']
+  },
+  'mandatory-public-disclosure': {
+    title: 'Mandatory Public Disclosure',
+    subtitle: 'Required school information and public documents.',
+    sections: ['General Information', 'Documents', 'Academic Information', 'Infrastructure Details']
+  }
+};
 
 function DynamicPage({ slug: propSlug }) {
   const params = useParams();
@@ -38,19 +89,37 @@ function DynamicPage({ slug: propSlug }) {
   const { data: pages, loading } = useFirestoreCollection('pages');
   
   const page = pages.find(p => p.slug === slug);
+  const samplePage = SAMPLE_PAGES[slug];
 
   if (loading && !page) return <Layout><div className="py-24 text-center"><h2 className="text-2xl font-bold text-slate-900 animate-pulse">Loading page...</h2></div></Layout>;
   
+  if (!page && samplePage) {
+    return (
+      <Layout>
+        <div className="max-w-6xl mx-auto py-12 lg:py-20 px-4">
+          <div className="max-w-3xl mb-12">
+            <p className="text-emerald-600 font-bold uppercase tracking-wider text-sm mb-3">Ansar English School</p>
+            <h1 className="text-4xl lg:text-5xl font-extrabold text-slate-900 mb-5">{samplePage.title}</h1>
+            <p className="text-xl text-slate-600 leading-relaxed">{samplePage.subtitle}</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {samplePage.sections.map(section => (
+              <section key={section} className="border border-slate-100 bg-white p-8 rounded-xl shadow-sm">
+                <h2 className="text-xl font-extrabold text-slate-900 mb-3">{section}</h2>
+                <p className="text-slate-600 leading-relaxed">Content for this section will be updated soon.</p>
+              </section>
+            ))}
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
   if (!page) return <Layout><div className="py-24 text-center"><h2 className="text-2xl font-bold text-slate-900">Page Not Found</h2><p className="text-slate-600 mt-4">The page you are looking for does not exist or has not been published yet.</p></div></Layout>;
 
   return (
     <Layout>
-      <div className="max-w-4xl mx-auto py-12 lg:py-20 px-4">
-        <h1 className="text-4xl lg:text-5xl font-extrabold text-slate-900 mb-6">{page.title}</h1>
-        {page.subtitle && <p className="text-xl text-slate-600 mb-12 font-light">{page.subtitle}</p>}
-        {page.heroImageUrl && <img src={page.heroImageUrl} alt={page.title} className="w-full h-64 sm:h-80 object-cover rounded-xl shadow-md mb-12" />}
-        <div className="prose prose-slate prose-lg sm:prose-xl max-w-none prose-a:text-emerald-600 prose-headings:text-slate-900" dangerouslySetInnerHTML={{ __html: page.bodyHtml }}></div>
-      </div>
+      <ContentPageLayout page={page} />
     </Layout>
   );
 }
@@ -279,7 +348,7 @@ export default function App() {
         <Route path="/life-at-ansar" element={<DynamicPage slug="life-at-ansar" />} />
         <Route path="/ansar-times" element={<DynamicPage slug="ansar-times" />} />
         <Route path="/alumni" element={<DynamicPage slug="alumni" />} />
-        <Route path="/achievements" element={<DynamicPage slug="achievements" />} />
+        <Route path="/achievements" element={<Achievements />} />
         <Route path="/sop" element={<DynamicPage slug="sop" />} />
         <Route path="/mandatory-public-disclosure" element={<DynamicPage slug="mandatory-public-disclosure" />} />
         <Route path="/:slug" element={<DynamicPage />} />
@@ -287,6 +356,7 @@ export default function App() {
         {/* Placeholder detail routes for News/Events cards */}
         <Route path="/news/:id" element={<ArticleView />} />
         <Route path="/events/:id" element={<ArticleView />} />
+        <Route path="/achievements/:id" element={<ArticleView />} />
 
         {/* Admin Dashboard Routes */}
         <Route path="/admin/*" element={

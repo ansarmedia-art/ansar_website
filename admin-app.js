@@ -21,6 +21,7 @@ import {
 const ADMIN_EMAILS = [
   'd3ztudio@gmail.com',
   'ansarmedia@ansarschool.in',
+  'shafeeqpulikkal32@gmail.com',
   'ansarschooloffice@gmail.com'
 ];
 

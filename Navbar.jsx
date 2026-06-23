@@ -2,6 +2,21 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSettings } from './SettingsContext';
 import { useFirestoreCollection } from './useFirestoreCollection';
+import NotificationsBell from './NotificationsBell';
+
+const LEGACY_EXPLORE_LINKS = [
+  { title: 'Gallery', slug: 'gallery' },
+  { title: 'Achievements', slug: 'achievements' },
+  { title: 'Sports', slug: 'sports-page' },
+  { title: 'ATL', slug: 'atl' },
+  { title: 'Ansar Sprouts', slug: 'ansar-sprouts' },
+  { title: 'Extension Services', slug: 'extension-services' },
+  { title: 'Life at Ansar', slug: 'life-at-ansar' },
+  { title: 'Ansar Times', slug: 'ansar-times' },
+  { title: 'Alumni', slug: 'alumni' },
+  { title: 'SOP', slug: 'sop' },
+  { title: 'Mandatory Public Disclosure', slug: 'mandatory-public-disclosure' }
+];
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -11,7 +26,13 @@ export default function Navbar() {
   // Fetch all custom pages to dynamically build the navigation menu
   const { data: pages } = useFirestoreCollection('pages', 'order', 'asc');
   const mainNavSlugs = ['about', 'academics', 'admission'];
-  const explorePages = pages.filter(p => p.published !== false && !mainNavSlugs.includes(p.slug));
+  const dynamicExplorePages = pages
+    .filter(p => p.published !== false && !mainNavSlugs.includes(p.slug))
+    .map(page => ({ title: page.title, slug: page.slug, id: page.id }));
+  const explorePages = [
+    ...LEGACY_EXPLORE_LINKS,
+    ...dynamicExplorePages.filter(page => !LEGACY_EXPLORE_LINKS.some(link => link.slug === page.slug))
+  ];
 
   return (
     <header className="relative bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-white/20 shadow-sm transition-all duration-300">
@@ -35,7 +56,7 @@ export default function Navbar() {
           </Link>
           
           {/* Fluid Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-6">
+          <nav className="hidden md:flex items-center gap-5">
             {['Home', 'About', 'Academics', 'Admission', 'News', 'Events', 'Contact'].map((item) => (
               <Link key={item} to={item === 'Home' ? '/' : `/${item.toLowerCase()}`} className="relative text-sm font-bold text-slate-700 hover:text-emerald-700 transition-colors py-2 group">
                 {item}
@@ -56,27 +77,29 @@ export default function Navbar() {
               {isMoreOpen && (
                 <div className="absolute right-0 mt-4 w-64 bg-white/95 backdrop-blur-xl border border-white/40 rounded-2xl shadow-2xl py-3 flex flex-col max-h-96 overflow-y-auto z-50 custom-scrollbar ring-1 ring-black/5">
                   {explorePages.map(page => (
-                    <Link key={page.id} to={`/${page.slug}`} onClick={() => setIsMoreOpen(false)} className="px-4 py-2 text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">{page.title}</Link>
+                    <Link key={page.id || page.slug} to={`/${page.slug}`} onClick={() => setIsMoreOpen(false)} className="px-4 py-2 text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">{page.title}</Link>
                   ))}
-                  <Link to="/gallery" className="px-4 py-2 text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">Gallery</Link>
                   <div className="border-t border-slate-100 my-1"></div>
                   <Link to="/admin" className="px-4 py-2 text-sm font-bold text-emerald-700 hover:bg-emerald-50 transition-colors">Login / Account</Link>
                 </div>
               )}
             </div>
+            <NotificationsBell />
           </nav>
 
-          {/* Mobile Hamburger Toggle */}
-          <button 
-            className="md:hidden p-2 text-slate-600 hover:text-emerald-600 focus:outline-none transition-colors"
-            onClick={() => setIsOpen(!isOpen)}
-          >
-            {isOpen ? (
-              <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-            ) : (
-              <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
-            )}
-          </button>
+          <div className="flex items-center gap-2 md:hidden">
+            <NotificationsBell />
+            <button 
+              className="p-2 text-slate-600 hover:text-emerald-600 focus:outline-none transition-colors"
+              onClick={() => setIsOpen(!isOpen)}
+            >
+              {isOpen ? (
+                <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+              ) : (
+                <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
+              )}
+            </button>
+          </div>
         </div>
       </div>
       
@@ -90,9 +113,8 @@ export default function Navbar() {
             <Link to="/academics" onClick={() => setIsOpen(false)} className="block rounded-lg px-4 py-3 text-base text-slate-700 font-bold hover:bg-emerald-50 hover:text-emerald-600">Academics</Link>
             <Link to="/news" onClick={() => setIsOpen(false)} className="block rounded-lg px-4 py-3 text-base text-slate-700 font-bold hover:bg-emerald-50 hover:text-emerald-600">News</Link>
             <Link to="/events" onClick={() => setIsOpen(false)} className="block rounded-lg px-4 py-3 text-base text-slate-700 font-bold hover:bg-emerald-50 hover:text-emerald-600">Events</Link>
-            <Link to="/gallery" onClick={() => setIsOpen(false)} className="block rounded-lg px-4 py-3 text-base text-slate-700 font-bold hover:bg-emerald-50 hover:text-emerald-600">Gallery</Link>
             {explorePages.map(page => (
-              <Link key={page.id} to={`/${page.slug}`} onClick={() => setIsOpen(false)} className="block rounded-lg px-4 py-3 text-base text-slate-700 font-bold hover:bg-emerald-50 hover:text-emerald-600">{page.title}</Link>
+              <Link key={page.id || page.slug} to={`/${page.slug}`} onClick={() => setIsOpen(false)} className="block rounded-lg px-4 py-3 text-base text-slate-700 font-bold hover:bg-emerald-50 hover:text-emerald-600">{page.title}</Link>
             ))}
             <Link to="/contact" onClick={() => setIsOpen(false)} className="block rounded-lg px-4 py-3 text-base text-slate-700 font-bold hover:bg-emerald-50 hover:text-emerald-600">Contact Us</Link>
             <div className="mt-2 border-t border-slate-100 pt-2">

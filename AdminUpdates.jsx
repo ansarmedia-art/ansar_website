@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { collection, addDoc, updateDoc, deleteDoc, doc, serverTimestamp, query, orderBy, onSnapshot } from 'firebase/firestore';
 import { db } from './firebase-init';
+import ImgBbUrlImporter from './ImgBbUrlImporter';
 
 // Utility to clean raw Google Image Search URLs
 const cleanImageUrl = (url) => {
@@ -55,6 +56,13 @@ export default function AdminUpdates() {
   };
 
   const addEventImageField = () => setFormData(prev => ({ ...prev, eventImages: [...prev.eventImages, ''] }));
+  const appendEventImages = (urls) => {
+    setFormData(prev => {
+      const existing = Array.isArray(prev.eventImages) ? prev.eventImages.filter(url => url.trim() !== '') : [];
+      return { ...prev, eventImages: [...existing, ...urls] };
+    });
+  };
+
   const removeEventImageField = (index) => {
     if (formData.eventImages.length <= 1) return;
     setFormData(prev => ({ ...prev, eventImages: prev.eventImages.filter((_, i) => i !== index) }));
@@ -149,8 +157,8 @@ export default function AdminUpdates() {
             </div>
             
             <div>
-              <label className="block text-sm font-bold text-slate-700 mb-1">Date (e.g., 24 JUN 2024)</label>
-              <input name="date" value={formData.date} onChange={handleChange} className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" />
+              <label className="block text-sm font-bold text-slate-700 mb-1">Date</label>
+              <input name="date" type="date" value={formData.date} onChange={handleChange} className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" />
             </div>
             
             <div className="md:col-span-2">
@@ -161,7 +169,12 @@ export default function AdminUpdates() {
             <div className="md:col-span-2 space-y-3 p-5 bg-emerald-50/50 border border-emerald-100 rounded-xl">
               <div>
                 <label className="block text-sm font-bold text-slate-700 mb-1">Cover Image URL (Primary Thumbnail)</label>
-                <input name="coverImageUrl" type="url" value={formData.coverImageUrl} onChange={handleChange} placeholder="https://example.com/cover.jpg" className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" />
+                <div className="space-y-2">
+                  <input name="coverImageUrl" type="url" value={formData.coverImageUrl} onChange={handleChange} placeholder="https://example.com/cover.jpg" className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" />
+                  <ImgBbUrlImporter
+                    onExtracted={(url) => setFormData(prev => ({ ...prev, coverImageUrl: url }))}
+                  />
+                </div>
               <div className="mt-3 w-full h-40 bg-slate-100 border border-slate-200 rounded-lg overflow-hidden relative flex items-center justify-center">
                 {!formData.coverImageUrl ? (
                   <div className="flex flex-col items-center text-slate-400">
@@ -182,7 +195,14 @@ export default function AdminUpdates() {
 
               {formData.category === 'Events' && (
                 <div>
-                  <label className="block text-sm font-bold text-slate-700 mb-2">Event Image URLs (Carousel)</label>
+                  <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                    <label className="block text-sm font-bold text-slate-700">Event Image URLs (Carousel)</label>
+                    <ImgBbUrlImporter
+                      multiple
+                      label="Extract Multiple ImgBB URLs"
+                      onExtracted={appendEventImages}
+                    />
+                  </div>
                   {Array.isArray(formData.eventImages) && formData.eventImages.map((url, index) => (
                     <div key={index} className="flex flex-col gap-2 mb-4 bg-white p-3 rounded-lg border border-slate-100 shadow-sm">
                       <div className="flex items-center gap-2">

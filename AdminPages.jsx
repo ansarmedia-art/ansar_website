@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { collection, setDoc, updateDoc, deleteDoc, doc, serverTimestamp } from 'firebase/firestore';
 import { db } from './firebase-init';
 import { useFirestoreCollection } from './useFirestoreCollection';
+import ImgBbUrlImporter from './ImgBbUrlImporter';
 
 export default function AdminPages() {
   const { data: items, loading } = useFirestoreCollection('pages', 'order', 'asc');
@@ -84,7 +85,12 @@ export default function AdminPages() {
             </div>
             <div>
               <label className="block text-sm font-bold text-slate-700 mb-1">Hero Image URL</label>
-              <input name="heroImageUrl" type="url" value={formData.heroImageUrl} onChange={handleChange} className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" />
+              <div className="space-y-2">
+                <input name="heroImageUrl" type="url" value={formData.heroImageUrl} onChange={handleChange} className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" />
+                <ImgBbUrlImporter
+                  onExtracted={(url) => setFormData(prev => ({ ...prev, heroImageUrl: url }))}
+                />
+              </div>
             </div>
             <div>
               <label className="block text-sm font-bold text-slate-700 mb-1">Category (Optional)</label>
