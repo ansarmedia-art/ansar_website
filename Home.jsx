@@ -5,11 +5,11 @@ import Layout from './Layout';
 import Hero from './Hero';
 import NewsCard from './NewsCard';
 import PrincipalCard from './PrincipalCard';
-import AchievementsTicker from './AchievementsTicker';
 import NoticePopup from './NoticePopup';
 import { useSettings } from './SettingsContext';
 import { useFirestoreCollection } from './useFirestoreCollection';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 
 // Transformed into a Bento Layout configuration using Lucide-style SVG icons
 const FALLBACK_FEATURES = [
@@ -146,11 +146,70 @@ function VisionMissionLoop({ vision, mission }) {
   );
 }
 
+function HomeAchievementsRail({ achievements }) {
+  const navigate = useNavigate();
+  const scrollerRef = useRef(null);
+  const publishedWithImages = (achievements || [])
+    .filter(item => item.published !== false && item.imageUrl)
+    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+  const shouldAutoScroll = publishedWithImages.length > 5;
+
+  useEffect(() => {
+    const scroller = scrollerRef.current;
+    if (!scroller || !shouldAutoScroll) return;
+
+    const timer = setInterval(() => {
+      const maxScroll = scroller.scrollWidth - scroller.clientWidth;
+      if (maxScroll <= 0) return;
+
+      if (scroller.scrollLeft >= maxScroll - 4) {
+        scroller.scrollTo({ left: 0, behavior: 'smooth' });
+      } else {
+        scroller.scrollBy({ left: 260, behavior: 'smooth' });
+      }
+    }, 2800);
+
+    return () => clearInterval(timer);
+  }, [shouldAutoScroll, publishedWithImages.length]);
+
+  if (!publishedWithImages.length) return null;
+
+  return (
+    <AnimatedSection className="mt-10 overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-emerald-950 via-emerald-800 to-[#124d7b] px-4 py-8 shadow-2xl sm:px-8 lg:px-12">
+      <div
+        ref={scrollerRef}
+        className={`flex snap-x snap-mandatory gap-6 overflow-x-auto scroll-smooth px-1 pb-4 [scrollbar-width:thin] [scrollbar-color:rgba(255,255,255,0.5)_transparent] ${shouldAutoScroll ? 'justify-start' : 'justify-center'}`}
+        aria-label="Achievement posters"
+      >
+        {publishedWithImages.map(item => (
+          <button
+            key={item.id}
+            type="button"
+            onClick={() => navigate(`/achievements/${item.id}`)}
+            className="group flex h-[22rem] w-[17rem] flex-none snap-center items-center justify-center overflow-hidden rounded-2xl bg-white p-2 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-amber-300/60 sm:h-[25rem] sm:w-[19rem] lg:h-[28rem] lg:w-[21rem]"
+            aria-label={`Open ${item.title || 'achievement'}`}
+          >
+            <span className="flex h-full w-full items-center justify-center overflow-hidden rounded-xl bg-slate-50">
+              <img
+                src={item.imageUrl}
+                alt={item.title || 'Achievement poster'}
+                loading="lazy"
+                className="max-h-full max-w-full object-contain transition-transform duration-500 group-hover:scale-[1.03]"
+              />
+            </span>
+          </button>
+        ))}
+      </div>
+    </AnimatedSection>
+  );
+}
+
 export default function Home() {
   const [updates, setUpdates] = useState([]);
   const settings = useSettings();
   const [lightboxImage, setLightboxImage] = useState(null);
   const { data: leadershipData } = useFirestoreCollection('leadership', 'order', 'asc');
+  const { data: achievementsData } = useFirestoreCollection('achievements', 'order', 'asc');
   
   // Real-time fetching of Unified 'updates' collection extended limit for separation
   useEffect(() => {
@@ -190,9 +249,6 @@ export default function Home() {
         </div>
       </AnimatedSection>
 
-      {/* Achievements Ticker */}
-      <AchievementsTicker />
-
       <AnimatedSection className="mt-32 grid grid-cols-1 lg:grid-cols-2 gap-16 items-stretch">
         <div className="flex flex-col justify-center">
           <div className="inline-block w-16 h-1.5 bg-amber-400 rounded-full mb-6"></div>
@@ -226,6 +282,8 @@ export default function Home() {
            </div>
          )}
       </AnimatedSection>
+
+      <HomeAchievementsRail achievements={achievementsData} />
 
       <AnimatedSection className="mt-32">
         <div className="text-center mb-12">

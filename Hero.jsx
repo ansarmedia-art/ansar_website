@@ -37,12 +37,13 @@ export default function Hero({ imageUrl, title, subtitle }) {
 
         {/* Right Side: Contained Featured Graphic */}
         <div className="w-full lg:w-2/5 flex justify-center lg:justify-end">
-          <div className="relative flex w-full max-w-[27rem] aspect-square items-center justify-center p-3 sm:p-4 group">
-            <div className="absolute inset-6 rounded-full bg-white/8 blur-3xl transition-opacity duration-700 group-hover:opacity-80" />
+          <div className="group relative flex w-full max-w-[30rem] items-center justify-center rounded-[2rem] border border-white/25 bg-white/15 p-3 shadow-2xl backdrop-blur-xl sm:p-4">
+            <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-white/25 via-white/10 to-white/5 opacity-80" />
+            <div className="absolute -inset-4 rounded-[2.25rem] bg-white/10 blur-2xl transition-opacity duration-700 group-hover:opacity-90" />
             <img 
               src={graphicUrl} 
               alt="Featured graphic" 
-              className="relative z-10 max-h-full max-w-full object-contain transition-transform duration-700 ease-out group-hover:scale-[1.03] drop-shadow-2xl contrast-125 brightness-105"
+              className="relative z-10 max-h-[18rem] w-full rounded-[1.35rem] object-contain transition-transform duration-700 ease-out group-hover:scale-[1.02] sm:max-h-[21rem] lg:max-h-[24rem]"
               style={{ imageRendering: '-webkit-optimize-contrast', transform: 'translateZ(0)', backfaceVisibility: 'hidden' }}
               loading="eager"
             />
