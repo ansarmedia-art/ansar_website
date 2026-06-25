@@ -1,7 +1,153 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Layout from './Layout';
 import ContentPageLayout from './ContentPageLayout';
 import { useFirestoreCollection } from './useFirestoreCollection';
+import { useSettings } from './SettingsContext';
+
+const ANSAR_MILESTONES = [
+  { year: '1979', title: 'ACT got registered', color: 'bg-red-600', ring: 'ring-red-100' },
+  { year: '1982', title: 'School got registered', color: 'bg-amber-400', ring: 'ring-amber-100' },
+  { year: '1988', title: 'Affiliation from CBSE', color: 'bg-cyan-500', ring: 'ring-cyan-100' },
+  { year: '1990', title: 'Updated to Senior Secondary', color: 'bg-indigo-700', ring: 'ring-indigo-100' },
+  { year: '1992', title: '1st batch of class XII', color: 'bg-red-600', ring: 'ring-red-100' },
+  { year: '2021', title: 'New vision & mission', color: 'bg-amber-400', ring: 'ring-amber-100' },
+  { year: '2022', title: 'Year of Excellence', color: 'bg-cyan-500', ring: 'ring-cyan-100' },
+  { year: '2022', title: 'Year of Talent', color: 'bg-indigo-700', ring: 'ring-indigo-100' },
+  { year: '2023', title: 'Year of Quality', color: 'bg-red-600', ring: 'ring-red-100' },
+  { year: '2023', title: 'Year of Innovation', color: 'bg-amber-400', ring: 'ring-amber-100' },
+  { year: '2024', title: 'NABET Accredited', color: 'bg-cyan-500', ring: 'ring-cyan-100' },
+  { year: '2025', title: 'National Silver Medal', color: 'bg-indigo-700', ring: 'ring-indigo-100' },
+  { year: '2025', title: 'CBSE Topper', color: 'bg-red-600', ring: 'ring-red-100' },
+  { year: '2026', title: 'Year of Sustainability', color: 'bg-indigo-700', ring: 'ring-indigo-100' }
+];
+
+function AnimatedSection({ children, className = '' }) {
+  const [isVisible, setIsVisible] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        setIsVisible(true);
+        observer.unobserve(entry.target);
+      }
+    }, { threshold: 0.12 });
+
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div ref={ref} className={`transition-all duration-700 ease-out ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'} ${className}`}>
+      {children}
+    </div>
+  );
+}
+
+function AnsarTimeline() {
+  return (
+    <AnimatedSection className="mt-14 overflow-hidden rounded-[2rem] border border-slate-100 bg-white p-6 shadow-sm sm:p-8 lg:p-10">
+      <div className="mb-10 max-w-3xl">
+        <p className="text-sm font-black uppercase tracking-widest text-emerald-600">Ansar Timeline</p>
+        <h2 className="mt-3 text-4xl font-extrabold text-slate-950 lg:text-5xl">Milestones</h2>
+      </div>
+
+      <div className="hidden overflow-x-auto pb-4 lg:block">
+        <div className="relative min-w-[1220px] px-6 py-24">
+          <div className="absolute left-10 right-10 top-1/2 h-1 -translate-y-1/2 rounded-full bg-slate-800" />
+          <div className="grid grid-cols-[repeat(14,minmax(0,1fr))]">
+            {ANSAR_MILESTONES.map((milestone, index) => {
+              const isTop = index % 2 === 0;
+              return (
+                <div key={`${milestone.year}-${milestone.title}`} className="relative h-48">
+                  <span className={`absolute left-1/2 top-1/2 z-10 h-6 w-6 -translate-x-1/2 -translate-y-1/2 rounded-full ${milestone.color} ring-8 ${milestone.ring} shadow-md`} />
+                  <span className={`absolute left-1/2 h-16 w-px -translate-x-1/2 bg-slate-700/70 ${isTop ? 'bottom-1/2 mb-3' : 'top-1/2 mt-3'}`} />
+                  <div className={`absolute left-1/2 w-32 -translate-x-1/2 text-center ${isTop ? 'bottom-[8.25rem]' : 'top-[8.25rem]'}`}>
+                    <p className="text-2xl font-black text-slate-950">{milestone.year}</p>
+                    <h3 className="mt-2 rounded-xl border border-slate-100 bg-slate-50 px-3 py-2 text-sm font-extrabold leading-tight text-slate-700 shadow-sm">{milestone.title}</h3>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      <div className="relative space-y-6 lg:hidden">
+        <div className="absolute bottom-4 left-4 top-4 w-1 rounded-full bg-slate-800" />
+        {ANSAR_MILESTONES.map((milestone) => (
+          <div key={`${milestone.year}-${milestone.title}-mobile`} className="relative flex gap-5 pl-0.5">
+            <span className={`relative z-10 mt-2 h-8 w-8 flex-none rounded-full ${milestone.color} ring-8 ${milestone.ring} shadow-md`} />
+            <div className="min-w-0 rounded-xl border border-slate-100 bg-slate-50 p-4">
+              <p className="text-2xl font-black text-slate-950">{milestone.year}</p>
+              <h3 className="mt-1 text-base font-extrabold text-slate-700">{milestone.title}</h3>
+            </div>
+          </div>
+        ))}
+      </div>
+    </AnimatedSection>
+  );
+}
+
+function HistoryAndTrustees({ historyText, trustees = [] }) {
+  const visibleTrustees = Array.isArray(trustees) ? trustees.filter(item => item?.imageUrl || item?.name) : [];
+  const trusteeSlots = visibleTrustees.length ? visibleTrustees : Array.from({ length: 6 }, (_, index) => ({ name: `Trustee Member ${index + 1}` }));
+
+  return (
+    <AnimatedSection className="mt-12 space-y-10">
+      <section className="grid gap-8 rounded-[2rem] border border-emerald-100 bg-emerald-50 p-8 lg:grid-cols-[0.8fr_1.2fr] lg:p-12">
+        <div>
+          <p className="text-sm font-black uppercase tracking-widest text-emerald-700">Our Story</p>
+          <h2 className="mt-3 text-4xl font-extrabold text-emerald-950">History of ANSAR</h2>
+        </div>
+        <div className="min-h-48 rounded-2xl bg-white p-6 text-lg leading-relaxed text-slate-600 shadow-sm">
+          {historyText ? (
+            <p className="whitespace-pre-wrap">{historyText}</p>
+          ) : (
+            <p>History content will be updated soon.</p>
+          )}
+        </div>
+      </section>
+
+      <section className="rounded-[2rem] border border-slate-100 bg-white p-8 shadow-sm lg:p-12">
+        <div className="mb-8 text-center">
+          <p className="text-sm font-black uppercase tracking-widest text-amber-600">Ansari Charitable Trust</p>
+          <h2 className="mt-3 text-4xl font-extrabold text-slate-950">Trustee Members</h2>
+        </div>
+        <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-6">
+          {trusteeSlots.map((trustee, index) => (
+            <div key={`${trustee.name || 'trustee'}-${index}`} className="group overflow-hidden rounded-2xl border border-slate-100 bg-slate-50 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+              <div className="relative aspect-[4/5] bg-slate-100">
+                {trustee.imageUrl ? (
+                  <img src={trustee.imageUrl} alt={trustee.name || 'Trustee member'} className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center text-slate-300">
+                    <svg className="h-14 w-14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0zM12 14a7 7 0 0 0-7 7h14a7 7 0 0 0-7-7z" /></svg>
+                  </div>
+                )}
+              </div>
+              <div className="p-4 text-center">
+                <h3 className="text-sm font-extrabold text-slate-800">{trustee.name}</h3>
+                {trustee.role && <p className="mt-1 text-xs font-bold text-emerald-600">{trustee.role}</p>}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    </AnimatedSection>
+  );
+}
+
+function AboutInstitutionSections() {
+  const settings = useSettings();
+
+  return (
+    <>
+      <AnsarTimeline />
+      <HistoryAndTrustees historyText={settings?.ansarHistoryText} trustees={settings?.trusteeMembers} />
+    </>
+  );
+}
 
 export default function About() {
   const { data: pages } = useFirestoreCollection('pages');
@@ -19,6 +165,9 @@ export default function About() {
             </a>
           )}
         />
+        <div className="mx-auto max-w-7xl px-4 pb-12 lg:pb-20">
+          <AboutInstitutionSections />
+        </div>
       </Layout>
     );
   }
@@ -91,6 +240,8 @@ export default function About() {
             </a>
           </aside>
         </section>
+
+        <AboutInstitutionSections />
       </div>
     </Layout>
   );

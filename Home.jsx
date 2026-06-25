@@ -31,23 +31,6 @@ const FALLBACK_LEADERS = [
   { name: 'Babitha KN', role: 'Junior Principal', detail: 'Sprouts' }
 ];
 
-const ANSAR_MILESTONES = [
-  { year: '1979', title: 'ACT got registered', color: 'bg-red-600', ring: 'ring-red-200' },
-  { year: '1982', title: 'School got registered', color: 'bg-amber-400', ring: 'ring-amber-200' },
-  { year: '1988', title: 'Affiliation from CBSE', color: 'bg-cyan-500', ring: 'ring-cyan-200' },
-  { year: '1990', title: 'Updated to Senior Secondary', color: 'bg-indigo-700', ring: 'ring-indigo-200' },
-  { year: '1992', title: '1st batch of class XII', color: 'bg-red-600', ring: 'ring-red-200' },
-  { year: '2021', title: 'New vision & mission', color: 'bg-amber-400', ring: 'ring-amber-200' },
-  { year: '2022', title: 'Year of Excellence', color: 'bg-cyan-500', ring: 'ring-cyan-200' },
-  { year: '2022', title: 'Year of Talent', color: 'bg-indigo-700', ring: 'ring-indigo-200' },
-  { year: '2023', title: 'Year of Quality', color: 'bg-red-600', ring: 'ring-red-200' },
-  { year: '2023', title: 'Year of Innovation', color: 'bg-amber-400', ring: 'ring-amber-200' },
-  { year: '2024', title: 'NABET Accredited', color: 'bg-cyan-500', ring: 'ring-cyan-200' },
-  { year: '2025', title: 'National Silver Medal', color: 'bg-indigo-700', ring: 'ring-indigo-200' },
-  { year: '2025', title: 'CBSE Topper', color: 'bg-red-600', ring: 'ring-red-200' },
-  { year: '2026', title: 'Year of Sustainability', color: 'bg-indigo-700', ring: 'ring-indigo-200' }
-];
-
 function AnimatedSection({ children, className = "" }) {
   const [isVisible, setIsVisible] = useState(false);
   const ref = useRef(null);
@@ -158,116 +141,6 @@ function VisionMissionLoop({ vision, mission }) {
         )}
       </AnimatePresence>
     </div>
-  );
-}
-
-function AnsarTimeline() {
-  return (
-    <AnimatedSection className="mt-20 overflow-hidden rounded-[2rem] border border-sky-100 bg-sky-50 p-6 shadow-sm sm:p-8 lg:p-10">
-      <div className="mb-10 flex flex-col gap-3 text-center sm:mb-12">
-        <p className="text-sm font-black uppercase tracking-widest text-sky-700">Ansar Timeline</p>
-        <h2 className="text-4xl font-extrabold text-slate-950 lg:text-5xl">Milestones</h2>
-      </div>
-
-      <div className="relative hidden overflow-x-auto pb-4 lg:block">
-        <div className="relative min-w-[1180px] px-8 py-28">
-          <div className="absolute left-10 right-10 top-1/2 h-1 -translate-y-1/2 rounded-full bg-slate-800/80" />
-          <div className="grid grid-cols-[repeat(14,minmax(0,1fr))] gap-4">
-            {ANSAR_MILESTONES.map((milestone, index) => {
-              const isTop = index % 2 === 0;
-              return (
-                <motion.div
-                  key={`${milestone.year}-${milestone.title}`}
-                  initial={{ opacity: 0, y: isTop ? -24 : 24 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.35 }}
-                  transition={{ duration: 0.45, delay: Math.min(index * 0.04, 0.35) }}
-                  className="relative flex h-48 flex-col items-center justify-center"
-                >
-                  <div className={`absolute left-1/2 h-20 w-px -translate-x-1/2 bg-slate-700/70 ${isTop ? 'bottom-24' : 'top-24'}`} />
-                  <div className={`absolute left-1/2 top-1/2 z-10 h-8 w-8 -translate-x-1/2 -translate-y-1/2 rounded-full ${milestone.color} ring-8 ${milestone.ring} shadow-md`} />
-                  <div className={`absolute left-1/2 flex w-32 -translate-x-1/2 flex-col items-center ${isTop ? 'bottom-[7.7rem]' : 'top-[7.7rem]'}`}>
-                    <div className={`flex h-24 w-24 items-center justify-center rounded-full border-4 border-white bg-white p-3 text-center text-sm font-extrabold leading-tight text-slate-800 shadow-lg ring-2 ${milestone.ring}`}>
-                      {milestone.title}
-                    </div>
-                    <p className={`text-3xl font-black text-slate-950 ${isTop ? 'mt-16' : 'order-first mb-16'}`}>{milestone.year}</p>
-                  </div>
-                </motion.div>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-
-      <div className="relative space-y-6 lg:hidden">
-        <div className="absolute bottom-4 left-5 top-4 w-1 rounded-full bg-slate-800/70" />
-        {ANSAR_MILESTONES.map((milestone, index) => (
-          <motion.div
-            key={`${milestone.year}-${milestone.title}-mobile`}
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, amount: 0.4 }}
-            transition={{ duration: 0.35, delay: Math.min(index * 0.035, 0.25) }}
-            className="relative flex gap-5 pl-1"
-          >
-            <span className={`relative z-10 mt-2 h-9 w-9 flex-none rounded-full ${milestone.color} ring-8 ${milestone.ring} shadow-md`} />
-            <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-100">
-              <p className="text-2xl font-black text-slate-950">{milestone.year}</p>
-              <h3 className="mt-1 text-lg font-extrabold text-slate-800">{milestone.title}</h3>
-            </div>
-          </motion.div>
-        ))}
-      </div>
-    </AnimatedSection>
-  );
-}
-
-function HistoryAndTrustees({ historyText, trustees = [] }) {
-  const visibleTrustees = Array.isArray(trustees) ? trustees.filter(item => item?.imageUrl || item?.name) : [];
-  const trusteeSlots = visibleTrustees.length ? visibleTrustees : Array.from({ length: 6 }, (_, index) => ({ name: `Trustee Member ${index + 1}` }));
-
-  return (
-    <AnimatedSection className="mt-12 space-y-10">
-      <section className="grid gap-8 rounded-[2rem] border border-emerald-100 bg-white p-8 shadow-sm lg:grid-cols-[0.8fr_1.2fr] lg:p-12">
-        <div>
-          <p className="text-sm font-black uppercase tracking-widest text-emerald-600">Our Story</p>
-          <h2 className="mt-3 text-4xl font-extrabold text-emerald-950">History of ANSAR</h2>
-        </div>
-        <div className="min-h-48 rounded-2xl bg-slate-50 p-6 text-lg leading-relaxed text-slate-600">
-          {historyText ? (
-            <p className="whitespace-pre-wrap">{historyText}</p>
-          ) : (
-            <p>History content will be updated soon.</p>
-          )}
-        </div>
-      </section>
-
-      <section className="rounded-[2rem] border border-slate-100 bg-white p-8 shadow-sm lg:p-12">
-        <div className="mb-8 text-center">
-          <p className="text-sm font-black uppercase tracking-widest text-amber-600">Ansari Charitable Trust</p>
-          <h2 className="mt-3 text-4xl font-extrabold text-slate-950">Trustee Members</h2>
-        </div>
-        <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-6">
-          {trusteeSlots.map((trustee, index) => (
-            <div key={`${trustee.name || 'trustee'}-${index}`} className="group overflow-hidden rounded-2xl border border-slate-100 bg-slate-50 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
-              <div className="relative aspect-[4/5] bg-slate-100">
-                {trustee.imageUrl ? (
-                  <img src={trustee.imageUrl} alt={trustee.name || 'Trustee member'} className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
-                ) : (
-                  <div className="absolute inset-0 flex items-center justify-center text-slate-300">
-                    <svg className="h-14 w-14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0zM12 14a7 7 0 0 0-7 7h14a7 7 0 0 0-7-7z" /></svg>
-                  </div>
-                )}
-              </div>
-              <div className="p-4 text-center">
-                <h3 className="text-sm font-extrabold text-slate-800">{trustee.name}</h3>
-                {trustee.role && <p className="mt-1 text-xs font-bold text-emerald-600">{trustee.role}</p>}
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-    </AnimatedSection>
   );
 }
 
@@ -407,10 +280,6 @@ export default function Home() {
            <VerticalCarousel images={settings?.premisesImages || []} onImageClick={setLightboxImage} />
         </div>
       </AnimatedSection>
-
-      <AnsarTimeline />
-
-      <HistoryAndTrustees historyText={settings?.ansarHistoryText} trustees={settings?.trusteeMembers} />
 
       <AnimatedSection className="mt-16 grid grid-cols-1 lg:grid-cols-2 gap-16 items-stretch">
         <div className="bg-emerald-950 p-8 sm:p-12 md:p-16 rounded-[2.5rem] shadow-2xl text-white flex flex-col justify-center relative overflow-hidden group order-2 lg:order-1">
