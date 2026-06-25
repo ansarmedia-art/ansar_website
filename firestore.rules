@@ -152,7 +152,7 @@ service cloud.firestore {
              isValidOptionalString('time', 0, 100) &&
              isValidDateString('date') &&
              isValidUrl('image') &&
-             isOptionalUrlList('imageUrls', 20) &&
+             isOptionalUrlList('imageUrls', 100) &&
              isValidUrl('facebookUrl') &&
              isValidUrl('instagramUrl') &&
              isValidUrl('youtubeUrl') &&
@@ -167,9 +167,9 @@ service cloud.firestore {
              isValidStringLength('title', 1, 200) &&
              isValidOptionalString('description', 0, 50000) &&
              isValidUrl('imageUrl') &&
-             isOptionalUrlList('imageUrls', 20) &&
+             isOptionalUrlList('imageUrls', 100) &&
              isValidUrl('coverImageUrl') &&
-             isOptionalUrlList('eventImages', 20) &&
+             isOptionalUrlList('eventImages', 100) &&
              isValidDateString('date') &&
              isValidUrl('facebookUrl') &&
              isValidUrl('instagramUrl') &&

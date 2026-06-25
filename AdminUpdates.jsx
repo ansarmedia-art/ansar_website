@@ -3,6 +3,8 @@ import { collection, addDoc, updateDoc, deleteDoc, doc, serverTimestamp, query, 
 import { db } from './firebase-init';
 import ImgBbUrlImporter from './ImgBbUrlImporter';
 
+const MAX_EVENT_IMAGES = 100;
+
 // Utility to clean raw Google Image Search URLs
 const cleanImageUrl = (url) => {
   if (!url || typeof url !== 'string') return '';
@@ -55,11 +57,22 @@ export default function AdminUpdates() {
     setFormData(prev => ({ ...prev, eventImages: newEventImages }));
   };
 
-  const addEventImageField = () => setFormData(prev => ({ ...prev, eventImages: [...prev.eventImages, ''] }));
+  const addEventImageField = () => setFormData(prev => {
+    const currentImages = Array.isArray(prev.eventImages) ? prev.eventImages : [];
+    if (currentImages.length >= MAX_EVENT_IMAGES) {
+      alert(`You can add up to ${MAX_EVENT_IMAGES} images for one event.`);
+      return prev;
+    }
+    return { ...prev, eventImages: [...currentImages, ''] };
+  });
   const appendEventImages = (urls) => {
     setFormData(prev => {
       const existing = Array.isArray(prev.eventImages) ? prev.eventImages.filter(url => url.trim() !== '') : [];
-      return { ...prev, eventImages: [...existing, ...urls] };
+      const nextImages = [...existing, ...urls].slice(0, MAX_EVENT_IMAGES);
+      if (existing.length + urls.length > MAX_EVENT_IMAGES) {
+        alert(`Only the first ${MAX_EVENT_IMAGES} image links were added. For bigger albums, create another event/gallery entry.`);
+      }
+      return { ...prev, eventImages: nextImages };
     });
   };
 
@@ -100,6 +113,11 @@ export default function AdminUpdates() {
       const cleanedEventImages = (Array.isArray(formData.eventImages) ? formData.eventImages : [])
         .map(url => cleanImageUrl(url))
         .filter(url => url !== '');
+
+      if (cleanedEventImages.length > MAX_EVENT_IMAGES) {
+        alert(`Save failed: one event can have up to ${MAX_EVENT_IMAGES} image links.`);
+        return;
+      }
 
       const payload = {
         category: formData.category || 'News',

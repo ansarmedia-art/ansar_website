@@ -4,6 +4,8 @@ import { db } from './firebase-init';
 import { useFirestoreCollection } from './useFirestoreCollection';
 import ImgBbUrlImporter from './ImgBbUrlImporter';
 
+const MAX_EVENT_IMAGES = 100;
+
 export default function AdminEvents() {
   const { data: items, loading } = useFirestoreCollection('events', 'date', 'desc');
   
@@ -24,13 +26,24 @@ export default function AdminEvents() {
   };
 
   const addImageUrlField = () => {
-    setFormData(prev => ({ ...prev, imageUrls: [...prev.imageUrls, ''] }));
+    setFormData(prev => {
+      const currentImages = Array.isArray(prev.imageUrls) ? prev.imageUrls : [];
+      if (currentImages.length >= MAX_EVENT_IMAGES) {
+        alert(`You can add up to ${MAX_EVENT_IMAGES} images for one event.`);
+        return prev;
+      }
+      return { ...prev, imageUrls: [...currentImages, ''] };
+    });
   };
 
   const appendImageUrls = (urls) => {
     setFormData(prev => {
       const existing = Array.isArray(prev.imageUrls) ? prev.imageUrls.filter(url => url.trim() !== '') : [];
-      return { ...prev, imageUrls: [...existing, ...urls] };
+      const nextImages = [...existing, ...urls].slice(0, MAX_EVENT_IMAGES);
+      if (existing.length + urls.length > MAX_EVENT_IMAGES) {
+        alert(`Only the first ${MAX_EVENT_IMAGES} image links were added. For bigger albums, create another event/gallery entry.`);
+      }
+      return { ...prev, imageUrls: nextImages };
     });
   };
 
@@ -61,9 +74,15 @@ export default function AdminEvents() {
     e.preventDefault();
     setIsSubmitting(true);
     try {
+      const cleanedImageUrls = formData.imageUrls.filter(url => url.trim() !== '');
+      if (cleanedImageUrls.length > MAX_EVENT_IMAGES) {
+        alert(`Save failed: one event can have up to ${MAX_EVENT_IMAGES} image links.`);
+        return;
+      }
+
       const payload = {
         ...formData,
-        imageUrls: formData.imageUrls.filter(url => url.trim() !== ''), // Clean up empty strings
+        imageUrls: cleanedImageUrls,
         updatedAt: serverTimestamp()
       };
 
