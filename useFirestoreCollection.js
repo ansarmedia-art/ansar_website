@@ -8,7 +8,10 @@ export function useFirestoreCollection(collectionName, orderByField = 'createdAt
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const q = query(collection(db, collectionName), orderBy(orderByField, orderDir));
+    const collectionRef = collection(db, collectionName);
+    const q = orderByField
+      ? query(collectionRef, orderBy(orderByField, orderDir))
+      : query(collectionRef);
     
     // onSnapshot sets up a real-time listener
     const unsubscribe = onSnapshot(q, (snapshot) => {

@@ -4,12 +4,10 @@ import { db } from './firebase-init';
 import Layout from './Layout';
 import Hero from './Hero';
 import NewsCard from './NewsCard';
-import PrincipalCard from './PrincipalCard';
 import NoticePopup from './NoticePopup';
 import { useSettings } from './SettingsContext';
 import { useFirestoreCollection } from './useFirestoreCollection';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
 
 // Transformed into a Bento Layout configuration using Lucide-style SVG icons
 const FALLBACK_FEATURES = [
@@ -31,6 +29,23 @@ const FALLBACK_LEADERS = [
   { name: 'Ravya K R', role: 'Junior Principal', detail: 'Secondary Section' },
   { name: 'Saleena Kader', role: 'Junior Principal', detail: 'Primary Section' },
   { name: 'Babitha KN', role: 'Junior Principal', detail: 'Sprouts' }
+];
+
+const ANSAR_MILESTONES = [
+  { year: '1979', title: 'ACT got registered', color: 'bg-red-600', ring: 'ring-red-200' },
+  { year: '1982', title: 'School got registered', color: 'bg-amber-400', ring: 'ring-amber-200' },
+  { year: '1988', title: 'Affiliation from CBSE', color: 'bg-cyan-500', ring: 'ring-cyan-200' },
+  { year: '1990', title: 'Updated to Senior Secondary', color: 'bg-indigo-700', ring: 'ring-indigo-200' },
+  { year: '1992', title: '1st batch of class XII', color: 'bg-red-600', ring: 'ring-red-200' },
+  { year: '2021', title: 'New vision & mission', color: 'bg-amber-400', ring: 'ring-amber-200' },
+  { year: '2022', title: 'Year of Excellence', color: 'bg-cyan-500', ring: 'ring-cyan-200' },
+  { year: '2022', title: 'Year of Talent', color: 'bg-indigo-700', ring: 'ring-indigo-200' },
+  { year: '2023', title: 'Year of Quality', color: 'bg-red-600', ring: 'ring-red-200' },
+  { year: '2023', title: 'Year of Innovation', color: 'bg-amber-400', ring: 'ring-amber-200' },
+  { year: '2024', title: 'NABET Accredited', color: 'bg-cyan-500', ring: 'ring-cyan-200' },
+  { year: '2025', title: 'National Silver Medal', color: 'bg-indigo-700', ring: 'ring-indigo-200' },
+  { year: '2025', title: 'CBSE Topper', color: 'bg-red-600', ring: 'ring-red-200' },
+  { year: '2026', title: 'Year of Sustainability', color: 'bg-indigo-700', ring: 'ring-indigo-200' }
 ];
 
 function AnimatedSection({ children, className = "" }) {
@@ -146,61 +161,173 @@ function VisionMissionLoop({ vision, mission }) {
   );
 }
 
-function HomeAchievementsRail({ achievements }) {
-  const navigate = useNavigate();
-  const scrollerRef = useRef(null);
-  const publishedWithImages = (achievements || [])
-    .filter(item => item.published !== false && item.imageUrl)
-    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
-  const shouldAutoScroll = publishedWithImages.length > 5;
-
-  useEffect(() => {
-    const scroller = scrollerRef.current;
-    if (!scroller || !shouldAutoScroll) return;
-
-    const timer = setInterval(() => {
-      const maxScroll = scroller.scrollWidth - scroller.clientWidth;
-      if (maxScroll <= 0) return;
-
-      if (scroller.scrollLeft >= maxScroll - 4) {
-        scroller.scrollTo({ left: 0, behavior: 'smooth' });
-      } else {
-        scroller.scrollBy({ left: 260, behavior: 'smooth' });
-      }
-    }, 2800);
-
-    return () => clearInterval(timer);
-  }, [shouldAutoScroll, publishedWithImages.length]);
-
-  if (!publishedWithImages.length) return null;
-
+function AnsarTimeline() {
   return (
-    <AnimatedSection className="mt-10 overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-emerald-950 via-emerald-800 to-[#124d7b] px-4 py-8 shadow-2xl sm:px-8 lg:px-12">
-      <div
-        ref={scrollerRef}
-        className={`flex snap-x snap-mandatory gap-6 overflow-x-auto scroll-smooth px-1 pb-4 [scrollbar-width:thin] [scrollbar-color:rgba(255,255,255,0.5)_transparent] ${shouldAutoScroll ? 'justify-start' : 'justify-center'}`}
-        aria-label="Achievement posters"
-      >
-        {publishedWithImages.map(item => (
-          <button
-            key={item.id}
-            type="button"
-            onClick={() => navigate(`/achievements/${item.id}`)}
-            className="group flex h-[22rem] w-[17rem] flex-none snap-center items-center justify-center overflow-hidden rounded-2xl bg-white p-2 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-amber-300/60 sm:h-[25rem] sm:w-[19rem] lg:h-[28rem] lg:w-[21rem]"
-            aria-label={`Open ${item.title || 'achievement'}`}
+    <AnimatedSection className="mt-20 overflow-hidden rounded-[2rem] border border-sky-100 bg-sky-50 p-6 shadow-sm sm:p-8 lg:p-10">
+      <div className="mb-10 flex flex-col gap-3 text-center sm:mb-12">
+        <p className="text-sm font-black uppercase tracking-widest text-sky-700">Ansar Timeline</p>
+        <h2 className="text-4xl font-extrabold text-slate-950 lg:text-5xl">Milestones</h2>
+      </div>
+
+      <div className="relative hidden overflow-x-auto pb-4 lg:block">
+        <div className="relative min-w-[1180px] px-8 py-28">
+          <div className="absolute left-10 right-10 top-1/2 h-1 -translate-y-1/2 rounded-full bg-slate-800/80" />
+          <div className="grid grid-cols-[repeat(14,minmax(0,1fr))] gap-4">
+            {ANSAR_MILESTONES.map((milestone, index) => {
+              const isTop = index % 2 === 0;
+              return (
+                <motion.div
+                  key={`${milestone.year}-${milestone.title}`}
+                  initial={{ opacity: 0, y: isTop ? -24 : 24 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.35 }}
+                  transition={{ duration: 0.45, delay: Math.min(index * 0.04, 0.35) }}
+                  className="relative flex h-48 flex-col items-center justify-center"
+                >
+                  <div className={`absolute left-1/2 h-20 w-px -translate-x-1/2 bg-slate-700/70 ${isTop ? 'bottom-24' : 'top-24'}`} />
+                  <div className={`absolute left-1/2 top-1/2 z-10 h-8 w-8 -translate-x-1/2 -translate-y-1/2 rounded-full ${milestone.color} ring-8 ${milestone.ring} shadow-md`} />
+                  <div className={`absolute left-1/2 flex w-32 -translate-x-1/2 flex-col items-center ${isTop ? 'bottom-[7.7rem]' : 'top-[7.7rem]'}`}>
+                    <div className={`flex h-24 w-24 items-center justify-center rounded-full border-4 border-white bg-white p-3 text-center text-sm font-extrabold leading-tight text-slate-800 shadow-lg ring-2 ${milestone.ring}`}>
+                      {milestone.title}
+                    </div>
+                    <p className={`text-3xl font-black text-slate-950 ${isTop ? 'mt-16' : 'order-first mb-16'}`}>{milestone.year}</p>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      <div className="relative space-y-6 lg:hidden">
+        <div className="absolute bottom-4 left-5 top-4 w-1 rounded-full bg-slate-800/70" />
+        {ANSAR_MILESTONES.map((milestone, index) => (
+          <motion.div
+            key={`${milestone.year}-${milestone.title}-mobile`}
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, amount: 0.4 }}
+            transition={{ duration: 0.35, delay: Math.min(index * 0.035, 0.25) }}
+            className="relative flex gap-5 pl-1"
           >
-            <span className="flex h-full w-full items-center justify-center overflow-hidden rounded-xl bg-slate-50">
-              <img
-                src={item.imageUrl}
-                alt={item.title || 'Achievement poster'}
-                loading="lazy"
-                className="max-h-full max-w-full object-contain transition-transform duration-500 group-hover:scale-[1.03]"
-              />
-            </span>
-          </button>
+            <span className={`relative z-10 mt-2 h-9 w-9 flex-none rounded-full ${milestone.color} ring-8 ${milestone.ring} shadow-md`} />
+            <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-100">
+              <p className="text-2xl font-black text-slate-950">{milestone.year}</p>
+              <h3 className="mt-1 text-lg font-extrabold text-slate-800">{milestone.title}</h3>
+            </div>
+          </motion.div>
         ))}
       </div>
     </AnimatedSection>
+  );
+}
+
+function HistoryAndTrustees({ historyText, trustees = [] }) {
+  const visibleTrustees = Array.isArray(trustees) ? trustees.filter(item => item?.imageUrl || item?.name) : [];
+  const trusteeSlots = visibleTrustees.length ? visibleTrustees : Array.from({ length: 6 }, (_, index) => ({ name: `Trustee Member ${index + 1}` }));
+
+  return (
+    <AnimatedSection className="mt-12 space-y-10">
+      <section className="grid gap-8 rounded-[2rem] border border-emerald-100 bg-white p-8 shadow-sm lg:grid-cols-[0.8fr_1.2fr] lg:p-12">
+        <div>
+          <p className="text-sm font-black uppercase tracking-widest text-emerald-600">Our Story</p>
+          <h2 className="mt-3 text-4xl font-extrabold text-emerald-950">History of ANSAR</h2>
+        </div>
+        <div className="min-h-48 rounded-2xl bg-slate-50 p-6 text-lg leading-relaxed text-slate-600">
+          {historyText ? (
+            <p className="whitespace-pre-wrap">{historyText}</p>
+          ) : (
+            <p>History content will be updated soon.</p>
+          )}
+        </div>
+      </section>
+
+      <section className="rounded-[2rem] border border-slate-100 bg-white p-8 shadow-sm lg:p-12">
+        <div className="mb-8 text-center">
+          <p className="text-sm font-black uppercase tracking-widest text-amber-600">Ansari Charitable Trust</p>
+          <h2 className="mt-3 text-4xl font-extrabold text-slate-950">Trustee Members</h2>
+        </div>
+        <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-6">
+          {trusteeSlots.map((trustee, index) => (
+            <div key={`${trustee.name || 'trustee'}-${index}`} className="group overflow-hidden rounded-2xl border border-slate-100 bg-slate-50 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+              <div className="relative aspect-[4/5] bg-slate-100">
+                {trustee.imageUrl ? (
+                  <img src={trustee.imageUrl} alt={trustee.name || 'Trustee member'} className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center text-slate-300">
+                    <svg className="h-14 w-14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0zM12 14a7 7 0 0 0-7 7h14a7 7 0 0 0-7-7z" /></svg>
+                  </div>
+                )}
+              </div>
+              <div className="p-4 text-center">
+                <h3 className="text-sm font-extrabold text-slate-800">{trustee.name}</h3>
+                {trustee.role && <p className="mt-1 text-xs font-bold text-emerald-600">{trustee.role}</p>}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    </AnimatedSection>
+  );
+}
+
+function LeadershipProfile({ profile, reverse = false }) {
+  const imageUrl = profile.imageUrl || '';
+  return (
+    <motion.article
+      initial={{ opacity: 0, y: 36 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.25 }}
+      transition={{ duration: 0.65, ease: "easeOut" }}
+      className={`grid overflow-hidden rounded-[2rem] border border-emerald-100 bg-white shadow-xl lg:grid-cols-[18rem_1fr] ${reverse ? 'lg:grid-cols-[1fr_18rem]' : ''}`}
+    >
+      <div className={`relative min-h-[20rem] bg-emerald-950 ${reverse ? 'lg:order-2' : ''}`}>
+        {imageUrl ? (
+          <img src={imageUrl} alt={profile.name} className="absolute inset-0 h-full w-full object-cover" loading="lazy" />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center bg-emerald-950 text-emerald-100">
+            <svg className="h-20 w-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0zM12 14a7 7 0 0 0-7 7h14a7 7 0 0 0-7-7z" /></svg>
+          </div>
+        )}
+      </div>
+      <div className="flex flex-col justify-center p-7 sm:p-10">
+        <p className="text-sm font-black uppercase tracking-widest text-emerald-600">{profile.role}</p>
+        <h3 className="mt-2 text-3xl font-extrabold text-emerald-950">{profile.name}</h3>
+        {profile.qualifications && <p className="mt-2 font-bold text-amber-600">{profile.qualifications}</p>}
+        {profile.message ? (
+          <p className="mt-6 whitespace-pre-wrap text-base leading-relaxed text-slate-600 sm:text-lg">{profile.message}</p>
+        ) : (
+          <p className="mt-6 text-base leading-relaxed text-slate-500">A message from this office will be updated soon.</p>
+        )}
+      </div>
+    </motion.article>
+  );
+}
+
+function JuniorPrincipalTile({ leader, index }) {
+  return (
+    <motion.article
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.3 }}
+      transition={{ duration: 0.5, delay: Math.min(index * 0.08, 0.32) }}
+      className="group overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-emerald-200 hover:shadow-xl"
+    >
+      <div className="relative aspect-[4/5] bg-slate-100">
+        {leader.imageUrl ? (
+          <img src={leader.imageUrl} alt={leader.name} className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center text-slate-300">
+            <svg className="h-12 w-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0zM12 14a7 7 0 0 0-7 7h14a7 7 0 0 0-7-7z" /></svg>
+          </div>
+        )}
+      </div>
+      <div className="p-5 text-center">
+        <h4 className="text-lg font-extrabold text-slate-900">{leader.name}</h4>
+        {(leader.qualification || leader.qualifications) && <p className="mt-1 text-sm font-semibold text-amber-600">{leader.qualification || leader.qualifications}</p>}
+        <p className="mt-1 text-sm font-bold text-emerald-600">{leader.section}</p>
+      </div>
+    </motion.article>
   );
 }
 
@@ -209,7 +336,6 @@ export default function Home() {
   const settings = useSettings();
   const [lightboxImage, setLightboxImage] = useState(null);
   const { data: leadershipData } = useFirestoreCollection('leadership', 'order', 'asc');
-  const { data: achievementsData } = useFirestoreCollection('achievements', 'order', 'asc');
   
   // Real-time fetching of Unified 'updates' collection extended limit for separation
   useEffect(() => {
@@ -224,6 +350,27 @@ export default function Home() {
   const homeNews = publishedUpdates.filter(item => item.category === 'News' || !item.category).slice(0, 3);
   const homeEvents = publishedUpdates.filter(item => item.category === 'Events').slice(0, 3);
   const activeLeaders = leadershipData.length ? leadershipData.filter(l => l.published !== false) : FALLBACK_LEADERS;
+  const legacyDirector = activeLeaders.find(leader => (leader.role || '').toLowerCase().includes('director')) || FALLBACK_LEADERS[0];
+  const legacyPrincipal = activeLeaders.find(leader => (leader.role || '').toLowerCase().includes('principal') && !(leader.role || '').toLowerCase().includes('junior')) || FALLBACK_LEADERS[1];
+  const directorProfile = {
+    name: settings?.directorName || legacyDirector.name,
+    qualifications: settings?.directorQualifications || legacyDirector.qualification || legacyDirector.detail,
+    role: settings?.directorRole || legacyDirector.role || 'Director',
+    imageUrl: settings?.directorImageUrl || legacyDirector.imageUrl,
+    message: settings?.directorMessage || ''
+  };
+  const principalProfile = {
+    name: settings?.principalName || legacyPrincipal.name,
+    qualifications: settings?.principalQualifications || legacyPrincipal.qualification || legacyPrincipal.detail,
+    role: settings?.principalRole || legacyPrincipal.role || 'Principal',
+    imageUrl: settings?.principalImageUrl || legacyPrincipal.imageUrl,
+    message: settings?.principalMessage || ''
+  };
+  const juniorPrincipals = Array.isArray(settings?.juniorPrincipals) && settings.juniorPrincipals.length
+    ? settings.juniorPrincipals.filter(leader => leader.name || leader.imageUrl || leader.section || leader.qualification || leader.qualifications)
+    : activeLeaders
+        .filter(leader => (leader.role || '').toLowerCase().includes('junior'))
+        .map(leader => ({ name: leader.name, qualification: leader.qualification || '', section: leader.detail || leader.role, imageUrl: leader.imageUrl }));
 
   return (
     <Layout isHome={true}>
@@ -261,6 +408,10 @@ export default function Home() {
         </div>
       </AnimatedSection>
 
+      <AnsarTimeline />
+
+      <HistoryAndTrustees historyText={settings?.ansarHistoryText} trustees={settings?.trusteeMembers} />
+
       <AnimatedSection className="mt-16 grid grid-cols-1 lg:grid-cols-2 gap-16 items-stretch">
         <div className="bg-emerald-950 p-8 sm:p-12 md:p-16 rounded-[2.5rem] shadow-2xl text-white flex flex-col justify-center relative overflow-hidden group order-2 lg:order-1">
           <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl -mr-20 -mt-20 group-hover:bg-amber-500/20 transition-colors duration-700"></div>
@@ -282,8 +433,6 @@ export default function Home() {
            </div>
          )}
       </AnimatedSection>
-
-      <HomeAchievementsRail achievements={achievementsData} />
 
       <AnimatedSection className="mt-32">
         <div className="text-center mb-12">
@@ -351,10 +500,19 @@ export default function Home() {
           <p className="text-emerald-600 font-black uppercase tracking-widest text-sm mb-3">Leadership</p>
           <h2 className="text-4xl lg:text-5xl font-extrabold text-emerald-950">Guiding visionaries behind our success</h2>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {activeLeaders.map((leader, i) => (
-            <PrincipalCard key={i} name={leader.name} role={leader.role} qualification={leader.qualification || leader.detail} imageUrl={leader.imageUrl} />
-          ))}
+        <div className="space-y-8">
+          <LeadershipProfile profile={directorProfile} />
+          <LeadershipProfile profile={principalProfile} reverse />
+          {juniorPrincipals.length > 0 && (
+            <div className="pt-6">
+              <h3 className="mb-6 text-center text-2xl font-extrabold text-slate-900">Junior Principals</h3>
+              <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-5">
+                {juniorPrincipals.map((leader, index) => (
+                  <JuniorPrincipalTile key={`${leader.name || 'junior'}-${index}`} leader={leader} index={index} />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </AnimatedSection>
 

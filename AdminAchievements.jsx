@@ -4,10 +4,18 @@ import { db } from './firebase-init';
 import { useFirestoreCollection } from './useFirestoreCollection';
 import ImgBbUrlImporter from './ImgBbUrlImporter';
 
+function getAchievementTime(item) {
+  if (item.createdAt?.toMillis) return item.createdAt.toMillis();
+  if (item.createdAt?.seconds) return item.createdAt.seconds * 1000;
+  if (item.date) return new Date(item.date).getTime() || 0;
+  return 0;
+}
+
 export default function AdminAchievements() {
-  const { data: items, loading } = useFirestoreCollection('achievements', 'order', 'asc');
+  const { data: items, loading } = useFirestoreCollection('achievements', null);
+  const newestFirstItems = [...items].sort((a, b) => getAchievementTime(b) - getAchievementTime(a));
   
-  const initialFormState = { title: '', description: '', imageUrl: '', date: '', studentName: '', order: 0, published: true };
+  const initialFormState = { title: '', description: '', imageUrl: '', date: '', studentName: '', published: true };
   const [formData, setFormData] = useState(initialFormState);
   const [editingId, setEditingId] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -25,7 +33,6 @@ export default function AdminAchievements() {
       imageUrl: item.imageUrl || '',
       date: item.date || '',
       studentName: item.studentName || '',
-      order: item.order || 0, 
       published: item.published !== false 
     });
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -42,7 +49,6 @@ export default function AdminAchievements() {
     try {
       const payload = {
         ...formData,
-        order: Number(formData.order),
         updatedAt: serverTimestamp()
       };
 
@@ -97,10 +103,6 @@ export default function AdminAchievements() {
               <label className="block text-sm font-bold text-slate-700 mb-1">Description</label>
               <textarea name="description" value={formData.description} onChange={handleChange} className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none h-24" />
             </div>
-            <div>
-              <label className="block text-sm font-bold text-slate-700 mb-1">Display Order</label>
-              <input name="order" type="number" value={formData.order} onChange={handleChange} className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" />
-            </div>
           </div>
           <div className="flex items-center justify-between mt-6 pt-4 border-t border-slate-100">
             <label className="flex items-center gap-2 cursor-pointer font-medium text-slate-700">
@@ -119,11 +121,11 @@ export default function AdminAchievements() {
 
       <div className="space-y-4">
         <h3 className="font-bold text-lg text-slate-800 mb-4">Current Achievements</h3>
-        {loading ? <p className="text-slate-500">Loading achievements...</p> : items.map(item => (
+        {loading ? <p className="text-slate-500">Loading achievements...</p> : newestFirstItems.map(item => (
           <div key={item.id} className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm flex items-center justify-between hover:border-emerald-200 transition-colors">
             <div>
               <h4 className="font-bold text-slate-900">{item.title}</h4>
-              <p className="text-sm text-slate-500">{item.date || 'No date'} | Order: {item.order} | {item.published ? 'Published' : 'Draft'}</p>
+              <p className="text-sm text-slate-500">{item.date || 'No date'} | {item.published ? 'Published' : 'Draft'}</p>
             </div>
             <div className="flex items-center gap-2 flex-shrink-0">
               <button onClick={() => handleEdit(item)} className="px-3 py-1.5 text-sm font-bold text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors">Edit</button>

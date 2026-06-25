@@ -24,6 +24,8 @@ import AdminNotices from './AdminNotices';
 import AdminAcademics from './AdminAcademics';
 import ArticleView from './ArticleView';
 import AdminSettings from './AdminSettings';
+import AdminPublicDisclosure from './AdminPublicDisclosure';
+import MandatoryDisclosure from './MandatoryDisclosure';
 import ContentPageLayout from './ContentPageLayout';
 import { SettingsProvider } from './SettingsContext';
 
@@ -350,7 +352,7 @@ export default function App() {
         <Route path="/alumni" element={<DynamicPage slug="alumni" />} />
         <Route path="/achievements" element={<Achievements />} />
         <Route path="/sop" element={<DynamicPage slug="sop" />} />
-        <Route path="/mandatory-public-disclosure" element={<DynamicPage slug="mandatory-public-disclosure" />} />
+        <Route path="/mandatory-public-disclosure" element={<MandatoryDisclosure />} />
         <Route path="/:slug" element={<DynamicPage />} />
         
         {/* Placeholder detail routes for News/Events cards */}
@@ -376,6 +378,7 @@ export default function App() {
                   <Route path="/achievements" element={<AdminAchievements />} />
                   <Route path="/leadership" element={<AdminLeadership />} />
                   <Route path="/academics" element={<AdminAcademics />} />
+                  <Route path="/public-disclosure" element={<AdminPublicDisclosure />} />
                   <Route path="/gallery" element={<div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100"><h2 className="text-xl font-bold">Gallery</h2><p className="text-slate-500">Module under construction.</p></div>} />
                   <Route path="/notices" element={<AdminNotices />} />
                   <Route path="/settings" element={<AdminSettings />} />

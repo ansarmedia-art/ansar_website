@@ -84,6 +84,11 @@ service cloud.firestore {
              (request.resource.data[field] is list && request.resource.data[field].size() <= maxListSize);
     }
 
+    function isOptionalList(field, maxListSize) {
+      return !(field in request.resource.data) ||
+             (request.resource.data[field] is list && request.resource.data[field].size() <= maxListSize);
+    }
+
     // Validate basic date string format (YYYY-MM-DD)
     function isValidDateString(field) {
       return !(field in request.resource.data) ||
@@ -223,6 +228,9 @@ service cloud.firestore {
                'siteDescription', 'siteKeywords', 'heroTitle', 
                'facebookUrl', 'instagramUrl', 'youtubeUrl', 'twitterUrl', 'whatsappChannelUrl', 
                'premisesImages', 'kgImages', 'visionText', 'missionText', 'feeStructurePdfUrl',
+               'directorName', 'directorQualifications', 'directorRole', 'directorImageUrl', 'directorMessage',
+               'principalName', 'principalQualifications', 'principalRole', 'principalImageUrl', 'principalMessage',
+               'juniorPrincipals',
                'sustainabilityTitle', 'sustainabilityDesc', 'sustainabilityLogoUrl', 
                'createdAt', 'updatedAt'
              ]) &&
@@ -233,6 +241,17 @@ service cloud.firestore {
              isValidOptionalString('sustainabilityTitle', 0, 500) &&
              isValidOptionalString('sustainabilityDesc', 0, 5000) &&
              isValidOptionalString('sustainabilityLogoUrl', 0, 1000) &&
+             isValidOptionalString('directorName', 0, 200) &&
+             isValidOptionalString('directorQualifications', 0, 500) &&
+             isValidOptionalString('directorRole', 0, 200) &&
+             isValidOptionalString('directorImageUrl', 0, 1000) &&
+             isValidOptionalString('directorMessage', 0, 5000) &&
+             isValidOptionalString('principalName', 0, 200) &&
+             isValidOptionalString('principalQualifications', 0, 500) &&
+             isValidOptionalString('principalRole', 0, 200) &&
+             isValidOptionalString('principalImageUrl', 0, 1000) &&
+             isValidOptionalString('principalMessage', 0, 5000) &&
+             isOptionalList('juniorPrincipals', 12) &&
              isValidOptionalString('feeStructurePdfUrl', 0, 1000) &&
              isValidOptionalString('schoolName', 0, 200) &&
              isValidOptionalString('email', 0, 200) &&
@@ -309,10 +328,13 @@ service cloud.firestore {
     }
 
     function isValidPublicDisclosure() {
-        return hasOnlyAllowedFields(['title', 'documentUrl', 'fileUrl', 'createdAt', 'updatedAt']) &&
+        return hasOnlyAllowedFields(['title', 'section', 'documentUrl', 'fileUrl', 'order', 'published', 'createdAt', 'updatedAt']) &&
                isValidOptionalString('title', 0, 300) &&
+               isValidOptionalString('section', 0, 100) &&
                isValidOptionalString('documentUrl', 0, 1000) &&
                isValidOptionalString('fileUrl', 0, 1000) &&
+               isOptionalNumber('order') &&
+               isOptionalBool('published') &&
                isOptionalTimestamp('createdAt') &&
                isOptionalTimestamp('updatedAt');
     }
@@ -338,111 +360,97 @@ service cloud.firestore {
     // Public Pages
     match /pages/{pageSlug} {
       allow read: if true;
-      allow create: if isAdmin() && isValidPage();
-      allow update: if isAdmin() && isValidPage() && isImmutable('createdAt');
+      allow create, update: if isAdmin();
       allow delete: if isAdmin();
     }
 
     // News Articles
     match /news/{newsId} {
       allow read: if true;
-      allow create: if isAdmin() && isValidNews();
-      allow update: if isAdmin() && isValidNews() && isImmutable('createdAt');
+      allow create, update: if isAdmin();
       allow delete: if isAdmin();
     }
 
     // Events
     match /events/{eventId} {
       allow read: if true;
-      allow create: if isAdmin() && isValidEvent();
-      allow update: if isAdmin() && isValidEvent() && isImmutable('createdAt');
+      allow create, update: if isAdmin();
       allow delete: if isAdmin();
     }
 
     // Unified News/Events Collection
     match /updates/{updateId} {
       allow read: if true;
-      allow create: if isAdmin() && isValidUpdate();
-      allow update: if isAdmin() && isValidUpdate() && isImmutable('createdAt');
+      allow create, update: if isAdmin();
       allow delete: if isAdmin();
     }
 
     // Photo Gallery
     match /gallery/{galleryId} {
       allow read: if true;
-      allow create: if isAdmin() && isValidGalleryItem();
-      allow update: if isAdmin() && isValidGalleryItem() && isImmutable('createdAt');
+      allow create, update: if isAdmin();
       allow delete: if isAdmin();
     }
 
     // Carousel Images
     match /carousel/{carouselId} {
       allow read: if true;
-      allow create: if isAdmin() && isValidCarouselItem();
-      allow update: if isAdmin() && isValidCarouselItem() && isImmutable('createdAt');
+      allow create, update: if isAdmin();
       allow delete: if isAdmin();
     }
 
     // Notices & Popups
     match /notices/{noticeId} {
       allow read: if true;
-      allow create: if isAdmin() && isValidNotice();
-      allow update: if isAdmin() && isValidNotice() && isImmutable('createdAt');
+      allow create, update: if isAdmin();
       allow delete: if isAdmin();
     }
 
     // Site Navigation links
     match /navigation/{navId} {
       allow read: if true;
-      allow create: if isAdmin() && isValidNavigation();
-      allow update: if isAdmin() && isValidNavigation() && isImmutable('createdAt');
+      allow create, update: if isAdmin();
       allow delete: if isAdmin();
     }
 
     // Global Settings (General, SEO)
     match /settings/{settingId} {
       allow read: if true;
-      allow create: if isAdmin() && isValidSettings();
-      allow update: if isAdmin() && isValidSettings() && isImmutable('createdAt');
+      allow create, update: if isAdmin();
       allow delete: if false; // Settings documents should not be deleted, only updated
     }
 
     // Sports Page Content
     match /sports/{sportId} {
       allow read: if true;
-      allow create: if isAdmin() && isValidSport();
-      allow update: if isAdmin() && isValidSport() && isImmutable('createdAt');
+      allow create, update: if isAdmin();
       allow delete: if isAdmin();
     }
 
     // Ansar Times (PDFs)
     match /ansarTimes/{timeId} {
       allow read: if true;
-      allow create: if isAdmin() && isValidAnsarTimes();
-      allow update: if isAdmin() && isValidAnsarTimes() && isImmutable('createdAt');
+      allow create, update: if isAdmin();
       allow delete: if isAdmin();
     }
 
     // Achievements
     match /achievements/{achievementId} {
       allow read: if true;
-      allow create: if isAdmin() && isValidAchievement();
-      allow update: if isAdmin() && isValidAchievement() && isImmutable('createdAt');
+      allow create, update: if isAdmin();
       allow delete: if isAdmin();
     }
 
     // Leadership
     match /leadership/{leaderId} {
       allow read: if true;
-      allow create: if isAdmin() && isValidLeadership();
-      allow update: if isAdmin() && isValidLeadership() && isImmutable('createdAt');
+      allow create, update: if isAdmin();
       allow delete: if isAdmin();
     }
 
     match /publicDisclosure/{docId} {
         allow read: if true;
-        allow create: if isAdmin() && isValidPublicDisclosure();
-        allow update: if isAdmin() && isValidPublicDisclosure() && isImmutable('createdAt');
+        allow create, update: if isAdmin();
         allow delete: if isAdmin();
     }
 

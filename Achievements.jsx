@@ -4,6 +4,13 @@ import Layout from './Layout';
 import ShareButton from './ShareButton';
 import { useFirestoreCollection } from './useFirestoreCollection';
 
+function getAchievementTime(item) {
+  if (item.createdAt?.toMillis) return item.createdAt.toMillis();
+  if (item.createdAt?.seconds) return item.createdAt.seconds * 1000;
+  if (item.date) return new Date(item.date).getTime() || 0;
+  return 0;
+}
+
 function AchievementCard({ achievement }) {
   const navigate = useNavigate();
   const shareUrl = `${window.location.origin}/achievements/${achievement.id}`;
@@ -49,8 +56,10 @@ function AchievementCard({ achievement }) {
 }
 
 export default function Achievements() {
-  const { data: achievements, loading } = useFirestoreCollection('achievements', 'order', 'asc');
-  const publishedAchievements = achievements.filter(item => item.published !== false);
+  const { data: achievements, loading } = useFirestoreCollection('achievements', null);
+  const publishedAchievements = achievements
+    .filter(item => item.published !== false)
+    .sort((a, b) => getAchievementTime(b) - getAchievementTime(a));
 
   return (
     <Layout>

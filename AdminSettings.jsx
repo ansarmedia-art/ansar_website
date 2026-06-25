@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from './firebase-init';
+import ImgBbUrlImporter from './ImgBbUrlImporter';
 
 export default function AdminSettings() {
   const [formData, setFormData] = useState({
@@ -15,6 +16,17 @@ export default function AdminSettings() {
     kgImages: [''],
     visionText: '',
     missionText: '',
+    directorName: '',
+    directorQualifications: '',
+    directorRole: 'Director',
+    directorImageUrl: '',
+    directorMessage: '',
+    principalName: '',
+    principalQualifications: '',
+    principalRole: 'Principal',
+    principalImageUrl: '',
+    principalMessage: '',
+    juniorPrincipals: [{ name: '', qualification: '', section: '', imageUrl: '' }],
     sustainabilityTitle: '',
     sustainabilityDesc: '',
     sustainabilityLogoUrl: ''
@@ -41,6 +53,26 @@ export default function AdminSettings() {
     const newArr = [...formData[field]];
     newArr[index] = value;
     setFormData(prev => ({ ...prev, [field]: newArr }));
+  };
+
+  const handleJuniorPrincipalChange = (index, field, value) => {
+    const current = Array.isArray(formData.juniorPrincipals) ? formData.juniorPrincipals : [];
+    const next = [...current];
+    next[index] = { ...(next[index] || {}), [field]: value };
+    setFormData(prev => ({ ...prev, juniorPrincipals: next }));
+  };
+
+  const addJuniorPrincipal = () => {
+    setFormData(prev => ({
+      ...prev,
+      juniorPrincipals: [...(Array.isArray(prev.juniorPrincipals) ? prev.juniorPrincipals : []), { name: '', qualification: '', section: '', imageUrl: '' }]
+    }));
+  };
+
+  const removeJuniorPrincipal = (index) => {
+    const current = Array.isArray(formData.juniorPrincipals) ? formData.juniorPrincipals : [];
+    if (current.length <= 1) return;
+    setFormData(prev => ({ ...prev, juniorPrincipals: current.filter((_, i) => i !== index) }));
   };
   const addArrayItem = (field) => {
     setFormData(prev => ({ ...prev, [field]: [...prev[field], ''] }));
@@ -126,6 +158,43 @@ export default function AdminSettings() {
                   <button type="button" onClick={() => addArrayItem('kgImages')} className="text-sm font-bold text-emerald-600 hover:bg-emerald-50 py-1 px-3 mt-1 rounded-lg">+ Add Image</button>
                 </div>
               </div>
+            </div>
+          </div>
+
+          <div className="space-y-5 p-5 bg-slate-50 border border-slate-100 rounded-xl">
+            <h3 className="font-extrabold text-slate-900">Homepage Leadership</h3>
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+              <div className="space-y-3 rounded-xl border border-white bg-white p-4 shadow-sm">
+                <h4 className="font-bold text-emerald-800">Director Box</h4>
+                <input name="directorName" value={formData.directorName} onChange={handleChange} placeholder="Director name" className="w-full p-3 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-emerald-500" />
+                <input name="directorQualifications" value={formData.directorQualifications} onChange={handleChange} placeholder="Qualifications" className="w-full p-3 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-emerald-500" />
+                <input name="directorRole" value={formData.directorRole} onChange={handleChange} placeholder="Role" className="w-full p-3 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-emerald-500" />
+                <input name="directorImageUrl" type="url" value={formData.directorImageUrl} onChange={handleChange} placeholder="Director image URL" className="w-full p-3 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-emerald-500" />
+                <ImgBbUrlImporter onExtracted={(url) => setFormData(prev => ({ ...prev, directorImageUrl: url }))} />
+                <textarea name="directorMessage" value={formData.directorMessage} onChange={handleChange} placeholder="Director message" className="h-28 w-full p-3 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-emerald-500" />
+              </div>
+              <div className="space-y-3 rounded-xl border border-white bg-white p-4 shadow-sm">
+                <h4 className="font-bold text-emerald-800">Principal Box</h4>
+                <input name="principalName" value={formData.principalName} onChange={handleChange} placeholder="Principal name" className="w-full p-3 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-emerald-500" />
+                <input name="principalQualifications" value={formData.principalQualifications} onChange={handleChange} placeholder="Qualifications" className="w-full p-3 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-emerald-500" />
+                <input name="principalRole" value={formData.principalRole} onChange={handleChange} placeholder="Role" className="w-full p-3 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-emerald-500" />
+                <input name="principalImageUrl" type="url" value={formData.principalImageUrl} onChange={handleChange} placeholder="Principal image URL" className="w-full p-3 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-emerald-500" />
+                <ImgBbUrlImporter onExtracted={(url) => setFormData(prev => ({ ...prev, principalImageUrl: url }))} />
+                <textarea name="principalMessage" value={formData.principalMessage} onChange={handleChange} placeholder="Principal message" className="h-28 w-full p-3 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-emerald-500" />
+              </div>
+            </div>
+            <div className="space-y-3 rounded-xl border border-white bg-white p-4 shadow-sm">
+              <h4 className="font-bold text-emerald-800">Junior Principals</h4>
+              {(Array.isArray(formData.juniorPrincipals) ? formData.juniorPrincipals : [{ name: '', qualification: '', section: '', imageUrl: '' }]).map((leader, index) => (
+                <div key={`junior-${index}`} className="grid grid-cols-1 gap-2 border-b border-slate-100 pb-3 md:grid-cols-[1fr_1fr_1fr_1.3fr_auto]">
+                  <input value={leader.name || ''} onChange={(e) => handleJuniorPrincipalChange(index, 'name', e.target.value)} placeholder="Name" className="p-2 border border-slate-200 rounded-lg outline-none" />
+                  <input value={leader.qualification || leader.qualifications || ''} onChange={(e) => handleJuniorPrincipalChange(index, 'qualification', e.target.value)} placeholder="Qualifications" className="p-2 border border-slate-200 rounded-lg outline-none" />
+                  <input value={leader.section || ''} onChange={(e) => handleJuniorPrincipalChange(index, 'section', e.target.value)} placeholder="Section" className="p-2 border border-slate-200 rounded-lg outline-none" />
+                  <input value={leader.imageUrl || ''} onChange={(e) => handleJuniorPrincipalChange(index, 'imageUrl', e.target.value)} placeholder="Image URL" className="p-2 border border-slate-200 rounded-lg outline-none" />
+                  <button type="button" onClick={() => removeJuniorPrincipal(index)} disabled={(formData.juniorPrincipals || []).length <= 1} className="px-3 py-2 text-sm font-bold text-red-600 hover:bg-red-50 rounded-lg disabled:opacity-50">Remove</button>
+                </div>
+              ))}
+              <button type="button" onClick={addJuniorPrincipal} className="text-sm font-bold text-emerald-600 hover:bg-emerald-50 py-2 px-3 rounded-lg">+ Add Junior Principal</button>
             </div>
           </div>
 
