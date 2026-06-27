@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { BrowserRouter as Router, Routes, Route, useParams, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useParams, Navigate, useLocation } from 'react-router-dom';
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { doc, setDoc, serverTimestamp, collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 import { auth, db } from './firebase-init';
@@ -19,6 +19,7 @@ import Gallery from './Gallery';
 import AdminPages from './AdminPages';
 import AdminUpdates from './AdminUpdates';
 import AdminAchievements from './AdminAchievements';
+import AdminGallery from './AdminGallery';
 import AdminLeadership from './AdminLeadership';
 import AdminNotices from './AdminNotices';
 import AdminAcademics from './AdminAcademics';
@@ -82,8 +83,123 @@ const SAMPLE_PAGES = {
     title: 'Mandatory Public Disclosure',
     subtitle: 'Required school information and public documents.',
     sections: ['General Information', 'Documents', 'Academic Information', 'Infrastructure Details']
+  },
+  'ansar-media-production': {
+    title: 'Ansar Media and Production',
+    subtitle: 'An in-house media production unit documenting campus life, student achievements, institutional milestones, and creative communication at Ansar English School.',
+    sections: ['Photography', 'Videography', 'Drone Videography', 'Podcast', 'Graphic Designing', 'Editing']
   }
 };
+
+const MEDIA_SERVICES = [
+  {
+    title: 'Photography',
+    kicker: 'Moments with meaning',
+    image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=90&w=3840&auto=format&fit=crop',
+    body: 'Our photography team captures the spirit of school life with clarity and care. From assemblies, celebrations, competitions, classroom activities, portraits, and official documentation, Ansar Media preserves important moments as high-quality visual records for the institution.',
+  },
+  {
+    title: 'Videography',
+    kicker: 'Stories in motion',
+    image: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?q=90&w=3840&auto=format&fit=crop',
+    body: 'We produce event films, highlight videos, awareness clips, reels, institutional presentations, and programme coverage. The unit supports departments by turning school activities into polished video stories that can be shared with parents, students, alumni, and the wider community.',
+  },
+  {
+    title: 'Drone Videography',
+    kicker: 'A wider campus view',
+    image: 'https://images.unsplash.com/photo-1508614589041-895b88991e3e?q=90&w=3840&auto=format&fit=crop',
+    body: 'Aerial visuals bring scale, movement, and a fresh perspective to campus documentation. Drone videography is used for major events, campus showcases, infrastructure highlights, outdoor activities, and special productions where a broader view helps tell the story better.',
+  },
+  {
+    title: 'Podcast',
+    kicker: 'Voices from Ansar',
+    image: 'https://images.unsplash.com/photo-1478737270239-2f02b77fc618?q=90&w=3840&auto=format&fit=crop',
+    body: 'The podcast setup creates space for student conversations, interviews, academic discussions, alumni interactions, awareness programmes, and leadership messages. It gives the Ansar community a clear voice and encourages confident, thoughtful communication.',
+  },
+  {
+    title: 'Graphic Designing',
+    kicker: 'Design for every announcement',
+    image: 'https://images.unsplash.com/photo-1586717791821-3f44a563fa4c?q=90&w=3840&auto=format&fit=crop',
+    body: 'Our design work supports posters, event announcements, certificates, social media creatives, digital banners, brochures, identity materials, and campaign visuals. Every design is prepared to keep school communication attractive, consistent, and easy to understand.',
+  },
+  {
+    title: 'Editing',
+    kicker: 'Finishing every story',
+    image: 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?q=90&w=3840&auto=format&fit=crop',
+    body: 'Editing brings together footage, sound, images, captions, color, and rhythm into a complete final output. The in-house team handles photo retouching, video cuts, event recaps, subtitles, audio cleanup, and final exports for web, social media, archives, and presentations.',
+  }
+];
+
+function ScrollToTop() {
+  const { pathname, hash } = useLocation();
+
+  useEffect(() => {
+    if (!hash) {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    }
+  }, [pathname, hash]);
+
+  return null;
+}
+
+function AnsarMediaProductionPage() {
+  return (
+    <Layout>
+      <main className="mx-auto max-w-7xl px-4 py-12 lg:py-20">
+        <section className="relative overflow-hidden rounded-3xl bg-slate-950 text-white shadow-2xl">
+          <img
+            src="https://images.unsplash.com/photo-1497366754035-f200968a6e72?q=90&w=3840&auto=format&fit=crop"
+            alt="Ansar Media and Production studio workspace"
+            className="absolute inset-0 h-full w-full object-cover opacity-30"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/88 to-emerald-950/50" />
+          <div className="relative z-10 max-w-4xl px-6 py-16 sm:px-10 lg:px-14 lg:py-24">
+            <p className="mb-3 text-sm font-extrabold uppercase tracking-widest text-amber-300">In-house Media Unit</p>
+            <h1 className="text-4xl font-extrabold leading-tight lg:text-6xl">Ansar Media and Production</h1>
+            <p className="mt-6 max-w-3xl text-lg leading-relaxed text-slate-100/85 lg:text-xl">
+              A dedicated creative unit for photography, videography, drone visuals, podcasts, graphic design, and editing at Ansar English School.
+            </p>
+          </div>
+        </section>
+
+        <section className="mx-auto mt-12 max-w-4xl text-center">
+          <p className="text-sm font-black uppercase tracking-widest text-emerald-600">Creative documentation</p>
+          <h2 className="mt-3 text-3xl font-extrabold text-slate-900 lg:text-5xl">Capturing, creating, and sharing the Ansar story</h2>
+          <p className="mt-5 text-lg leading-relaxed text-slate-600">
+            Ansar Media and Production works as the institution's own media studio, supporting academic, cultural, social, and administrative communication with professional visual content.
+          </p>
+        </section>
+
+        <section className="mt-16 space-y-16">
+          {MEDIA_SERVICES.map((service, index) => {
+            const reverse = index % 2 === 1;
+            return (
+              <article key={service.title} className="grid grid-cols-1 items-center gap-8 lg:grid-cols-2 lg:gap-14">
+                <div className={reverse ? 'lg:order-2' : ''}>
+                  <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-slate-100 shadow-xl">
+                    <img
+                      src={service.image}
+                      alt={`${service.title} at Ansar Media and Production`}
+                      className="absolute inset-0 h-full w-full object-cover"
+                      loading={index < 2 ? 'eager' : 'lazy'}
+                      decoding="async"
+                      fetchPriority={index === 0 ? 'high' : 'auto'}
+                    />
+                  </div>
+                </div>
+                <div className="flex flex-col justify-center">
+                  <p className="text-sm font-black uppercase tracking-widest text-amber-600">{service.kicker}</p>
+                  <h3 className="mt-3 text-3xl font-extrabold text-emerald-950 lg:text-4xl">{service.title}</h3>
+                  <p className="mt-5 text-lg leading-relaxed text-slate-600">{service.body}</p>
+                </div>
+              </article>
+            );
+          })}
+        </section>
+      </main>
+    </Layout>
+  );
+}
 
 function DynamicPage({ slug: propSlug }) {
   const params = useParams();
@@ -94,6 +210,10 @@ function DynamicPage({ slug: propSlug }) {
   const samplePage = SAMPLE_PAGES[slug];
 
   if (loading && !page) return <Layout><div className="py-24 text-center"><h2 className="text-2xl font-bold text-slate-900 animate-pulse">Loading page...</h2></div></Layout>;
+
+  if (!page && slug === 'ansar-media-production') {
+    return <AnsarMediaProductionPage />;
+  }
   
   if (!page && samplePage) {
     return (
@@ -333,6 +453,7 @@ export default function App() {
   return (
     <SettingsProvider>
     <Router>
+      <ScrollToTop />
       <Routes>
         {/* Public Website Routes */}
         <Route path="/" element={<Home />} />
@@ -379,7 +500,7 @@ export default function App() {
                   <Route path="/leadership" element={<AdminLeadership />} />
                   <Route path="/academics" element={<AdminAcademics />} />
                   <Route path="/public-disclosure" element={<AdminPublicDisclosure />} />
-                  <Route path="/gallery" element={<div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100"><h2 className="text-xl font-bold">Gallery</h2><p className="text-slate-500">Module under construction.</p></div>} />
+                  <Route path="/gallery" element={<AdminGallery />} />
                   <Route path="/notices" element={<AdminNotices />} />
                   <Route path="/settings" element={<AdminSettings />} />
                   <Route path="*" element={<div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100 border-t-4 border-red-500"><h2 className="text-xl font-bold text-slate-800">Module Not Found</h2><p className="text-slate-500">Select a valid module from the sidebar.</p></div>} />

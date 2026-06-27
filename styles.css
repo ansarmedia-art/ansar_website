@@ -939,3 +939,16 @@ header, section, footer, main, .container, .row, .grid-wrapper {
     padding-inline: 16px;
   }
 }
+
+.achievement-ticker-mask {
+  overflow: hidden;
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+
+.achievement-ticker-scroll {
+  scrollbar-width: none;
+}
+
+.achievement-ticker-scroll::-webkit-scrollbar {
+  display: none;
+}

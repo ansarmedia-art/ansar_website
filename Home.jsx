@@ -3,6 +3,7 @@ import Layout from './Layout';
 import Hero from './Hero';
 import NewsCard from './NewsCard';
 import NoticePopup from './NoticePopup';
+import AchievementsTicker from './AchievementsTicker';
 import { useSettings } from './SettingsContext';
 import { useContentCollection } from './useContentCollection';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -309,6 +310,8 @@ export default function Home() {
           ))}
         </div>
       </AnimatedSection>
+
+      <AchievementsTicker />
 
       <AnimatedSection className="mt-32">
         <div className="text-center mb-12">

@@ -7,6 +7,7 @@ import NotificationsBell from './NotificationsBell';
 const LEGACY_EXPLORE_LINKS = [
   { title: 'Gallery', slug: 'gallery' },
   { title: 'Achievements', slug: 'achievements' },
+  { title: 'Ansar Media and Production', slug: 'ansar-media-production' },
   { title: 'Sports', slug: 'sports-page' },
   { title: 'ATL', slug: 'atl' },
   { title: 'Ansar Sprouts', slug: 'ansar-sprouts' },
@@ -35,21 +36,23 @@ export default function Navbar() {
   ];
 
   return (
-    <header className="relative bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-white/20 shadow-sm transition-all duration-300">
+    <header className="relative sticky top-0 z-50 border-b border-white/10 bg-emerald-950/95 shadow-lg shadow-emerald-950/20 backdrop-blur-md transition-all duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-24">
           {/* Premium Logo Layout */}
           <Link to="/" className="flex items-center gap-3">
-            <img 
-              src={settings?.logoUrl || "https://i.ibb.co/7d4mTQVT/image.png"} 
-              alt="Ansar English School Logo" 
-              className="h-14 w-auto object-contain contrast-125 brightness-105 transition-all duration-300 hover:scale-[1.03] hover:drop-shadow-[0_0_15px_rgba(5,150,105,0.4)]" 
-              style={{ imageRendering: '-webkit-optimize-contrast', transform: 'translateZ(0)', backfaceVisibility: 'hidden' }}
-            />
-            <div className="hidden sm:flex flex-col border-l-2 border-emerald-600/20 pl-3 ml-1">
-              <span className="block font-extrabold text-slate-900 text-lg leading-tight tracking-tight">Ansar English School</span>
+            <span className="flex h-16 items-center rounded-2xl bg-white px-3 shadow-md shadow-slate-950/20 ring-1 ring-white/60">
+              <img 
+                src={settings?.logoUrl || "https://i.ibb.co/7d4mTQVT/image.png"} 
+                alt="Ansar English School Logo" 
+                className="h-12 w-auto object-contain contrast-125 brightness-105 transition-all duration-300 hover:scale-[1.03]" 
+                style={{ imageRendering: '-webkit-optimize-contrast', transform: 'translateZ(0)', backfaceVisibility: 'hidden' }}
+              />
+            </span>
+            <div className="hidden sm:flex flex-col border-l-2 border-white/25 pl-3 ml-1">
+              <span className="block font-extrabold text-white text-lg leading-tight tracking-tight">Ansar English School</span>
               <div className="flex items-center gap-2 mt-0.5">
-                <span className="block text-emerald-700 text-[10px] font-bold uppercase tracking-widest">Perumpilavu</span>
+                <span className="block text-emerald-100 text-[10px] font-bold uppercase tracking-widest">Perumpilavu</span>
                 <span className="block bg-amber-100 text-amber-800 text-[9px] font-bold px-1.5 py-0.5 rounded-sm uppercase tracking-widest">NABET Accredited</span>
               </div>
             </div>
@@ -58,9 +61,9 @@ export default function Navbar() {
           {/* Fluid Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-5">
             {['Home', 'About', 'Academics', 'Admission', 'News', 'Events', 'Contact'].map((item) => (
-              <Link key={item} to={item === 'Home' ? '/' : `/${item.toLowerCase()}`} className="relative text-sm font-bold text-slate-700 hover:text-emerald-700 transition-colors py-2 group">
+              <Link key={item} to={item === 'Home' ? '/' : `/${item.toLowerCase()}`} className="relative text-sm font-bold text-white/90 hover:text-amber-300 transition-colors py-2 group">
                 {item}
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-emerald-600 transition-all duration-300 ease-out group-hover:w-full rounded-full"></span>
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-amber-300 transition-all duration-300 ease-out group-hover:w-full rounded-full"></span>
               </Link>
             ))}
             
@@ -68,7 +71,7 @@ export default function Navbar() {
             <div className="relative">
               <button 
                 onClick={() => setIsMoreOpen(!isMoreOpen)}
-                className="flex items-center gap-1 text-sm font-bold text-slate-700 hover:text-emerald-700 transition-colors py-2"
+                className="flex items-center gap-1 text-sm font-bold text-white/90 hover:text-amber-300 transition-colors py-2"
               >
                 Explore
                 <svg className={`w-4 h-4 transition-transform duration-300 ${isMoreOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
@@ -90,7 +93,7 @@ export default function Navbar() {
           <div className="flex items-center gap-2 md:hidden">
             <NotificationsBell />
             <button 
-              className="p-2 text-slate-600 hover:text-emerald-600 focus:outline-none transition-colors"
+              className="p-2 text-white hover:text-amber-300 focus:outline-none transition-colors"
               onClick={() => setIsOpen(!isOpen)}
             >
               {isOpen ? (
@@ -105,20 +108,20 @@ export default function Navbar() {
       
       {/* Mobile Navigation Dropdown */}
       {isOpen && (
-        <div className="absolute left-0 right-0 top-full z-50 max-h-[calc(100vh-6rem)] overflow-y-auto border-t border-slate-100 bg-white shadow-xl md:hidden">
+        <div className="absolute left-0 right-0 top-full z-50 max-h-[calc(100vh-6rem)] overflow-y-auto border-t border-white/10 bg-emerald-950 shadow-xl md:hidden">
           <div className="mx-auto grid w-full max-w-7xl gap-1 px-4 py-4">
-            <Link to="/" onClick={() => setIsOpen(false)} className="block rounded-lg px-4 py-3 text-base text-slate-700 font-bold hover:bg-emerald-50 hover:text-emerald-600">Home</Link>
-            <Link to="/about" onClick={() => setIsOpen(false)} className="block rounded-lg px-4 py-3 text-base text-slate-700 font-bold hover:bg-emerald-50 hover:text-emerald-600">About Us</Link>
-            <Link to="/admission" onClick={() => setIsOpen(false)} className="block rounded-lg px-4 py-3 text-base text-slate-700 font-bold hover:bg-emerald-50 hover:text-emerald-600">Admissions</Link>
-            <Link to="/academics" onClick={() => setIsOpen(false)} className="block rounded-lg px-4 py-3 text-base text-slate-700 font-bold hover:bg-emerald-50 hover:text-emerald-600">Academics</Link>
-            <Link to="/news" onClick={() => setIsOpen(false)} className="block rounded-lg px-4 py-3 text-base text-slate-700 font-bold hover:bg-emerald-50 hover:text-emerald-600">News</Link>
-            <Link to="/events" onClick={() => setIsOpen(false)} className="block rounded-lg px-4 py-3 text-base text-slate-700 font-bold hover:bg-emerald-50 hover:text-emerald-600">Events</Link>
+            <Link to="/" onClick={() => setIsOpen(false)} className="block rounded-lg px-4 py-3 text-base text-white font-bold hover:bg-white/10 hover:text-amber-300">Home</Link>
+            <Link to="/about" onClick={() => setIsOpen(false)} className="block rounded-lg px-4 py-3 text-base text-white font-bold hover:bg-white/10 hover:text-amber-300">About Us</Link>
+            <Link to="/admission" onClick={() => setIsOpen(false)} className="block rounded-lg px-4 py-3 text-base text-white font-bold hover:bg-white/10 hover:text-amber-300">Admissions</Link>
+            <Link to="/academics" onClick={() => setIsOpen(false)} className="block rounded-lg px-4 py-3 text-base text-white font-bold hover:bg-white/10 hover:text-amber-300">Academics</Link>
+            <Link to="/news" onClick={() => setIsOpen(false)} className="block rounded-lg px-4 py-3 text-base text-white font-bold hover:bg-white/10 hover:text-amber-300">News</Link>
+            <Link to="/events" onClick={() => setIsOpen(false)} className="block rounded-lg px-4 py-3 text-base text-white font-bold hover:bg-white/10 hover:text-amber-300">Events</Link>
             {explorePages.map(page => (
-              <Link key={page.id || page.slug} to={`/${page.slug}`} onClick={() => setIsOpen(false)} className="block rounded-lg px-4 py-3 text-base text-slate-700 font-bold hover:bg-emerald-50 hover:text-emerald-600">{page.title}</Link>
+              <Link key={page.id || page.slug} to={`/${page.slug}`} onClick={() => setIsOpen(false)} className="block rounded-lg px-4 py-3 text-base text-white font-bold hover:bg-white/10 hover:text-amber-300">{page.title}</Link>
             ))}
-            <Link to="/contact" onClick={() => setIsOpen(false)} className="block rounded-lg px-4 py-3 text-base text-slate-700 font-bold hover:bg-emerald-50 hover:text-emerald-600">Contact Us</Link>
-            <div className="mt-2 border-t border-slate-100 pt-2">
-              <Link to="/admin" onClick={() => setIsOpen(false)} className="block rounded-lg px-4 py-3 text-base text-emerald-700 font-extrabold hover:bg-emerald-50 hover:text-emerald-800">Login / Account</Link>
+            <Link to="/contact" onClick={() => setIsOpen(false)} className="block rounded-lg px-4 py-3 text-base text-white font-bold hover:bg-white/10 hover:text-amber-300">Contact Us</Link>
+            <div className="mt-2 border-t border-white/10 pt-2">
+              <Link to="/admin" onClick={() => setIsOpen(false)} className="block rounded-lg px-4 py-3 text-base text-amber-300 font-extrabold hover:bg-white/10 hover:text-white">Login / Account</Link>
             </div>
           </div>
         </div>
