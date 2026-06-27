@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from './Layout';
 import ShareButton from './ShareButton';
-import { useFirestoreCollection } from './useFirestoreCollection';
+import { useContentCollection } from './useContentCollection';
 
 function getAchievementTime(item) {
   if (item.createdAt?.toMillis) return item.createdAt.toMillis();
@@ -11,9 +11,10 @@ function getAchievementTime(item) {
   return 0;
 }
 
-function AchievementCard({ achievement }) {
+function AchievementCard({ achievement, priority = false }) {
   const navigate = useNavigate();
   const shareUrl = `${window.location.origin}/achievements/${achievement.id}`;
+  const imageUrl = achievement.thumbnailUrl || achievement.coverImageUrl || achievement.imageUrl;
 
   return (
     <div
@@ -21,12 +22,16 @@ function AchievementCard({ achievement }) {
       className="group flex h-full cursor-pointer flex-col overflow-hidden rounded-xl border border-slate-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-emerald-200 hover:shadow-xl"
     >
       <div className="relative min-h-56 overflow-hidden border-b border-slate-100 bg-slate-100">
-        {achievement.imageUrl ? (
+        {imageUrl ? (
           <img
-            src={achievement.imageUrl}
+            src={imageUrl}
             alt={achievement.title}
             className="absolute inset-0 h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"
-            loading="lazy"
+            loading={priority ? 'eager' : 'lazy'}
+            decoding="async"
+            fetchPriority={priority ? 'high' : 'auto'}
+            width="640"
+            height="360"
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center text-slate-400">
@@ -56,7 +61,7 @@ function AchievementCard({ achievement }) {
 }
 
 export default function Achievements() {
-  const { data: achievements, loading } = useFirestoreCollection('achievements', null);
+  const { data: achievements, loading } = useContentCollection('achievements', null);
   const publishedAchievements = achievements
     .filter(item => item.published !== false)
     .sort((a, b) => getAchievementTime(b) - getAchievementTime(a));
@@ -74,7 +79,7 @@ export default function Achievements() {
         ) : (
           <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {publishedAchievements.length ? (
-              publishedAchievements.map(item => <AchievementCard key={item.id} achievement={item} />)
+              publishedAchievements.map((item, index) => <AchievementCard key={item.id} achievement={item} priority={index < 3} />)
             ) : (
               <p className="col-span-full text-center text-slate-500">Achievements will appear here once published.</p>
             )}

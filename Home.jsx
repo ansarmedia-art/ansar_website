@@ -1,12 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { collection, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
-import { db } from './firebase-init';
 import Layout from './Layout';
 import Hero from './Hero';
 import NewsCard from './NewsCard';
 import NoticePopup from './NoticePopup';
 import { useSettings } from './SettingsContext';
-import { useFirestoreCollection } from './useFirestoreCollection';
+import { useContentCollection } from './useContentCollection';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // Transformed into a Bento Layout configuration using Lucide-style SVG icons
@@ -205,19 +203,10 @@ function JuniorPrincipalTile({ leader, index }) {
 }
 
 export default function Home() {
-  const [updates, setUpdates] = useState([]);
   const settings = useSettings();
   const [lightboxImage, setLightboxImage] = useState(null);
-  const { data: leadershipData } = useFirestoreCollection('leadership', 'order', 'asc');
-  
-  // Real-time fetching of Unified 'updates' collection extended limit for separation
-  useEffect(() => {
-    const q = query(collection(db, 'updates'), orderBy('createdAt', 'desc'), limit(12));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      setUpdates(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-    });
-    return () => unsubscribe();
-  }, []); 
+  const { data: leadershipData } = useContentCollection('leadership', 'order', 'asc', { firestoreOnly: true });
+  const { data: updates } = useContentCollection('updates', 'createdAt', 'desc', { limit: 12 });
 
   const publishedUpdates = updates.filter(item => item.published !== false);
   const homeNews = publishedUpdates.filter(item => item.category === 'News' || !item.category).slice(0, 3);
@@ -327,8 +316,8 @@ export default function Home() {
           <h2 className="text-4xl lg:text-5xl font-extrabold text-emerald-950">Latest News</h2>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {homeNews.length ? homeNews.map(item => (
-            <NewsCard key={item.id} id={item.id} title={item.title} excerpt={item.excerpt || item.description || item.content} date={item.date} coverImageUrl={item.coverImageUrl} imageUrl={item.image || item.imageUrl} type={item.category ? item.category.toLowerCase() : 'news'} />
+          {homeNews.length ? homeNews.map((item, index) => (
+            <NewsCard key={item.id} id={item.id} title={item.title} excerpt={item.excerpt || item.description || item.content} date={item.date} thumbnailUrl={item.thumbnailUrl} coverImageUrl={item.coverImageUrl} imageUrl={item.image || item.imageUrl} type={item.category ? item.category.toLowerCase() : 'news'} priority={index === 0} />
           )) : <p className="col-span-full text-center text-slate-500">Latest news will appear here once published.</p>}
         </div>
       </AnimatedSection>
@@ -339,8 +328,8 @@ export default function Home() {
           <h2 className="text-4xl lg:text-5xl font-extrabold text-emerald-950">Events</h2>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {homeEvents.length ? homeEvents.map(item => (
-            <NewsCard key={item.id} id={item.id} title={item.title} excerpt={item.description || item.excerpt || item.content} date={item.date} coverImageUrl={item.coverImageUrl} imageUrl={item.eventImages?.[0] || item.imageUrls?.[0] || item.imageUrl} type="events" />
+          {homeEvents.length ? homeEvents.map((item, index) => (
+            <NewsCard key={item.id} id={item.id} title={item.title} excerpt={item.description || item.excerpt || item.content} date={item.date} thumbnailUrl={item.thumbnailUrl} coverImageUrl={item.coverImageUrl} imageUrl={item.eventImages?.[0] || item.imageUrls?.[0] || item.imageUrl} type="events" priority={index === 0} />
           )) : <p className="col-span-full text-center text-slate-500">Events will appear here once scheduled.</p>}
         </div>
       </AnimatedSection>

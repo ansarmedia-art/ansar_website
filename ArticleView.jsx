@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from './firebase-init';
 import Layout from './Layout';
 import { useSettings } from './SettingsContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import ShareButton from './ShareButton';
+import { useContentDocument } from './useContentCollection';
 
 const variants = {
   enter: (direction) => ({
@@ -29,35 +28,13 @@ const fallbackImageSvg = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://
 export default function ArticleView() {
   const { id } = useParams();
   const location = useLocation();
-  const [article, setArticle] = useState(null);
-  const [loading, setLoading] = useState(true);
   const settings = useSettings();
   const isAchievement = location.pathname.startsWith('/achievements/');
   const collectionName = isAchievement ? 'achievements' : 'updates';
   const shareUrl = `${window.location.origin}${location.pathname}`;
+  const { data: article, loading } = useContentDocument(collectionName, id);
 
   const [[page, direction], setPage] = useState([0, 0]);
-
-  useEffect(() => {
-    const fetchArticle = async () => {
-      if (!id) return;
-      setLoading(true);
-      try {
-        const docRef = doc(db, collectionName, id);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          setArticle({ id: docSnap.id, ...docSnap.data() });
-        } else {
-          console.log("No such document!");
-        }
-      } catch (error) {
-        console.error("Error fetching document:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchArticle();
-  }, [id, collectionName]);
 
   // Safely extract valid images even during the loading state
   const fallbackImage = article?.coverImageUrl || article?.imageUrl;

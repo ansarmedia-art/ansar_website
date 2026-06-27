@@ -2,9 +2,9 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import ShareButton from './ShareButton';
 
-export default function NewsCard({ id, title, excerpt, coverImageUrl, imageUrl, date, type = 'news' }) {
+export default function NewsCard({ id, title, excerpt, thumbnailUrl, coverImageUrl, imageUrl, date, type = 'news', priority = false }) {
   const navigate = useNavigate();
-  const targetImage = coverImageUrl || imageUrl;
+  const targetImage = thumbnailUrl || coverImageUrl || imageUrl;
   const shareUrl = `${window.location.origin}/${type}/${id}`;
 
   return (
@@ -22,9 +22,13 @@ export default function NewsCard({ id, title, excerpt, coverImageUrl, imageUrl, 
             <img 
               src={targetImage} 
               alt={title} 
-              style={{ width: '100%', height: 'auto', maxHeight: '750px', objectFit: 'contain', backgroundColor: '#f7f9fa', display: 'block', margin: '0 auto' }}
+              width="640"
+              height="360"
+              style={{ width: '100%', height: '224px', objectFit: 'cover', backgroundColor: '#f7f9fa', display: 'block', margin: '0 auto' }}
               className="transition-transform duration-300 group-hover:scale-105"
-              loading="lazy"
+              loading={priority ? 'eager' : 'lazy'}
+              decoding="async"
+              fetchPriority={priority ? 'high' : 'auto'}
               onError={(e) => { 
                 // If the URL fails to load as a direct asset, trigger a graceful fallback block
                 e.currentTarget.style.display = 'none';

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import ShareButton from './ShareButton';
 
-export default function EventCard({ id, title, description, date, coverImageUrl, imageUrl, eventImages, imageUrls, type = 'events' }) {
-  const primaryImage = coverImageUrl || imageUrl || (eventImages && eventImages[0]) || (imageUrls && imageUrls[0]) || null;
+export default function EventCard({ id, title, description, date, thumbnailUrl, coverImageUrl, imageUrl, eventImages, imageUrls, type = 'events', priority = false }) {
+  const primaryImage = thumbnailUrl || coverImageUrl || imageUrl || (eventImages && eventImages[0]) || (imageUrls && imageUrls[0]) || null;
   const [imgError, setImgError] = useState(false);
   const shareUrl = `${window.location.origin}/${type}/${id}`;
 
@@ -17,9 +17,13 @@ export default function EventCard({ id, title, description, date, coverImageUrl,
           <img
             src={primaryImage}
             alt={title}
-            style={{ width: '100%', height: 'auto', maxHeight: '750px', objectFit: 'contain', backgroundColor: '#f7f9fa', display: 'block', margin: '0 auto' }}
+            width="640"
+            height="360"
+            style={{ width: '100%', height: '224px', objectFit: 'cover', backgroundColor: '#f7f9fa', display: 'block', margin: '0 auto' }}
             className="transition-transform duration-700 group-hover:scale-105"
-            loading="lazy"
+            loading={priority ? 'eager' : 'lazy'}
+            decoding="async"
+            fetchPriority={priority ? 'high' : 'auto'}
             onError={() => setImgError(true)}
           />
         ) : (

@@ -1,6 +1,6 @@
 import React from 'react';
 import Layout from './Layout';
-import { useFirestoreCollection } from './useFirestoreCollection';
+import { useContentCollection } from './useContentCollection';
 import { useSettings } from './SettingsContext';
 
 function getDocumentUrl(item) {
@@ -53,7 +53,7 @@ function groupDocumentsBySection(documents, sectionOrder) {
 }
 
 export default function MandatoryDisclosure() {
-  const { data: documents, loading } = useFirestoreCollection('publicDisclosure', 'order', 'asc');
+  const { data: documents, loading } = useContentCollection('publicDisclosure', 'order', 'asc');
   const settings = useSettings();
   const publishedDocuments = documents.filter(item => item.published !== false && getDocumentUrl(item));
   const disclosureTitle = settings?.mandatoryDisclosureTitle || 'Mandatory Public Disclosure';

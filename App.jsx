@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, useParams, Navigate } from 'rea
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { doc, setDoc, serverTimestamp, collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 import { auth, db } from './firebase-init';
-import { useFirestoreCollection } from './useFirestoreCollection';
+import { useContentCollection } from './useContentCollection';
 
 import Layout from './Layout';
 import AdminLayout from './AdminLayout';
@@ -88,7 +88,7 @@ const SAMPLE_PAGES = {
 function DynamicPage({ slug: propSlug }) {
   const params = useParams();
   const slug = propSlug || params.slug;
-  const { data: pages, loading } = useFirestoreCollection('pages');
+  const { data: pages, loading } = useContentCollection('pages', 'createdAt', 'desc', { firestoreOnly: true });
   
   const page = pages.find(p => p.slug === slug);
   const samplePage = SAMPLE_PAGES[slug];

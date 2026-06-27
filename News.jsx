@@ -1,24 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { collection, query, where, onSnapshot } from 'firebase/firestore';
-import { db } from './firebase-init';
+import React from 'react';
 import Layout from './Layout';
 import NewsCard from './NewsCard';
+import { useContentCollection } from './useContentCollection';
 
 export default function News() {
-  const [news, setNews] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    // Strict category filtering + Real-time listeners
-    const q = query(collection(db, 'updates'), where('category', '==', 'News'), where('published', '==', true));
-    
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const docs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setNews(docs.sort((a, b) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0)));
-      setLoading(false);
-    });
-    return () => unsubscribe();
-  }, []);
+  const { data: updates, loading } = useContentCollection('updates', 'createdAt', 'desc');
+  const news = updates
+    .filter(item => item.published !== false && (item.category === 'News' || !item.category))
+    .sort((a, b) => (Date.parse(b.createdAt || b.date) || 0) - (Date.parse(a.createdAt || a.date) || 0));
 
   return (
     <Layout>
@@ -31,8 +20,8 @@ export default function News() {
           <p className="text-center text-slate-500">Loading news...</p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {news.length ? news.map(item => (
-              <NewsCard key={item.id} id={item.id} title={item.title} excerpt={item.excerpt || item.description || item.content} date={item.date} coverImageUrl={item.coverImageUrl} imageUrl={item.image || item.imageUrl} type="news" />
+            {news.length ? news.map((item, index) => (
+              <NewsCard key={item.id} id={item.id} title={item.title} excerpt={item.excerpt || item.description || item.content} date={item.date} thumbnailUrl={item.thumbnailUrl} coverImageUrl={item.coverImageUrl} imageUrl={item.image || item.imageUrl} type="news" priority={index < 3} />
             )) : <p className="col-span-full text-center text-slate-500">No news articles have been published yet.</p>}
           </div>
         )}

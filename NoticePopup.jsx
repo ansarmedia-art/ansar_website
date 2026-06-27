@@ -4,6 +4,8 @@ import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { db } from './firebase-init';
 import { useNavigate } from 'react-router-dom';
 
+let hasShownNoticeThisPageLoad = false;
+
 export default function NoticePopup() {
   const [notice, setNotice] = useState(null);
   const [isVisible, setIsVisible] = useState(false);
@@ -14,7 +16,10 @@ export default function NoticePopup() {
     const unsubscribe = onSnapshot(q, (snapshot) => {
       if (!snapshot.empty) {
         setNotice({ id: snapshot.docs[0].id, ...snapshot.docs[0].data() });
-        setIsVisible(true);
+        if (!hasShownNoticeThisPageLoad) {
+          hasShownNoticeThisPageLoad = true;
+          setIsVisible(true);
+        }
       } else {
         setIsVisible(false);
       }
