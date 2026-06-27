@@ -2,9 +2,84 @@
 
 The public website now reads content from this spreadsheet first:
 
-`https://docs.google.com/spreadsheets/d/1sWpN19lKl3hAtXKRleqpyJUThM_q4rrlqWHqBsrsAlc/edit`
+`https://docs.google.com/spreadsheets/d/1ymcRw-HqJfbqcRWa4BXXFzID4prJ20LhrTNK24jpVVE/edit`
 
 The website merges this Sheet with existing Firestore content, so older Firestore events/news can remain visible while new image-based content is added in Sheets.
+
+## Admin panel writes to Sheets
+
+News, Events, and Achievements can be saved from the website admin panel into Google Sheets by using a Google Apps Script Web App.
+
+### 1. Add the Apps Script
+
+Open the spreadsheet, then go to:
+
+`Extensions` -> `Apps Script`
+
+Paste the contents of this project file into Apps Script:
+
+`GOOGLE_SHEETS_APPS_SCRIPT.gs`
+
+Save the Apps Script project.
+
+### 2. Create the Sheet tabs
+
+In Apps Script, select this function and run it once:
+
+`setupWebsiteSheets`
+
+Approve the permission request. This creates or updates these tabs:
+
+- `updates`
+- `achievements`
+- `publicDisclosure`
+
+The admin panel stores News and Events together in the `updates` tab. Event rows use `category` = `Events`; news rows use `category` = `News`.
+
+### 3. Optional write token
+
+In Apps Script, open:
+
+`Project Settings` -> `Script properties`
+
+Add this property:
+
+| Property | Value |
+| --- | --- |
+| `WRITE_TOKEN` | any long private text |
+
+If you set a token here, put the same value in `googleSheetsConfig.js` as `writeToken`.
+
+### 4. Deploy as Web App
+
+In Apps Script:
+
+`Deploy` -> `New deployment` -> choose `Web app`
+
+Use these settings:
+
+| Setting | Value |
+| --- | --- |
+| Execute as | `Me` |
+| Who has access | `Anyone` |
+
+Click `Deploy`, approve permissions, then copy the Web App URL.
+
+### 5. Connect the website admin panel
+
+Open `googleSheetsConfig.js` and paste the Web App URL:
+
+```javascript
+writeEndpoint: 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec',
+```
+
+If you used `WRITE_TOKEN`, also set:
+
+```javascript
+writeToken: 'your-long-private-text',
+```
+
+After this, admin panel saves, edits, and deletes for News, Events, and Achievements go to Google Sheets.
 
 ## Required sharing
 

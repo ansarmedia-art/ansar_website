@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { collection, addDoc, updateDoc, deleteDoc, doc, serverTimestamp } from 'firebase/firestore';
+import { addDoc, collection, deleteDoc, doc, serverTimestamp, updateDoc } from 'firebase/firestore';
 import { db } from './firebase-init';
-import { useFirestoreCollection } from './useFirestoreCollection';
+import { clearGoogleSheetsCache, useContentCollection } from './useContentCollection';
+import { deleteSheetRecord, saveSheetRecord } from './googleSheetsAdminApi';
 import ImgBbUrlImporter from './ImgBbUrlImporter';
 
 function getAchievementTime(item) {
@@ -12,12 +13,14 @@ function getAchievementTime(item) {
 }
 
 export default function AdminAchievements() {
-  const { data: items, loading } = useFirestoreCollection('achievements', null);
+  const [refreshKey, setRefreshKey] = useState(0);
+  const { data: items, loading } = useContentCollection('achievements', null, 'desc', { refreshKey });
   const newestFirstItems = [...items].sort((a, b) => getAchievementTime(b) - getAchievementTime(a));
   
   const initialFormState = { title: '', description: '', imageUrl: '', date: '', studentName: '', published: true };
   const [formData, setFormData] = useState(initialFormState);
   const [editingId, setEditingId] = useState(null);
+  const [editingItem, setEditingItem] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
@@ -27,6 +30,7 @@ export default function AdminAchievements() {
 
   const handleEdit = (item) => {
     setEditingId(item.id);
+    setEditingItem(item);
     setFormData({ 
       title: item.title || '',
       description: item.description || '',
@@ -40,6 +44,7 @@ export default function AdminAchievements() {
 
   const resetForm = () => {
     setEditingId(null);
+    setEditingItem(null);
     setFormData(initialFormState);
   };
 
@@ -48,17 +53,47 @@ export default function AdminAchievements() {
     setIsSubmitting(true);
     try {
       const payload = {
-        ...formData,
-        updatedAt: serverTimestamp()
+        ...formData
       };
 
-      if (editingId) {
-        await updateDoc(doc(db, 'achievements', editingId), payload);
-      } else {
-        payload.createdAt = serverTimestamp();
-        await addDoc(collection(db, 'achievements'), payload);
+      let recordId = editingId;
+      let firestoreError = null;
+      let sheetsError = null;
+
+      try {
+        if (editingId && (!editingItem?._contentSource || editingItem._contentSource === 'firestore' || editingItem._contentSource === 'merged')) {
+          await updateDoc(doc(db, 'achievements', editingId), {
+            ...payload,
+            updatedAt: serverTimestamp()
+          });
+        } else if (!editingId) {
+          const docRef = await addDoc(collection(db, 'achievements'), {
+            ...payload,
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp()
+          });
+          recordId = docRef.id;
+        }
+      } catch (error) {
+        firestoreError = error;
       }
+
+      try {
+        await saveSheetRecord('achievements', { ...payload, id: recordId || undefined });
+      } catch (error) {
+        sheetsError = error;
+      }
+
+      if (firestoreError && sheetsError) {
+        throw new Error(`Firestore: ${firestoreError.message}. Sheets: ${sheetsError.message}`);
+      }
+
+      clearGoogleSheetsCache();
+      setRefreshKey(key => key + 1);
       resetForm();
+      if (firestoreError || sheetsError) {
+        alert(`Saved with warning: ${firestoreError ? 'Firestore failed. ' : ''}${sheetsError ? 'Google Sheets failed.' : ''}`);
+      }
     } catch (error) {
       console.error("Error saving:", error);
       alert("Save failed: " + error.message);
@@ -67,9 +102,20 @@ export default function AdminAchievements() {
     }
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (item) => {
     if (!window.confirm("Are you sure you want to delete this achievement?")) return;
-    try { await deleteDoc(doc(db, 'achievements', id)); } catch (error) { alert("Delete failed."); }
+    try {
+      if (!item._contentSource || item._contentSource === 'firestore' || item._contentSource === 'merged') {
+        await deleteDoc(doc(db, 'achievements', item.id));
+      }
+      if (item._contentSource === 'sheets' || item._contentSource === 'merged') {
+        await deleteSheetRecord('achievements', item.id);
+      }
+      clearGoogleSheetsCache();
+      setRefreshKey(key => key + 1);
+    } catch (error) {
+      alert("Delete failed: " + error.message);
+    }
   };
 
   return (
@@ -129,7 +175,7 @@ export default function AdminAchievements() {
             </div>
             <div className="flex items-center gap-2 flex-shrink-0">
               <button onClick={() => handleEdit(item)} className="px-3 py-1.5 text-sm font-bold text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors">Edit</button>
-              <button onClick={() => handleDelete(item.id)} className="px-3 py-1.5 text-sm font-bold text-red-600 hover:bg-red-50 rounded-lg transition-colors">Delete</button>
+              <button onClick={() => handleDelete(item)} className="px-3 py-1.5 text-sm font-bold text-red-600 hover:bg-red-50 rounded-lg transition-colors">Delete</button>
             </div>
           </div>
         ))}

@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { collection, addDoc, updateDoc, deleteDoc, doc, serverTimestamp, query, orderBy, onSnapshot } from 'firebase/firestore';
+import React, { useState } from 'react';
+import { addDoc, collection, deleteDoc, doc, serverTimestamp, updateDoc } from 'firebase/firestore';
 import { db } from './firebase-init';
+import { clearGoogleSheetsCache, useContentCollection } from './useContentCollection';
+import { deleteSheetRecord, saveSheetRecord } from './googleSheetsAdminApi';
 import ImgBbUrlImporter from './ImgBbUrlImporter';
 
 const MAX_EVENT_IMAGES = 100;
@@ -29,22 +31,14 @@ const cleanImageUrl = (url) => {
 };
 
 export default function AdminUpdates() {
-  const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [refreshKey, setRefreshKey] = useState(0);
+  const { data: items, loading } = useContentCollection('updates', 'date', 'desc', { refreshKey });
   
   const initialFormState = { category: 'News', title: '', description: '', date: '', coverImageUrl: '', eventImages: [''], instagramUrl: '', facebookUrl: '', youtubeUrl: '', published: true };
   const [formData, setFormData] = useState(initialFormState);
   const [editingId, setEditingId] = useState(null);
+  const [editingItem, setEditingItem] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  useEffect(() => {
-    const q = query(collection(db, 'updates'), orderBy('createdAt', 'desc'));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      setItems(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-      setLoading(false);
-    });
-    return () => unsubscribe();
-  }, []);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -83,6 +77,7 @@ export default function AdminUpdates() {
 
   const handleEdit = (item) => {
     setEditingId(item.id);
+    setEditingItem(item);
     setFormData({ 
       category: item.category || 'News',
       title: item.title || '', 
@@ -100,6 +95,7 @@ export default function AdminUpdates() {
 
   const resetForm = () => {
     setEditingId(null);
+    setEditingItem(null);
     setFormData(initialFormState);
   };
 
@@ -129,17 +125,44 @@ export default function AdminUpdates() {
         instagramUrl: formData.instagramUrl || '',
         facebookUrl: formData.facebookUrl || '',
         youtubeUrl: formData.youtubeUrl || '',
-        published: !!formData.published,
-        updatedAt: serverTimestamp()
+        published: !!formData.published
       };
 
-      if (editingId) {
-        await updateDoc(doc(db, 'updates', editingId), payload);
-      } else {
-        payload.createdAt = serverTimestamp();
-        await addDoc(collection(db, 'updates'), payload);
+      let recordId = editingId;
+      let firestoreError = null;
+      let sheetsError = null;
+
+      try {
+        if (editingId && (!editingItem?._contentSource || editingItem._contentSource === 'firestore' || editingItem._contentSource === 'merged')) {
+          await updateDoc(doc(db, 'updates', editingId), { ...payload, updatedAt: serverTimestamp() });
+        } else if (!editingId) {
+          const docRef = await addDoc(collection(db, 'updates'), {
+            ...payload,
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp()
+          });
+          recordId = docRef.id;
+        }
+      } catch (error) {
+        firestoreError = error;
       }
+
+      try {
+        await saveSheetRecord('updates', { ...payload, id: recordId || undefined });
+      } catch (error) {
+        sheetsError = error;
+      }
+
+      if (firestoreError && sheetsError) {
+        throw new Error(`Firestore: ${firestoreError.message}. Sheets: ${sheetsError.message}`);
+      }
+
+      clearGoogleSheetsCache();
+      setRefreshKey(key => key + 1);
       resetForm();
+      if (firestoreError || sheetsError) {
+        alert(`Saved with warning: ${firestoreError ? 'Firestore failed. ' : ''}${sheetsError ? 'Google Sheets failed.' : ''}`);
+      }
     } catch (error) {
       console.error("Error saving:", error);
       alert("Save failed: " + error.message);
@@ -148,9 +171,20 @@ export default function AdminUpdates() {
     }
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (item) => {
     if (!window.confirm("Are you sure you want to delete this publication?")) return;
-    try { await deleteDoc(doc(db, 'updates', id)); } catch (error) { alert("Delete failed."); }
+    try {
+      if (!item._contentSource || item._contentSource === 'firestore' || item._contentSource === 'merged') {
+        await deleteDoc(doc(db, 'updates', item.id));
+      }
+      if (item._contentSource === 'sheets' || item._contentSource === 'merged') {
+        await deleteSheetRecord('updates', item.id);
+      }
+      clearGoogleSheetsCache();
+      setRefreshKey(key => key + 1);
+    } catch (error) {
+      alert("Delete failed: " + error.message);
+    }
   };
 
   return (
@@ -316,7 +350,7 @@ export default function AdminUpdates() {
             
             <div className="flex items-center gap-2 flex-shrink-0">
               <button onClick={() => handleEdit(item)} className="px-3 py-1.5 text-sm font-bold text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors">Edit</button>
-              <button onClick={() => handleDelete(item.id)} className="px-3 py-1.5 text-sm font-bold text-red-600 hover:bg-red-50 rounded-lg transition-colors">Delete</button>
+              <button onClick={() => handleDelete(item)} className="px-3 py-1.5 text-sm font-bold text-red-600 hover:bg-red-50 rounded-lg transition-colors">Delete</button>
             </div>
           </div>
         ))}

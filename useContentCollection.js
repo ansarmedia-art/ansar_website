@@ -5,6 +5,10 @@ import { GOOGLE_SHEETS_DATABASE } from './googleSheetsConfig';
 
 const SHEET_CACHE = new Map();
 
+export function clearGoogleSheetsCache() {
+  SHEET_CACHE.clear();
+}
+
 function normalizeHeader(header) {
   return String(header || '')
     .trim()
@@ -77,6 +81,36 @@ function coerceRow(row, collectionName, rowIndex) {
   return item;
 }
 
+function hasMeaningfulSheetValue(row) {
+  return Object.entries(row).some(([key, value]) => {
+    if (key === 'id') return false;
+    if (Array.isArray(value)) return value.length > 0;
+    return String(value ?? '').trim() !== '';
+  });
+}
+
+function hasDisplayableContent(item) {
+  const contentKeys = [
+    'title',
+    'description',
+    'date',
+    'documentUrl',
+    'fileUrl',
+    'imageUrl',
+    'coverImageUrl',
+    'thumbnailUrl',
+    'studentName',
+    'eventImages',
+    'imageUrls'
+  ];
+
+  return contentKeys.some((key) => {
+    const value = item?.[key];
+    if (Array.isArray(value)) return value.some((entry) => String(entry || '').trim() !== '');
+    return String(value ?? '').trim() !== '';
+  });
+}
+
 function sortRows(rows, orderByField, orderDir) {
   if (!orderByField) return rows;
   const direction = orderDir === 'asc' ? 1 : -1;
@@ -103,11 +137,11 @@ function getTimeValue(value) {
 function mergeRows(firestoreRows, sheetRows) {
   const merged = new Map();
 
-  firestoreRows.forEach((item) => {
+  firestoreRows.filter(hasDisplayableContent).forEach((item) => {
     merged.set(item.id, { ...item, _contentSource: 'firestore' });
   });
 
-  sheetRows.forEach((item) => {
+  sheetRows.filter(hasDisplayableContent).forEach((item) => {
     const existing = merged.get(item.id) || {};
     merged.set(item.id, { ...existing, ...item, _contentSource: existing.id ? 'merged' : 'sheets' });
   });
@@ -118,8 +152,9 @@ function mergeRows(firestoreRows, sheetRows) {
 async function fetchSheetTab(spreadsheetId, tabName) {
   const params = new URLSearchParams({ tqx: 'out:json' });
   if (tabName) params.set('sheet', tabName);
+  params.set('cachebust', String(Date.now()));
   const url = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/gviz/tq?${params.toString()}`;
-  const response = await fetch(url);
+  const response = await fetch(url, { cache: 'no-store' });
   if (!response.ok) throw new Error(`Google Sheets request failed (${response.status})`);
 
   const text = await response.text();
@@ -138,12 +173,12 @@ async function fetchSheetTab(spreadsheetId, tabName) {
       (row.c || []).forEach((cell, index) => {
         if (headers[index]) values[headers[index]] = readCell(cell);
       });
-      return coerceRow(values, tabName || 'sheet', rowIndex);
+      return hasMeaningfulSheetValue(values) ? coerceRow(values, tabName || 'sheet', rowIndex) : null;
     })
-    .filter(item => Object.values(item).some(value => value !== ''));
+    .filter(Boolean);
 }
 
-async function fetchSheetCollection(collectionName) {
+export async function fetchSheetCollection(collectionName) {
   const config = GOOGLE_SHEETS_DATABASE;
   const tabs = config.collectionTabs[collectionName] || [collectionName];
   let lastError = null;
@@ -169,25 +204,27 @@ async function fetchSheetCollection(collectionName) {
 export function useContentCollection(collectionName, orderByField = 'createdAt', orderDir = 'desc', options = {}) {
   const [state, setState] = useState({ data: [], loading: true, error: null, source: null });
   const maxItems = options.limit || null;
+  const refreshKey = options.refreshKey || 0;
   const hasSheetTabs = Object.prototype.hasOwnProperty.call(GOOGLE_SHEETS_DATABASE.collectionTabs, collectionName);
   const useSheets = GOOGLE_SHEETS_DATABASE.enabled && hasSheetTabs && !options.firestoreOnly;
+  const sheetsOnly = !!options.sheetsOnly;
 
   useEffect(() => {
     let cancelled = false;
     let unsubscribe;
     let firestoreRows = [];
     let sheetRows = [];
-    let firestoreLoaded = false;
+    let firestoreLoaded = sheetsOnly;
     let sheetLoaded = !useSheets;
 
     const publish = () => {
       if (cancelled) return;
-      const sorted = sortRows(mergeRows(firestoreRows, sheetRows), orderByField, orderDir);
+      const sorted = sortRows(sheetsOnly ? sheetRows : mergeRows(firestoreRows, sheetRows), orderByField, orderDir);
       setState({
         data: maxItems ? sorted.slice(0, maxItems) : sorted,
-        loading: !firestoreLoaded,
+        loading: !(firestoreLoaded && sheetLoaded),
         error: null,
-        source: useSheets ? 'merged' : 'firestore'
+        source: sheetsOnly ? 'sheets' : (useSheets ? 'merged' : 'firestore')
       });
     };
 
@@ -220,17 +257,23 @@ export function useContentCollection(collectionName, orderByField = 'createdAt',
         .catch((error) => {
           console.warn(`Google Sheets unavailable for ${collectionName}; using Firestore only.`, error);
           sheetLoaded = true;
+          if (sheetsOnly && !cancelled) {
+            setState({ data: [], loading: false, error, source: 'sheets' });
+            return;
+          }
           publish();
         });
     }
 
-    subscribeFirestore();
+    if (!sheetsOnly) {
+      subscribeFirestore();
+    }
 
     return () => {
       cancelled = true;
       if (typeof unsubscribe === 'function') unsubscribe();
     };
-  }, [collectionName, orderByField, orderDir, maxItems, useSheets]);
+  }, [collectionName, orderByField, orderDir, maxItems, useSheets, sheetsOnly, refreshKey]);
 
   return state;
 }
