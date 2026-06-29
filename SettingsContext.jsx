@@ -20,6 +20,8 @@ Ms. Sajidha Razak
 Principal
 Ansar English School, Perumpilavu`;
 
+const DEFAULT_FEE_STRUCTURE_URL = 'https://drive.google.com/file/d/1BlRQIlD4U4RjRGvVIq2Kah4xYxNjChoa/view?usp=drive_link';
+
 export const SettingsProvider = ({ children }) => {
   const [settings, setSettings] = useState({
     heroTitle: 'Empowering Minds, Enriching Futures',
@@ -59,7 +61,8 @@ export const SettingsProvider = ({ children }) => {
       'Others'
     ],
     sustainabilityTitle: 'Year of Sustainability 2026–2027',
-    feeStructurePdfUrl: '',
+    feeStructureTitle: 'Fee Structure 2026 - 2027',
+    feeStructurePdfUrl: DEFAULT_FEE_STRUCTURE_URL,
     sustainabilityDesc: 'At our school, the Year of Sustainability is dedicated to nurturing environmentally responsible and socially conscious learners. Through awareness, action, and innovation, we encourage students to embrace sustainable practices and become active contributors to a greener future.',
     sustainabilityLogoUrl: '',
     _isLoaded: false
@@ -68,7 +71,14 @@ export const SettingsProvider = ({ children }) => {
   useEffect(() => {
     const unsubscribe = onSnapshot(doc(db, 'settings', 'global'), (docSnap) => {
       if (docSnap.exists()) {
-        setSettings(prev => ({ ...prev, ...docSnap.data(), _isLoaded: true }));
+        const savedSettings = docSnap.data();
+        setSettings(prev => ({
+          ...prev,
+          ...savedSettings,
+          feeStructureTitle: savedSettings.feeStructureTitle || prev.feeStructureTitle,
+          feeStructurePdfUrl: savedSettings.feeStructurePdfUrl || prev.feeStructurePdfUrl,
+          _isLoaded: true
+        }));
       } else {
         setSettings(prev => ({ ...prev, _isLoaded: true }));
       }

@@ -29,7 +29,9 @@ export default function AdminSettings() {
     juniorPrincipals: [{ name: '', qualification: '', section: '', imageUrl: '' }],
     sustainabilityTitle: '',
     sustainabilityDesc: '',
-    sustainabilityLogoUrl: ''
+    sustainabilityLogoUrl: '',
+    feeStructureTitle: 'Fee Structure 2026 - 2027',
+    feeStructurePdfUrl: 'https://drive.google.com/file/d/1BlRQIlD4U4RjRGvVIq2Kah4xYxNjChoa/view?usp=drive_link'
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState('');
@@ -38,7 +40,13 @@ export default function AdminSettings() {
     const fetchSettings = async () => {
       const docSnap = await getDoc(doc(db, 'settings', 'global'));
       if (docSnap.exists()) {
-        setFormData(prev => ({ ...prev, ...docSnap.data() }));
+        const savedSettings = docSnap.data();
+        setFormData(prev => ({
+          ...prev,
+          ...savedSettings,
+          feeStructureTitle: savedSettings.feeStructureTitle || prev.feeStructureTitle,
+          feeStructurePdfUrl: savedSettings.feeStructurePdfUrl || prev.feeStructurePdfUrl
+        }));
       }
     };
     fetchSettings();
@@ -196,6 +204,25 @@ export default function AdminSettings() {
               ))}
               <button type="button" onClick={addJuniorPrincipal} className="text-sm font-bold text-emerald-600 hover:bg-emerald-50 py-2 px-3 rounded-lg">+ Add Junior Principal</button>
             </div>
+          </div>
+
+          <div className="space-y-4 p-5 bg-slate-50 border border-slate-100 rounded-xl">
+            <h3 className="font-extrabold text-slate-900 mb-2">Admission Documents</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-bold text-slate-700 mb-2">Fee Structure Button Title</label>
+                <input name="feeStructureTitle" value={formData.feeStructureTitle || ''} onChange={handleChange} placeholder="Fee Structure 2026 - 2027" className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" />
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-slate-700 mb-2">Fee Structure PDF / Drive URL</label>
+                <input name="feeStructurePdfUrl" type="url" value={formData.feeStructurePdfUrl || ''} onChange={handleChange} placeholder="https://drive.google.com/file/d/..." className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" />
+              </div>
+            </div>
+            {formData.feeStructurePdfUrl && (
+              <a href={formData.feeStructurePdfUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center rounded-lg bg-slate-900 px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-emerald-700">
+                Preview current fee structure
+              </a>
+            )}
           </div>
 
           <div className="space-y-4 p-5 bg-slate-50 border border-slate-100 rounded-xl">

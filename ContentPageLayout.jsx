@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function ContentPageLayout({ page, eyebrow = 'Ansar English School', children, actions }) {
+export default function ContentPageLayout({ page, eyebrow = 'Ansar English School', children, actions, sidebar }) {
   return (
     <LayoutWrapper>
       <div className="relative overflow-hidden rounded-3xl bg-slate-900 px-6 py-14 text-white shadow-2xl sm:px-10 lg:px-14">
@@ -31,15 +31,19 @@ export default function ContentPageLayout({ page, eyebrow = 'Ansar English Schoo
         </article>
 
         <aside className="space-y-4">
-          <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-6">
-            <p className="text-xs font-extrabold uppercase tracking-widest text-emerald-700">Page Guide</p>
-            <h2 className="mt-3 text-xl font-extrabold text-slate-900">{page.title}</h2>
-            <p className="mt-3 text-sm leading-relaxed text-slate-600">This section is structured for quick reading and can be expanded from the admin panel.</p>
-          </div>
-          <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
-            <p className="text-sm font-bold text-slate-900">Need help?</p>
-            <p className="mt-2 text-sm leading-relaxed text-slate-600">Contact the school office for more details about this page.</p>
-          </div>
+          {sidebar || (
+            <>
+              <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-6">
+                <p className="text-xs font-extrabold uppercase tracking-widest text-emerald-700">Page Guide</p>
+                <h2 className="mt-3 text-xl font-extrabold text-slate-900">{page.title}</h2>
+                <p className="mt-3 text-sm leading-relaxed text-slate-600">This section is structured for quick reading and can be expanded from the admin panel.</p>
+              </div>
+              <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
+                <p className="text-sm font-bold text-slate-900">Need help?</p>
+                <p className="mt-2 text-sm leading-relaxed text-slate-600">Contact the school office for more details about this page.</p>
+              </div>
+            </>
+          )}
         </aside>
       </div>
     </LayoutWrapper>

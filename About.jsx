@@ -21,6 +21,39 @@ const ANSAR_MILESTONES = [
   { year: '2026', title: 'Year of Sustainability', color: 'bg-indigo-700', ring: 'ring-indigo-100' }
 ];
 
+const ABOUT_STATS = [
+  ['1982', 'Founded'],
+  ['4,600+', 'Students'],
+  ['270+', 'Educators'],
+  ['CBSE', 'Affiliated']
+];
+
+const ACT_TRUSTEES = [
+  { name: 'MAMMUNNI K K', role: 'Chairman', imageUrl: '/trustees/act-member-01.png' },
+  { name: 'V T ABDULLAH KOYA THANGAL', role: 'Acting Chairman', imageUrl: '/trustees/act-member-02.png' },
+  { name: 'MOHAMMED K V', role: 'Vice Chairman', imageUrl: '/trustees/act-member-03.png' },
+  { name: 'E A KUNJAHAMMU', role: 'Secretary', imageUrl: '/trustees/act-member-04.png' },
+  { name: 'SHAJU MOHAMEDUNNI', role: 'Asst. Secretary', imageUrl: '/trustees/act-member-05.png' },
+  { name: 'NAJEEB P', role: 'Managing Committee Member', imageUrl: '/trustees/act-member-06.png' },
+  { name: 'MOHAMMED AMEEN E M', role: 'Managing Committee Member', imageUrl: '/trustees/act-member-07.png' },
+  { name: 'MOOSA V', role: 'Managing Committee Member', imageUrl: '/trustees/act-member-08.png' },
+  { name: 'NOOR MOHAMMED KAMALUDHEEN', role: 'Managing Committee Member', imageUrl: '/trustees/act-member-09.png' },
+  { name: 'MUHAMMED SHEREEF E V', role: 'Managing Committee Member', imageUrl: '/trustees/act-member-10.png' },
+  { name: 'ABDUL HAMEED', role: 'Managing Committee Member', imageUrl: '/trustees/act-member-11.png' },
+  { name: 'K K SHANAVAS', role: 'Managing Committee Member', imageUrl: '/trustees/act-member-12.png' },
+  { name: 'MOHAMED KUTTY KAYINGIL', role: 'Managing Committee Member', imageUrl: '/trustees/act-member-13.png' },
+  { name: 'ISMAIL KASIM', role: 'Member', imageUrl: '/trustees/act-member-14.png' },
+  { name: 'SHOUKATH ALI KOROTH', role: 'Member', imageUrl: '/trustees/act-member-15.png' },
+  { name: 'T A MOIDEEN ALIAS MOIDUTTY', role: 'Member', imageUrl: '/trustees/act-member-16.png' },
+  { name: 'M I ABDUL AZEEZ', role: 'Member', imageUrl: '/trustees/act-member-17.png' },
+  { name: 'A USMAN', role: 'Member', imageUrl: '/trustees/act-member-18.png' },
+  { name: 'ANWAR ABDUL MAJEED', role: 'Member', imageUrl: '/trustees/act-member-19.png' },
+  { name: 'MUJEEB RAHMAN P', role: 'Member', imageUrl: '/trustees/act-member-20.png' },
+  { name: 'Dr. MOHAMED BADEEUZZAMAN', role: 'Member', imageUrl: '/trustees/act-member-21.png' },
+  { name: 'Dr. MOHAMMED ALI MAMPPILLY (KOOTTIL)', role: 'Member', imageUrl: '/trustees/act-member-22.png' },
+  { name: 'P I NOUSHAD', role: 'Member', imageUrl: '/trustees/act-member-23.png' }
+];
+
 function AnimatedSection({ children, className = '' }) {
   const [isVisible, setIsVisible] = useState(false);
   const ref = useRef(null);
@@ -44,9 +77,32 @@ function AnimatedSection({ children, className = '' }) {
   );
 }
 
+function AboutSidebar() {
+  return (
+    <>
+      <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-6">
+        <p className="text-xs font-extrabold uppercase tracking-widest text-emerald-700">School Profile</p>
+        <h2 className="mt-3 text-xl font-extrabold text-slate-900">Ansar English School</h2>
+        <p className="mt-3 text-sm leading-relaxed text-slate-600">A CBSE senior secondary school in Perumpilavu shaped by academic excellence, values, service, and inclusive learning.</p>
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        {ABOUT_STATS.map(([value, label]) => (
+          <div key={label} className="rounded-xl border border-slate-100 bg-white p-4 shadow-sm">
+            <p className="text-2xl font-extrabold text-slate-900">{value}</p>
+            <p className="mt-1 text-xs font-bold uppercase tracking-wide text-slate-500">{label}</p>
+          </div>
+        ))}
+      </div>
+      <a href="https://www.p4panorama.com/360-virtual-tour/ansar-school/" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center rounded-xl bg-emerald-600 px-5 py-3 text-center text-sm font-bold text-white shadow-lg transition-colors hover:bg-emerald-700">
+        Take a 360&deg; Virtual Tour
+      </a>
+    </>
+  );
+}
+
 function AnsarTimeline() {
   return (
-    <AnimatedSection className="mt-14 overflow-hidden rounded-[2rem] border border-slate-100 bg-white p-6 shadow-sm sm:p-8 lg:p-10">
+    <AnimatedSection className="mt-14 overflow-hidden rounded-2xl border border-slate-100 bg-white p-6 shadow-sm sm:p-8 lg:p-10">
       <div className="mb-10 max-w-3xl">
         <p className="text-sm font-black uppercase tracking-widest text-emerald-600">Ansar Timeline</p>
         <h2 className="mt-3 text-4xl font-extrabold text-slate-950 lg:text-5xl">Milestones</h2>
@@ -116,10 +172,10 @@ function HistoryAndTrustees({ historyText, trustees = [] }) {
         </div>
         <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-6">
           {trusteeSlots.map((trustee, index) => (
-            <div key={`${trustee.name || 'trustee'}-${index}`} className="group overflow-hidden rounded-2xl border border-slate-100 bg-slate-50 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+            <div key={`${trustee.name || 'trustee'}-${index}`} className="group overflow-hidden rounded-xl border border-slate-100 bg-slate-50 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
               <div className="relative aspect-[4/5] bg-slate-100">
                 {trustee.imageUrl ? (
-                  <img src={trustee.imageUrl} alt={trustee.name || 'Trustee member'} className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
+                  <img src={trustee.imageUrl} alt={trustee.name || 'Trustee member'} className="absolute inset-0 h-full w-full object-contain bg-white p-2 transition-transform duration-500 group-hover:scale-105" loading="lazy" />
                 ) : (
                   <div className="absolute inset-0 flex items-center justify-center text-slate-300">
                     <svg className="h-14 w-14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0zM12 14a7 7 0 0 0-7 7h14a7 7 0 0 0-7-7z" /></svg>
@@ -144,7 +200,7 @@ function AboutInstitutionSections() {
   return (
     <>
       <AnsarTimeline />
-      <HistoryAndTrustees historyText={settings?.ansarHistoryText} trustees={settings?.trusteeMembers} />
+      <HistoryAndTrustees historyText={settings?.ansarHistoryText} trustees={ACT_TRUSTEES} />
     </>
   );
 }
@@ -159,6 +215,7 @@ export default function About() {
         <ContentPageLayout
           page={page}
           eyebrow="About Ansar English School"
+          sidebar={<AboutSidebar />}
           actions={page.virtualTourUrl && (
             <a href={page.virtualTourUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center rounded-xl bg-emerald-600 px-6 py-3 font-bold text-white transition-colors hover:bg-emerald-700 no-underline">
               {page.virtualTourText || 'Take a 360\u00b0 Virtual Tour'}
@@ -175,22 +232,26 @@ export default function About() {
   return (
     <Layout>
       <div className="mx-auto max-w-7xl px-4 py-12 lg:py-20">
-        <section className="relative overflow-hidden rounded-3xl bg-slate-950 text-white shadow-2xl">
+        <section className="relative overflow-hidden rounded-2xl bg-slate-950 text-white shadow-2xl">
           <img
             src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1600&auto=format&fit=crop"
             alt="About Ansar English School"
-            className="absolute inset-0 h-full w-full object-cover opacity-25"
+            className="absolute inset-0 h-full w-full object-cover opacity-35"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/90 to-emerald-950/60" />
-          <div className="relative grid min-h-[28rem] grid-cols-1 items-end gap-10 px-6 py-12 sm:px-10 lg:grid-cols-[minmax(0,1fr)_22rem] lg:px-14 lg:py-16">
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/86 to-emerald-950/45" />
+          <div className="relative grid min-h-[28rem] grid-cols-1 items-end gap-10 px-6 py-12 sm:px-10 lg:grid-cols-[minmax(0,1fr)_24rem] lg:px-14 lg:py-16">
             <div>
               <p className="mb-4 text-sm font-extrabold uppercase tracking-widest text-amber-300">About Ansar English School</p>
               <h1 className="max-w-4xl text-4xl font-extrabold leading-tight lg:text-6xl">A Legacy of Excellence, A Future of Promise</h1>
               <p className="mt-6 max-w-3xl text-lg font-light leading-relaxed text-slate-100/90 lg:text-xl">Empowering generations since 1982 through value-driven education and inclusive learning.</p>
             </div>
-            <div className="rounded-2xl border border-white/15 bg-white/10 p-6 backdrop-blur">
-              <p className="text-5xl font-extrabold text-amber-300">1982</p>
-              <p className="mt-3 text-sm font-semibold leading-relaxed text-slate-100">Founded in 1982 by the Ansari Charitable Trust under the guidance of Late Jb. A V Abdul Majeed Saheb and visionary leaders.</p>
+            <div className="grid grid-cols-2 gap-3">
+              {ABOUT_STATS.map(([value, label]) => (
+                <div key={label} className="border border-white/15 bg-white/10 p-4 backdrop-blur">
+                  <p className="text-3xl font-extrabold text-amber-300">{value}</p>
+                  <p className="mt-1 text-xs font-bold uppercase tracking-wide text-slate-100">{label}</p>
+                </div>
+              ))}
             </div>
           </div>
         </section>
@@ -223,21 +284,7 @@ export default function About() {
           </article>
 
           <aside className="space-y-6">
-            <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="rounded-xl bg-slate-50 p-4">
-                  <p className="text-3xl font-extrabold text-slate-900">4,600</p>
-                  <p className="mt-1 text-sm font-semibold text-slate-500">students</p>
-                </div>
-                <div className="rounded-xl bg-slate-50 p-4">
-                  <p className="text-3xl font-extrabold text-slate-900">270+</p>
-                  <p className="mt-1 text-sm font-semibold text-slate-500">educators</p>
-                </div>
-              </div>
-            </div>
-            <a href="https://www.p4panorama.com/360-virtual-tour/ansar-school/" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center rounded-xl bg-emerald-600 px-6 py-4 text-center font-bold text-white shadow-lg transition-colors hover:bg-emerald-700">
-              Take a 360&deg; Virtual Tour of Ansar School
-            </a>
+            <AboutSidebar />
           </aside>
         </section>
 

@@ -4,6 +4,79 @@ import ContentPageLayout from './ContentPageLayout';
 import { useFirestoreCollection } from './useFirestoreCollection';
 import { useSettings } from './SettingsContext';
 
+const ACADEMIC_FOCUS = [
+  {
+    title: 'CBSE Curriculum',
+    body: 'Structured learning from foundational literacy to senior secondary subject specialization.'
+  },
+  {
+    title: 'Smart Learning',
+    body: 'Digital classrooms, practical labs, and activity-led sessions keep lessons clear and engaging.'
+  },
+  {
+    title: 'Competitive Readiness',
+    body: 'Focused support for board exams, skill development, and entrance-oriented preparation.'
+  }
+];
+
+const LEARNING_STAGES = [
+  ['Ansar Sprouts', 'Play-based early learning for confidence, language, movement, and social growth.'],
+  ['Primary School', 'Strong foundations in literacy, numeracy, environmental awareness, and expression.'],
+  ['Middle School', 'Concept clarity, analytical thinking, communication skills, and guided exploration.'],
+  ['Senior Secondary', 'Subject depth, practical work, projects, and focused CBSE exam preparation.']
+];
+
+function AcademicsHighlights() {
+  return (
+    <section className="mt-10 rounded-2xl border border-slate-100 bg-slate-50 p-6 sm:p-8">
+      <div className="max-w-3xl">
+        <p className="text-sm font-black uppercase tracking-widest text-emerald-600">Academic Life</p>
+        <h2 className="mt-3 text-3xl font-extrabold text-slate-900">Learning that connects knowledge, skill, and character</h2>
+        <p className="mt-4 text-base leading-relaxed text-slate-600">The academic programme combines classroom instruction, lab work, reading culture, enrichment activities, and regular mentoring so students can learn with clarity and confidence.</p>
+      </div>
+
+      <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-3">
+        {ACADEMIC_FOCUS.map((item) => (
+          <div key={item.title} className="rounded-xl border border-white bg-white p-5 shadow-sm">
+            <h3 className="text-lg font-extrabold text-slate-900">{item.title}</h3>
+            <p className="mt-3 text-sm leading-relaxed text-slate-600">{item.body}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function AcademicsSidebar({ onDownloadFeeStructure, hasFeeStructure }) {
+  return (
+    <>
+      <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-6">
+        <p className="text-xs font-extrabold uppercase tracking-widest text-emerald-700">Academic Overview</p>
+        <h2 className="mt-3 text-xl font-extrabold text-slate-900">CBSE learning pathway</h2>
+        <p className="mt-3 text-sm leading-relaxed text-slate-600">A balanced programme for academics, values, communication, technology, and future readiness.</p>
+      </div>
+      <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
+        <p className="text-sm font-bold text-slate-900">Learning Support</p>
+        <div className="mt-4 space-y-3 text-sm text-slate-600">
+          <p>Smart classrooms</p>
+          <p>Science and computer labs</p>
+          <p>Language enrichment</p>
+          <p>Exam preparation support</p>
+        </div>
+      </div>
+      {hasFeeStructure && (
+        <button
+          type="button"
+          onClick={onDownloadFeeStructure}
+          className="w-full rounded-xl bg-slate-900 px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-emerald-700"
+        >
+          Download Fee Structure
+        </button>
+      )}
+    </>
+  );
+}
+
 export default function Academics() {
   const { data: pages } = useFirestoreCollection('pages');
   const page = pages.find(p => p.slug === 'academics');
@@ -24,7 +97,17 @@ export default function Academics() {
   if (page) {
     return (
       <Layout>
-        <ContentPageLayout page={page} eyebrow="Academics" />
+        <ContentPageLayout
+          page={page}
+          eyebrow="Academics"
+          sidebar={<AcademicsSidebar onDownloadFeeStructure={() => handlePdfDownload(settings?.feeStructurePdfUrl)} hasFeeStructure={Boolean(settings?.feeStructurePdfUrl)} />}
+        >
+          <div
+            className="prose prose-slate prose-lg max-w-none prose-headings:text-slate-900 prose-a:text-emerald-600 prose-img:rounded-xl"
+            dangerouslySetInnerHTML={{ __html: page.bodyHtml }}
+          />
+          <AcademicsHighlights />
+        </ContentPageLayout>
       </Layout>
     );
   }
@@ -50,7 +133,7 @@ export default function Academics() {
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
               </div>
               <h2 className="text-2xl font-bold text-slate-900 mb-4">A Dynamic, Student-Centered Approach</h2>
-              <p className="text-slate-600 leading-relaxed">At Ansar English School, we believe education should be engaging, interactive, and deeply holistic. Our approach seamlessly blends modern infrastructure—including Smart Classrooms, Advanced Science & Computer Labs, and high-speed Wi-Fi—with deep-rooted value education.</p>
+              <p className="text-slate-600 leading-relaxed">At Ansar English School, we believe education should be engaging, interactive, and deeply holistic. Our approach blends modern infrastructure, including Smart Classrooms, Advanced Science & Computer Labs, and high-speed Wi-Fi, with deep-rooted value education.</p>
             </div>
           </div>
 
@@ -62,34 +145,26 @@ export default function Academics() {
               </div>
               <h2 className="text-2xl font-bold mb-4">Beyond the Textbooks</h2>
               <ul className="space-y-4 text-emerald-100">
-                <li className="flex items-start gap-3"><span className="text-amber-400 mt-1">★</span> <span><strong>Innovation & Tech:</strong> Hands-on creation at our state-of-the-art ATL Tinkering Lab.</span></li>
-                <li className="flex items-start gap-3"><span className="text-amber-400 mt-1">★</span> <span><strong>Communication:</strong> Advanced Language Labs and Language Ambassador programs.</span></li>
-                <li className="flex items-start gap-3"><span className="text-amber-400 mt-1">★</span> <span><strong>Future Readiness:</strong> Dedicated competitive exam coaching for Medical, Engineering, and NTSE.</span></li>
-                <li className="flex items-start gap-3"><span className="text-amber-400 mt-1">★</span> <span><strong>Leadership & Service:</strong> Active chapters of Student Police Cadet (SPC) and NSS.</span></li>
+                <li className="flex items-start gap-3"><span className="mt-2 h-2 w-2 flex-none rounded-full bg-amber-400"></span> <span><strong>Innovation & Tech:</strong> Hands-on creation at our state-of-the-art ATL Tinkering Lab.</span></li>
+                <li className="flex items-start gap-3"><span className="mt-2 h-2 w-2 flex-none rounded-full bg-amber-400"></span> <span><strong>Communication:</strong> Advanced Language Labs and Language Ambassador programs.</span></li>
+                <li className="flex items-start gap-3"><span className="mt-2 h-2 w-2 flex-none rounded-full bg-amber-400"></span> <span><strong>Future Readiness:</strong> Dedicated competitive exam coaching for Medical, Engineering, and NTSE.</span></li>
+                <li className="flex items-start gap-3"><span className="mt-2 h-2 w-2 flex-none rounded-full bg-amber-400"></span> <span><strong>Leadership & Service:</strong> Active chapters of Student Police Cadet (SPC) and NSS.</span></li>
               </ul>
             </div>
           </div>
         </div>
 
-        <div className="mb-16">
+        <AcademicsHighlights />
+
+        <div className="mb-16 mt-16">
           <h2 className="text-3xl font-extrabold text-slate-900 mb-8 text-center">The 4 Stages of Learning</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="academics-card bg-white p-8 rounded-2xl shadow-sm border border-slate-100 border-t-4 border-t-amber-400">
-              <h3 className="text-xl font-bold text-slate-900 mb-3">Ansar Sprouts</h3>
-              <p className="text-slate-600 text-sm leading-relaxed">A sensory and play-based environment focusing on cognitive, physical, and emotional development for Pre-Primary children.</p>
-            </div>
-            <div className="academics-card bg-white p-8 rounded-2xl shadow-sm border border-slate-100 border-t-4 border-t-emerald-400">
-              <h3 className="text-xl font-bold text-slate-900 mb-3">Primary School</h3>
-              <p className="text-slate-600 text-sm leading-relaxed">Building a rock-solid foundation in literacy, numeracy, and basic sciences through interactive and joyous learning.</p>
-            </div>
-            <div className="academics-card bg-white p-8 rounded-2xl shadow-sm border border-slate-100 border-t-4 border-t-blue-400">
-              <h3 className="text-xl font-bold text-slate-900 mb-3">Middle School</h3>
-              <p className="text-slate-600 text-sm leading-relaxed">Emphasizing conceptual understanding, confident communication, and sharp analytical skills to prepare for higher thinking.</p>
-            </div>
-            <div className="academics-card bg-white p-8 rounded-2xl shadow-sm border border-slate-100 border-t-4 border-t-purple-400">
-              <h3 className="text-xl font-bold text-slate-900 mb-3">Senior Secondary</h3>
-              <p className="text-slate-600 text-sm leading-relaxed">Subject specialization, hands-on projects, and focused CBSE curriculum exam preparation to ensure future success.</p>
-            </div>
+            {LEARNING_STAGES.map(([title, body]) => (
+              <div key={title} className="academics-card bg-white p-8 rounded-2xl shadow-sm border border-slate-100 border-t-4 border-t-emerald-400">
+                <h3 className="text-xl font-bold text-slate-900 mb-3">{title}</h3>
+                <p className="text-slate-600 text-sm leading-relaxed">{body}</p>
+              </div>
+            ))}
           </div>
         </div>
       </div>

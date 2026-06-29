@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useContentCollection } from './useContentCollection';
 
@@ -12,47 +12,45 @@ function getAchievementTime(item) {
 export default function AchievementsTicker() {
   const scrollerRef = useRef(null);
   const { data: achievements, loading } = useContentCollection('achievements', null);
-  const publishedAchievements = achievements
-    .filter(item => item.published !== false)
-    .sort((a, b) => getAchievementTime(b) - getAchievementTime(a))
-    .slice(0, 10);
+  const publishedAchievements = useMemo(() => {
+    const seenImages = new Set();
 
-  const tickerItems = [...publishedAchievements, ...publishedAchievements, ...publishedAchievements];
+    return achievements
+      .filter(item => item.published !== false)
+      .sort((a, b) => getAchievementTime(b) - getAchievementTime(a))
+      .filter(item => {
+        const imageUrl = item.thumbnailUrl || item.coverImageUrl || item.imageUrl;
+        const uniqueKey = imageUrl || item.id;
+
+        if (!uniqueKey || seenImages.has(uniqueKey)) return false;
+        seenImages.add(uniqueKey);
+        return true;
+      })
+      .slice(0, 10);
+  }, [achievements]);
+
   const canScroll = publishedAchievements.length > 1;
-
-  useEffect(() => {
-    if (!canScroll) return undefined;
-
-    const scroller = scrollerRef.current;
-    if (!scroller) return undefined;
-
-    const timer = window.setInterval(() => {
-      const resetPoint = scroller.scrollWidth / 3;
-
-      if (scroller.scrollLeft >= resetPoint * 2) {
-        scroller.scrollTo({ left: resetPoint, behavior: 'auto' });
-      } else {
-        scroller.scrollBy({ left: 2, behavior: 'auto' });
-      }
-    }, 24);
-
-    return () => window.clearInterval(timer);
-  }, [canScroll, publishedAchievements.length]);
-
-  useEffect(() => {
-    const scroller = scrollerRef.current;
-    if (!scroller || !canScroll) return;
-
-    const startAt = scroller.scrollWidth / 3;
-    scroller.scrollTo({ left: startAt, behavior: 'auto' });
-  }, [canScroll, tickerItems.length]);
 
   const scrollManually = (direction) => {
     const scroller = scrollerRef.current;
     if (!scroller) return;
 
+    const scrollAmount = Math.min(360, scroller.clientWidth * 0.75);
+    const maxScrollLeft = scroller.scrollWidth - scroller.clientWidth;
+    const nextLeft = scroller.scrollLeft + direction * scrollAmount;
+
+    if (direction > 0 && nextLeft >= maxScrollLeft - 4) {
+      scroller.scrollTo({ left: 0, behavior: 'smooth' });
+      return;
+    }
+
+    if (direction < 0 && nextLeft <= 4) {
+      scroller.scrollTo({ left: maxScrollLeft, behavior: 'smooth' });
+      return;
+    }
+
     scroller.scrollBy({
-      left: direction * Math.min(360, scroller.clientWidth * 0.75),
+      left: direction * scrollAmount,
       behavior: 'smooth'
     });
   };
@@ -97,21 +95,22 @@ export default function AchievementsTicker() {
 
       <div className="achievement-ticker-mask px-5">
         <div ref={scrollerRef} className="achievement-ticker-scroll flex gap-5 overflow-x-auto scroll-smooth pb-2">
-          {tickerItems.map((achievement, index) => {
+          {publishedAchievements.map((achievement, index) => {
             const imageUrl = achievement.thumbnailUrl || achievement.coverImageUrl || achievement.imageUrl;
 
             return (
               <Link
-                key={`${achievement.id}-${index}`}
+                key={achievement.id}
                 to={`/achievements/${achievement.id}`}
-                className="group block w-72 flex-none overflow-hidden rounded-2xl border border-white/10 bg-white text-slate-900 shadow-xl transition-transform duration-300 hover:-translate-y-1 hover:shadow-2xl sm:w-80"
+                className="group block w-64 flex-none overflow-hidden rounded-2xl border border-white/10 bg-white shadow-xl transition-transform duration-300 hover:-translate-y-1 hover:shadow-2xl sm:w-72"
+                aria-label={achievement.title ? `View achievement: ${achievement.title}` : 'View achievement'}
               >
-                <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
+                <div className="relative aspect-[3/4] overflow-hidden bg-slate-100">
                   {imageUrl ? (
                     <img
                       src={imageUrl}
                       alt={achievement.title}
-                      className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      className="absolute inset-0 h-full w-full object-contain p-2 transition-transform duration-500 group-hover:scale-[1.02]"
                       loading={index < 3 ? 'eager' : 'lazy'}
                       decoding="async"
                     />
@@ -122,11 +121,6 @@ export default function AchievementsTicker() {
                       </svg>
                     </div>
                   )}
-                </div>
-                <div className="p-5">
-                  {achievement.date && <p className="mb-2 text-xs font-black uppercase tracking-widest text-emerald-600">{achievement.date}</p>}
-                  <h3 className="line-clamp-2 text-lg font-extrabold leading-snug text-slate-900 group-hover:text-emerald-700">{achievement.title}</h3>
-                  {achievement.studentName && <p className="mt-2 truncate text-sm font-bold text-slate-500">{achievement.studentName}</p>}
                 </div>
               </Link>
             );
