@@ -13,20 +13,9 @@ export default function AchievementsTicker() {
   const scrollerRef = useRef(null);
   const { data: achievements, loading } = useContentCollection('achievements', null);
   const publishedAchievements = useMemo(() => {
-    const seenImages = new Set();
-
-    return achievements
+    return [...achievements]
       .filter(item => item.published !== false)
-      .sort((a, b) => getAchievementTime(b) - getAchievementTime(a))
-      .filter(item => {
-        const imageUrl = item.thumbnailUrl || item.coverImageUrl || item.imageUrl;
-        const uniqueKey = imageUrl || item.id;
-
-        if (!uniqueKey || seenImages.has(uniqueKey)) return false;
-        seenImages.add(uniqueKey);
-        return true;
-      })
-      .slice(0, 10);
+      .sort((a, b) => getAchievementTime(b) - getAchievementTime(a));
   }, [achievements]);
 
   const canScroll = publishedAchievements.length > 1;

@@ -1,14 +1,31 @@
-import React, { useState } from 'react';
-import { useNavigate, Link, useLocation } from 'react-router-dom';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 
 export default function AdminLayout({ children, user, onLogout }) {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
-  const navigate = useNavigate();
+  const [now, setNow] = useState(() => new Date());
   const location = useLocation();
   const path = location.pathname;
 
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(new Date()), 1000);
+    return () => window.clearInterval(timer);
+  }, []);
+
+  const clock = useMemo(() => {
+    return new Intl.DateTimeFormat('en-IN', {
+      weekday: 'short',
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true
+    }).format(now);
+  }, [now]);
+
   const getModuleTitle = () => {
-    if (path.includes('/pages')) return 'Pages';
     if (path.includes('/updates')) return 'News & Events';
     if (path.includes('/achievements')) return 'Achievements';
     if (path.includes('/leadership')) return 'Leadership';
@@ -42,7 +59,6 @@ export default function AdminLayout({ children, user, onLogout }) {
         </div>
         <nav className="p-4 space-y-1">
           <Link to="/admin/dashboard" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'Dashboard' ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>Dashboard</Link>
-          <Link to="/admin/pages" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'Pages' ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>Pages</Link>
           <Link to="/admin/updates" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'News & Events' ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>News & Events</Link>
           <Link to="/admin/achievements" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'Achievements' ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>Achievements</Link>
           <Link to="/admin/leadership" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'Leadership' ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>Leadership</Link>
@@ -66,10 +82,17 @@ export default function AdminLayout({ children, user, onLogout }) {
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
             </button>
-            <h1 className="text-2xl font-bold text-slate-800">{currentModule || 'Dashboard'}</h1>
+            <div>
+              <h1 className="text-2xl font-bold text-slate-800">{currentModule || 'Dashboard'}</h1>
+              <time dateTime={now.toISOString()} className="mt-1 block text-xs font-semibold text-slate-500 md:hidden">{clock}</time>
+            </div>
           </div>
           
-          <div className="flex items-center gap-4 sm:gap-6">
+          <div className="flex items-center gap-3 sm:gap-5">
+            <div className="hidden md:flex flex-col items-end leading-tight">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Date & Time</span>
+              <time dateTime={now.toISOString()} className="text-sm font-bold text-slate-700">{clock}</time>
+            </div>
             <span className="hidden sm:inline text-sm font-medium text-slate-500">{user?.email}</span>
             <button onClick={onLogout} className="px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors border border-transparent hover:border-red-100">
               Sign Out

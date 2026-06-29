@@ -16,7 +16,6 @@ import Events from './Events';
 import Achievements from './Achievements';
 import Contact from './Contact';
 import Gallery from './Gallery';
-import AdminPages from './AdminPages';
 import AdminUpdates from './AdminUpdates';
 import AdminAchievements from './AdminAchievements';
 import AdminGallery from './AdminGallery';
@@ -493,8 +492,7 @@ export default function App() {
                 <Routes>
                   <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />
                   <Route path="/dashboard" element={<AdminDashboard />} />
-                  {/* Fallbacks to prevent white screens on empty routes */}
-                  <Route path="/pages" element={<AdminPages />} />
+                  <Route path="/pages" element={<Navigate to="/admin/dashboard" replace />} />
                   <Route path="/updates" element={<AdminUpdates />} />
                   <Route path="/achievements" element={<AdminAchievements />} />
                   <Route path="/leadership" element={<AdminLeadership />} />
