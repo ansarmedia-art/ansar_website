@@ -14,7 +14,8 @@ function getAchievementTime(item) {
 function AchievementCard({ achievement, priority = false }) {
   const navigate = useNavigate();
   const shareUrl = `${window.location.origin}/achievements/${achievement.id}`;
-  const imageUrl = achievement.thumbnailUrl || achievement.coverImageUrl || achievement.imageUrl;
+  const galleryImages = Array.isArray(achievement.imageUrls) ? achievement.imageUrls.filter(Boolean) : [];
+  const imageUrl = achievement.thumbnailUrl || achievement.coverImageUrl || achievement.imageUrl || galleryImages[0];
 
   return (
     <div
@@ -46,6 +47,7 @@ function AchievementCard({ achievement, priority = false }) {
         <h3 className="mb-3 line-clamp-2 text-xl font-bold text-slate-900 group-hover:text-emerald-700">{achievement.title}</h3>
         {achievement.studentName && <p className="mb-2 text-sm font-bold text-slate-500">{achievement.studentName}</p>}
         {achievement.description && <p className="line-clamp-3 flex-1 text-sm leading-relaxed text-slate-600">{achievement.description}</p>}
+        {galleryImages.length > 1 && <p className="mt-3 text-xs font-black uppercase tracking-widest text-amber-600">{galleryImages.length} Photos</p>}
         <button className="mt-5 w-full rounded-lg bg-emerald-50 py-2.5 font-bold text-emerald-700 transition-colors hover:bg-emerald-600 hover:text-white">
           Read More
         </button>

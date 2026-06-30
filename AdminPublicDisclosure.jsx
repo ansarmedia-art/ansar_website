@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { collection, addDoc, updateDoc, deleteDoc, doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, updateDoc, doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from './firebase-init';
 import { useFirestoreCollection } from './useFirestoreCollection';
 import { useSettings } from './SettingsContext';
+import { softDeleteRecord } from './adminUndo';
 
 const DEFAULT_DISCLOSURE_TITLE = 'Mandatory Public Disclosure';
 
@@ -133,10 +134,10 @@ export default function AdminPublicDisclosure() {
     }
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (item) => {
     if (!window.confirm('Delete this disclosure document?')) return;
     try {
-      await deleteDoc(doc(db, 'publicDisclosure', id));
+      await softDeleteRecord('publicDisclosure', item);
     } catch (error) {
       alert('Delete failed: ' + error.message);
     }
@@ -227,7 +228,7 @@ export default function AdminPublicDisclosure() {
             <div className="flex flex-none items-center gap-2">
               <a href={item.documentUrl || item.fileUrl} target="_blank" rel="noopener noreferrer" className="rounded-lg px-3 py-1.5 text-sm font-bold text-slate-600 transition-colors hover:bg-slate-100">View</a>
               <button onClick={() => handleEdit(item)} className="rounded-lg px-3 py-1.5 text-sm font-bold text-emerald-600 transition-colors hover:bg-emerald-50">Edit</button>
-              <button onClick={() => handleDelete(item.id)} className="rounded-lg px-3 py-1.5 text-sm font-bold text-red-600 transition-colors hover:bg-red-50">Delete</button>
+              <button onClick={() => handleDelete(item)} className="rounded-lg px-3 py-1.5 text-sm font-bold text-red-600 transition-colors hover:bg-red-50">Delete</button>
             </div>
           </div>
         ))}

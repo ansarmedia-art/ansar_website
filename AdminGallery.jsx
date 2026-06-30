@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { addDoc, collection, deleteDoc, doc, onSnapshot, serverTimestamp, updateDoc } from 'firebase/firestore';
+import { addDoc, collection, doc, onSnapshot, serverTimestamp, updateDoc } from 'firebase/firestore';
 import { db } from './firebase-init';
 import ImgBbUrlImporter from './ImgBbUrlImporter';
+import { softDeleteRecord, softDeleteRecords } from './adminUndo';
 
 function getMillis(item) {
   if (item.createdAt?.toMillis) return item.createdAt.toMillis();
@@ -63,19 +64,26 @@ function collectWebsiteImages(galleryItems, updates, achievements) {
   });
 
   achievements.filter(item => item.published !== false).forEach(item => {
-    if (!item.imageUrl || item.imageUrl.trim() === '') return;
-    images.push({
-      id: `${item.id}-achievement`,
-      recordId: item.id,
-      source: 'achievements',
-      sourceLabel: 'Achievement',
-      url: item.imageUrl,
-      title: item.title || 'Achievement',
-      category: 'Achievements',
-      date: item.date || '',
-      published: true,
-      timestamp: getMillis(item),
-      raw: item
+    const urls = new Set();
+    if (item.imageUrl) urls.add(item.imageUrl);
+    if (Array.isArray(item.imageUrls)) item.imageUrls.forEach(url => url && urls.add(url));
+
+    let index = 0;
+    urls.forEach(url => {
+      if (!url || url.trim() === '') return;
+      images.push({
+        id: `${item.id}-achievement-${index++}`,
+        recordId: item.id,
+        source: 'achievements',
+        sourceLabel: 'Achievement',
+        url,
+        title: item.title || 'Achievement',
+        category: 'Achievements',
+        date: item.date || '',
+        published: true,
+        timestamp: getMillis(item),
+        raw: item
+      });
     });
   });
 
@@ -294,7 +302,8 @@ export default function AdminGallery() {
     if (!window.confirm(`Delete ${selectedIds.length} selected gallery image${selectedIds.length === 1 ? '' : 's'}?`)) return;
 
     try {
-      await Promise.all(selectedIds.map(id => deleteDoc(doc(db, 'gallery', id))));
+      const selectedItems = galleryItems.filter(item => selectedIds.includes(item.id));
+      await softDeleteRecords('gallery', selectedItems);
       clearSelection();
       if (selectedIds.includes(editingId)) resetForm();
     } catch (error) {
@@ -305,7 +314,7 @@ export default function AdminGallery() {
   const deleteSingle = async (item) => {
     if (!window.confirm(`Delete "${item.title}" from gallery?`)) return;
     try {
-      await deleteDoc(doc(db, 'gallery', item.recordId));
+      await softDeleteRecord('gallery', item.raw || item, { docId: item.recordId });
       setSelectedIds(prev => prev.filter(id => id !== item.recordId));
       if (editingId === item.recordId) resetForm();
     } catch (error) {

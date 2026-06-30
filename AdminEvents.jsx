@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { addDoc, collection, deleteDoc, doc, serverTimestamp, updateDoc } from 'firebase/firestore';
+import { addDoc, collection, doc, serverTimestamp, updateDoc } from 'firebase/firestore';
 import { db } from './firebase-init';
 import { clearGoogleSheetsCache, useContentCollection } from './useContentCollection';
-import { deleteSheetRecord, saveSheetRecord } from './googleSheetsAdminApi';
+import { saveSheetRecord } from './googleSheetsAdminApi';
 import ImgBbUrlImporter from './ImgBbUrlImporter';
+import { softDeleteRecord } from './adminUndo';
 
 const MAX_EVENT_IMAGES = 100;
 
@@ -149,12 +150,7 @@ export default function AdminEvents() {
   const handleDelete = async (item) => {
     if (!window.confirm("Are you sure you want to delete this event?")) return;
     try {
-      if (!item._contentSource || item._contentSource === 'firestore' || item._contentSource === 'merged') {
-        await deleteDoc(doc(db, 'events', item.id));
-      }
-      if (item._contentSource === 'sheets' || item._contentSource === 'merged') {
-        await deleteSheetRecord('events', item.id);
-      }
+      await softDeleteRecord('events', item);
       clearGoogleSheetsCache();
       setRefreshKey(key => key + 1);
     } catch (error) {

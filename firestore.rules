@@ -315,10 +315,11 @@ service cloud.firestore {
     }
 
     function isValidAchievement() {
-        return hasOnlyAllowedFields(['title', 'description', 'imageUrl', 'date', 'studentName', 'order', 'published', 'createdAt', 'updatedAt']) &&
+        return hasOnlyAllowedFields(['title', 'description', 'imageUrl', 'imageUrls', 'date', 'studentName', 'order', 'published', 'createdAt', 'updatedAt']) &&
                isValidStringLength('title', 1, 200) &&
                isValidOptionalString('description', 0, 10000) &&
                isValidUrl('imageUrl') &&
+               isOptionalUrlList('imageUrls', 30) &&
                isValidDateString('date') &&
                isValidOptionalString('studentName', 0, 500) &&
                isOptionalNumber('order') &&
@@ -439,6 +440,11 @@ service cloud.firestore {
       allow read: if true;
       allow create, update: if isAdmin();
       allow delete: if isAdmin();
+    }
+
+    // Temporary admin undo storage. Records are removed by the admin UI after the 15-minute undo window.
+    match /adminTrash/{trashId} {
+      allow read, create, update, delete: if isAdmin();
     }
 
     // Leadership

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { collection, addDoc, updateDoc, deleteDoc, doc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, updateDoc, doc, serverTimestamp } from 'firebase/firestore';
 import { db } from './firebase-init';
 import { useFirestoreCollection } from './useFirestoreCollection';
+import { softDeleteRecord } from './adminUndo';
 
 export default function AdminLeadership() {
   const { data: items, loading } = useFirestoreCollection('leadership', 'order', 'asc');
@@ -58,9 +59,9 @@ export default function AdminLeadership() {
     }
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (item) => {
     if (!window.confirm("Are you sure you want to delete this leadership profile?")) return;
-    try { await deleteDoc(doc(db, 'leadership', id)); } catch (error) { alert("Delete failed."); }
+    try { await softDeleteRecord('leadership', item); } catch (error) { alert("Delete failed: " + error.message); }
   };
 
   return (
@@ -92,7 +93,7 @@ export default function AdminLeadership() {
             <div><h4 className="font-bold text-slate-900">{item.name} <span className="text-emerald-600 ml-2 text-sm">{item.role}</span></h4><p className="text-sm text-slate-500">Order: {item.order} | {item.published ? 'Published' : 'Draft'}</p></div>
             <div className="flex items-center gap-2 flex-shrink-0">
               <button onClick={() => handleEdit(item)} className="px-3 py-1.5 text-sm font-bold text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors">Edit</button>
-              <button onClick={() => handleDelete(item.id)} className="px-3 py-1.5 text-sm font-bold text-red-600 hover:bg-red-50 rounded-lg transition-colors">Delete</button>
+              <button onClick={() => handleDelete(item)} className="px-3 py-1.5 text-sm font-bold text-red-600 hover:bg-red-50 rounded-lg transition-colors">Delete</button>
             </div>
           </div>
         ))}

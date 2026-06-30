@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { collection, setDoc, updateDoc, deleteDoc, doc, serverTimestamp } from 'firebase/firestore';
+import { collection, setDoc, updateDoc, doc, serverTimestamp } from 'firebase/firestore';
 import { db } from './firebase-init';
 import { useFirestoreCollection } from './useFirestoreCollection';
 import ImgBbUrlImporter from './ImgBbUrlImporter';
+import { softDeleteRecord } from './adminUndo';
 
 export default function AdminPages() {
   const { data: items, loading } = useFirestoreCollection('pages', 'order', 'asc');
@@ -60,9 +61,9 @@ export default function AdminPages() {
     }
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (item) => {
     if (!window.confirm("Are you sure you want to delete this page? This will break any links pointing to it!")) return;
-    try { await deleteDoc(doc(db, 'pages', id)); } catch (error) { alert("Delete failed."); }
+    try { await softDeleteRecord('pages', item); } catch (error) { alert("Delete failed: " + error.message); }
   };
 
   return (
@@ -125,7 +126,7 @@ export default function AdminPages() {
             </div>
             <div className="flex items-center gap-2 flex-shrink-0">
               <button onClick={() => handleEdit(item)} className="px-3 py-1.5 text-sm font-bold text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors">Edit</button>
-              <button onClick={() => handleDelete(item.id)} className="px-3 py-1.5 text-sm font-bold text-red-600 hover:bg-red-50 rounded-lg transition-colors">Delete</button>
+              <button onClick={() => handleDelete(item)} className="px-3 py-1.5 text-sm font-bold text-red-600 hover:bg-red-50 rounded-lg transition-colors">Delete</button>
             </div>
           </div>
         ))}

@@ -22,10 +22,38 @@ const ANSAR_MILESTONES = [
 ];
 
 const ABOUT_STATS = [
-  ['1982', 'Founded'],
+  ['1980', 'Founded'],
   ['4,600+', 'Students'],
   ['270+', 'Educators'],
   ['CBSE', 'Affiliated']
+];
+
+const DEFAULT_HISTORY_INTRO = 'Founded in 1980, Ansar English School, Perumpilavu, is the flagship educational institution of the Ansar Charitable Trust. What began as a humble initiative has grown into one of Kerala\'s respected CBSE Senior Secondary schools, serving a vibrant learning community of over 4,600 students.';
+
+const DEFAULT_HISTORY_SECTIONS = [
+  {
+    title: 'A Vision That Transforms',
+    body: 'The school was established with the noble vision of providing quality, value-based education that transforms lives and empowers future generations. Guided by the Trust\'s commitment to educational and social upliftment, Ansar creates an inclusive and caring environment where every child is encouraged to discover potential, think critically, embrace innovation, and grow as a lifelong learner.'
+  },
+  {
+    title: 'Learning Beyond Textbooks',
+    body: 'Affiliated with the Central Board of Secondary Education (CBSE), New Delhi, the school nurtures young minds through academic excellence, character formation, and holistic development. Experiential learning, leadership opportunities, co-curricular and sports programmes, arts, innovation, entrepreneurship, environmental stewardship, and community engagement cultivate creativity, confidence, collaboration, resilience, and social responsibility.'
+  },
+  {
+    title: 'A Campus Built For Inquiry',
+    body: 'The modern campus is equipped with smart classrooms, well-designed laboratories, dedicated innovation spaces, extensive sports facilities, and a resource-rich library with more than 34,000 books, journals, periodicals, newspapers, and digital learning resources that foster reading, inquiry, and research.'
+  },
+  {
+    title: 'Educators With Purpose',
+    body: 'A passionate team of educators delivers learner-centred education through innovative pedagogical practices that inspire curiosity, independent thinking, and academic excellence. Rooted in moral values and a culture of respect, discipline, and compassion, Ansar prepares students for higher education and the challenges of a rapidly changing global society.'
+  }
+];
+
+const HISTORY_HIGHLIGHTS = [
+  ['40+ Years', 'of steady service in value-based education'],
+  ['34,000+', 'library books and learning resources'],
+  ['CBSE', 'Senior Secondary affiliation'],
+  ['4,600+', 'students in a vibrant learning community']
 ];
 
 const ACT_TRUSTEES = [
@@ -72,6 +100,33 @@ function AnimatedSection({ children, className = '' }) {
 
   return (
     <div ref={ref} className={`transition-all duration-700 ease-out ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'} ${className}`}>
+      {children}
+    </div>
+  );
+}
+
+function FadeInOnView({ children, className = '', delay = 0 }) {
+  const [isVisible, setIsVisible] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        setIsVisible(true);
+        observer.unobserve(entry.target);
+      }
+    }, { threshold: 0.18 });
+
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div
+      ref={ref}
+      style={{ transitionDelay: `${delay}ms` }}
+      className={`transition-all duration-700 ease-out ${isVisible ? 'translate-y-0 opacity-100 blur-0' : 'translate-y-6 opacity-0 blur-sm'} ${className}`}
+    >
       {children}
     </div>
   );
@@ -148,20 +203,61 @@ function AnsarTimeline() {
 function HistoryAndTrustees({ historyText, trustees = [] }) {
   const visibleTrustees = Array.isArray(trustees) ? trustees.filter(item => item?.imageUrl || item?.name) : [];
   const trusteeSlots = visibleTrustees.length ? visibleTrustees : Array.from({ length: 6 }, (_, index) => ({ name: `Trustee Member ${index + 1}` }));
+  const customParagraphs = typeof historyText === 'string'
+    ? historyText.split(/\n{2,}/).map(paragraph => paragraph.trim()).filter(Boolean)
+    : [];
+  const hasCustomHistory = customParagraphs.length > 0;
+  const historySections = hasCustomHistory
+    ? customParagraphs.map((body, index) => ({ title: index === 0 ? 'Our Beginning' : `Chapter ${index + 1}`, body }))
+    : DEFAULT_HISTORY_SECTIONS;
 
   return (
     <AnimatedSection className="mt-12 space-y-10">
-      <section className="grid gap-8 rounded-[2rem] border border-emerald-100 bg-emerald-50 p-8 lg:grid-cols-[0.8fr_1.2fr] lg:p-12">
-        <div>
-          <p className="text-sm font-black uppercase tracking-widest text-emerald-700">Our Story</p>
-          <h2 className="mt-3 text-4xl font-extrabold text-emerald-950">History of ANSAR</h2>
+      <section className="overflow-hidden rounded-[2rem] border border-emerald-100 bg-emerald-50">
+        <div className="grid gap-8 p-8 lg:grid-cols-[0.82fr_1.18fr] lg:p-12">
+          <FadeInOnView className="flex flex-col justify-between gap-8">
+            <div>
+              <p className="text-sm font-black uppercase tracking-widest text-emerald-700">Our Story</p>
+              <h2 className="mt-3 text-4xl font-extrabold leading-tight text-emerald-950 lg:text-5xl">History of Ansar</h2>
+              <p className="mt-5 text-lg leading-relaxed text-emerald-950/75">
+                {hasCustomHistory ? 'A continuing journey of education, service, and community trust.' : DEFAULT_HISTORY_INTRO}
+              </p>
+            </div>
+            {!hasCustomHistory && (
+              <div className="grid grid-cols-2 gap-3">
+                {HISTORY_HIGHLIGHTS.map(([value, label], index) => (
+                  <FadeInOnView key={value} delay={120 + index * 80} className="rounded-xl border border-emerald-100 bg-white/85 p-4 shadow-sm">
+                    <p className="text-2xl font-extrabold text-emerald-950">{value}</p>
+                    <p className="mt-1 text-xs font-bold uppercase tracking-wide text-slate-500">{label}</p>
+                  </FadeInOnView>
+                ))}
+              </div>
+            )}
+          </FadeInOnView>
+
+          <div className="space-y-4">
+            {historySections.map((section, index) => (
+              <FadeInOnView
+                key={`${section.title}-${index}`}
+                delay={index * 110}
+                className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm"
+              >
+                <h3 className="text-xl font-extrabold text-slate-950">{section.title}</h3>
+                <p className="mt-3 text-base leading-relaxed text-slate-600 sm:text-lg">{section.body}</p>
+              </FadeInOnView>
+            ))}
+          </div>
         </div>
-        <div className="min-h-48 rounded-2xl bg-white p-6 text-lg leading-relaxed text-slate-600 shadow-sm">
-          {historyText ? (
-            <p className="whitespace-pre-wrap">{historyText}</p>
-          ) : (
-            <p>History content will be updated soon.</p>
-          )}
+
+        <div className="border-t border-emerald-100 bg-white/70 px-8 py-7 lg:px-12">
+          <FadeInOnView className="mx-auto max-w-4xl text-center">
+            <p className="text-xl font-extrabold leading-relaxed text-emerald-950 sm:text-2xl">
+              Educating Minds, Enriching Values, and Inspiring Excellence.
+            </p>
+            <p className="mt-3 text-base leading-relaxed text-slate-600">
+              At Ansar, education nurtures future leaders, innovators, and changemakers prepared for meaningful lives of service and leadership.
+            </p>
+          </FadeInOnView>
         </div>
       </section>
 

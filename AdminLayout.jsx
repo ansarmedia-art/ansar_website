@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import AdminUndoCenter from './AdminUndoCenter';
 
 export default function AdminLayout({ children, user, onLogout }) {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -107,6 +108,7 @@ export default function AdminLayout({ children, user, onLogout }) {
           </div>
         </main>
       </div>
+      <AdminUndoCenter />
     </div>
   );
 }

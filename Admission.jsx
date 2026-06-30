@@ -7,6 +7,7 @@ import { useSettings } from './SettingsContext';
 
 const DEFAULT_FEE_STRUCTURE_URL = 'https://drive.google.com/file/d/1BlRQIlD4U4RjRGvVIq2Kah4xYxNjChoa/view?usp=drive_link';
 const DEFAULT_FEE_STRUCTURE_TITLE = 'Fee Structure 2026 - 2027';
+const ADMISSION_PAYMENT_PORTAL_URL = 'https://ansartrust.atcampussolutions.com/school/';
 
 function getDriveFileId(url = '') {
   const match = url.match(/\/file\/d\/([^/]+)/) || url.match(/[?&]id=([^&]+)/);
@@ -57,6 +58,36 @@ function FeeStructureActions({ title, url, onDownload }) {
   );
 }
 
+function AdmissionPaymentPortal() {
+  return (
+    <div className="rounded-2xl border border-amber-100 bg-amber-50 p-6 shadow-sm">
+      <div className="flex items-start gap-4">
+        <div className="flex h-12 w-12 flex-none items-center justify-center rounded-xl bg-amber-500 text-white">
+          <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8V7m0 10v-1m9-4a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" />
+          </svg>
+        </div>
+        <div className="min-w-0">
+          <p className="text-sm font-black uppercase tracking-widest text-amber-700">Online Portal</p>
+          <h2 className="mt-2 text-2xl font-extrabold text-slate-950">Admissions & Payments</h2>
+          <p className="mt-2 text-sm leading-relaxed text-slate-600">Use the official AT Campus portal for admission-related services and online payments.</p>
+        </div>
+      </div>
+      <a
+        href={ADMISSION_PAYMENT_PORTAL_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-amber-500 px-5 py-3 text-sm font-bold text-white shadow-md transition-colors hover:bg-amber-600"
+      >
+        Open Admission & Payments Portal
+        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 17 17 7M8 7h9v9" />
+        </svg>
+      </a>
+    </div>
+  );
+}
+
 export default function Admission() {
   const { data: pages } = useFirestoreCollection('pages');
   const page = pages.find(p => p.slug === 'admission');
@@ -84,6 +115,7 @@ export default function Admission() {
           eyebrow="Admissions"
           sidebar={(
             <>
+              <AdmissionPaymentPortal />
               <FeeStructureActions title={feeStructureTitle} url={feeStructureUrl} onDownload={() => handlePdfDownload(feeStructureUrl)} />
               <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
                 <p className="text-sm font-bold text-slate-900">Admissions Office</p>
@@ -98,6 +130,9 @@ export default function Admission() {
             dangerouslySetInnerHTML={{ __html: page.bodyHtml }}
           />
           <div className="mt-10">
+            <AdmissionPaymentPortal />
+          </div>
+          <div className="mt-6">
             <FeeStructureActions title={feeStructureTitle} url={feeStructureUrl} onDownload={() => handlePdfDownload(feeStructureUrl)} />
           </div>
         </ContentPageLayout>
@@ -117,6 +152,9 @@ export default function Admission() {
             <Link to="/contact" className="inline-flex items-center justify-center bg-emerald-600 text-white font-bold px-8 py-4 rounded-full shadow-lg hover:bg-emerald-700 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
               Contact Admissions Office
             </Link>
+            <a href={ADMISSION_PAYMENT_PORTAL_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center rounded-full bg-amber-500 px-8 py-4 font-bold text-white shadow-lg transition-all duration-300 hover:-translate-y-1 hover:bg-amber-600 hover:shadow-xl">
+              Admission & Payments
+            </a>
             <a href={feeStructureUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-8 py-4 font-bold text-slate-900 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-emerald-200 hover:text-emerald-700">
               View Fee Structure
             </a>
@@ -155,6 +193,8 @@ export default function Admission() {
           </div>
 
           <div className="space-y-8">
+            <AdmissionPaymentPortal />
+
             <div className="bg-slate-900 p-8 rounded-3xl shadow-xl text-white academics-card">
               <h2 className="text-xl font-bold mb-6 text-emerald-400">Eligibility Criteria</h2>
               <div className="space-y-4">

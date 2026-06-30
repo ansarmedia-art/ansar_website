@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
-import { addDoc, collection, deleteDoc, doc, serverTimestamp, updateDoc } from 'firebase/firestore';
+import { addDoc, collection, doc, serverTimestamp, updateDoc } from 'firebase/firestore';
 import { db } from './firebase-init';
 import { clearGoogleSheetsCache, useContentCollection } from './useContentCollection';
-import { deleteSheetRecord, saveSheetRecord } from './googleSheetsAdminApi';
+import { saveSheetRecord } from './googleSheetsAdminApi';
 import ImgBbUrlImporter from './ImgBbUrlImporter';
+import { softDeleteRecord } from './adminUndo';
+
+const MAX_ACHIEVEMENT_IMAGES = 30;
 
 function getAchievementTime(item) {
   if (item.createdAt?.toMillis) return item.createdAt.toMillis();
@@ -17,7 +20,7 @@ export default function AdminAchievements() {
   const { data: items, loading } = useContentCollection('achievements', null, 'desc', { refreshKey });
   const newestFirstItems = [...items].sort((a, b) => getAchievementTime(b) - getAchievementTime(a));
   
-  const initialFormState = { title: '', description: '', imageUrl: '', date: '', studentName: '', published: true };
+  const initialFormState = { title: '', description: '', imageUrls: [''], date: '', studentName: '', published: true };
   const [formData, setFormData] = useState(initialFormState);
   const [editingId, setEditingId] = useState(null);
   const [editingItem, setEditingItem] = useState(null);
@@ -28,13 +31,49 @@ export default function AdminAchievements() {
     setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
   };
 
+  const handleImageUrlChange = (index, value) => {
+    setFormData(prev => ({
+      ...prev,
+      imageUrls: prev.imageUrls.map((url, urlIndex) => urlIndex === index ? value : url)
+    }));
+  };
+
+  const addImageUrlField = () => {
+    setFormData(prev => {
+      const currentImages = Array.isArray(prev.imageUrls) ? prev.imageUrls : [];
+      if (currentImages.length >= MAX_ACHIEVEMENT_IMAGES) {
+        alert(`You can add up to ${MAX_ACHIEVEMENT_IMAGES} images for one achievement.`);
+        return prev;
+      }
+      return { ...prev, imageUrls: [...currentImages, ''] };
+    });
+  };
+
+  const appendImageUrls = (urls) => {
+    setFormData(prev => {
+      const existing = Array.isArray(prev.imageUrls) ? prev.imageUrls.filter(url => url.trim() !== '') : [];
+      const nextImages = [...existing, ...urls].slice(0, MAX_ACHIEVEMENT_IMAGES);
+      if (existing.length + urls.length > MAX_ACHIEVEMENT_IMAGES) {
+        alert(`Only the first ${MAX_ACHIEVEMENT_IMAGES} image links were added.`);
+      }
+      return { ...prev, imageUrls: nextImages.length ? nextImages : [''] };
+    });
+  };
+
+  const removeImageUrlField = (index) => {
+    setFormData(prev => {
+      const nextImages = prev.imageUrls.filter((_, imageIndex) => imageIndex !== index);
+      return { ...prev, imageUrls: nextImages.length ? nextImages : [''] };
+    });
+  };
+
   const handleEdit = (item) => {
     setEditingId(item.id);
     setEditingItem(item);
     setFormData({ 
       title: item.title || '',
       description: item.description || '',
-      imageUrl: item.imageUrl || '',
+      imageUrls: Array.isArray(item.imageUrls) && item.imageUrls.length > 0 ? item.imageUrls : (item.imageUrl ? [item.imageUrl] : ['']),
       date: item.date || '',
       studentName: item.studentName || '',
       published: item.published !== false 
@@ -52,8 +91,19 @@ export default function AdminAchievements() {
     e.preventDefault();
     setIsSubmitting(true);
     try {
+      const cleanedImageUrls = (Array.isArray(formData.imageUrls) ? formData.imageUrls : [])
+        .map(url => url.trim())
+        .filter(Boolean)
+        .slice(0, MAX_ACHIEVEMENT_IMAGES);
+
       const payload = {
-        ...formData
+        title: formData.title || '',
+        description: formData.description || '',
+        imageUrl: cleanedImageUrls[0] || '',
+        imageUrls: cleanedImageUrls,
+        date: formData.date || '',
+        studentName: formData.studentName || '',
+        published: !!formData.published
       };
 
       let recordId = editingId;
@@ -103,14 +153,9 @@ export default function AdminAchievements() {
   };
 
   const handleDelete = async (item) => {
-    if (!window.confirm("Are you sure you want to delete this achievement?")) return;
+      if (!window.confirm("Are you sure you want to delete this achievement?")) return;
     try {
-      if (!item._contentSource || item._contentSource === 'firestore' || item._contentSource === 'merged') {
-        await deleteDoc(doc(db, 'achievements', item.id));
-      }
-      if (item._contentSource === 'sheets' || item._contentSource === 'merged') {
-        await deleteSheetRecord('achievements', item.id);
-      }
+      await softDeleteRecord('achievements', item);
       clearGoogleSheetsCache();
       setRefreshKey(key => key + 1);
     } catch (error) {
@@ -137,12 +182,29 @@ export default function AdminAchievements() {
               <input name="studentName" value={formData.studentName} onChange={handleChange} className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" />
             </div>
             <div className="md:col-span-2">
-              <label className="block text-sm font-bold text-slate-700 mb-1">Image URL</label>
-              <div className="space-y-2">
-                <input name="imageUrl" type="url" value={formData.imageUrl} onChange={handleChange} placeholder="https://example.com/achievement.jpg" className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" />
+              <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <label className="block text-sm font-bold text-slate-700">Achievement Image URLs</label>
                 <ImgBbUrlImporter
-                  onExtracted={(url) => setFormData(prev => ({ ...prev, imageUrl: url }))}
+                  multiple
+                  label="Extract Multiple ImgBB URLs"
+                  onExtracted={appendImageUrls}
                 />
+              </div>
+              <div className="space-y-3 rounded-xl border border-emerald-100 bg-emerald-50/50 p-4">
+                {formData.imageUrls.map((url, index) => (
+                  <div key={index} className="flex flex-col gap-2 rounded-lg border border-slate-100 bg-white p-3 shadow-sm">
+                    <div className="flex items-center gap-2">
+                      <input type="url" value={url} onChange={(event) => handleImageUrlChange(index, event.target.value)} placeholder="https://example.com/achievement.jpg" className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" />
+                      <button type="button" onClick={() => removeImageUrlField(index)} disabled={formData.imageUrls.length <= 1} className="rounded-lg px-3 py-2 font-bold text-red-600 transition-colors hover:bg-red-50 disabled:opacity-40">Remove</button>
+                    </div>
+                    {url && (
+                      <div className="relative h-28 overflow-hidden rounded-lg border border-slate-200 bg-slate-50">
+                        <img src={url} alt={`Achievement preview ${index + 1}`} className="absolute inset-0 h-full w-full object-contain" />
+                      </div>
+                    )}
+                  </div>
+                ))}
+                <button type="button" onClick={addImageUrlField} className="rounded-lg px-4 py-2 text-sm font-bold text-emerald-700 transition-colors hover:bg-emerald-50">+ Add another image</button>
               </div>
             </div>
             <div className="md:col-span-2">

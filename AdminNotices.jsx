@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { collection, addDoc, updateDoc, deleteDoc, doc, serverTimestamp, query, orderBy, onSnapshot } from 'firebase/firestore';
+import { collection, addDoc, updateDoc, doc, serverTimestamp, query, orderBy, onSnapshot } from 'firebase/firestore';
 import { db } from './firebase-init';
+import { softDeleteRecord } from './adminUndo';
 
 export default function AdminNotices() {
   const [notices, setNotices] = useState([]);
@@ -73,9 +74,9 @@ export default function AdminNotices() {
     }
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (item) => {
     if (!window.confirm("Are you sure you want to delete this notice?")) return;
-    try { await deleteDoc(doc(db, 'notices', id)); } catch (error) { alert("Delete failed."); }
+    try { await softDeleteRecord('notices', item); } catch (error) { alert("Delete failed: " + error.message); }
   };
 
   return (
@@ -145,7 +146,7 @@ export default function AdminNotices() {
             </div>
             <div className="flex items-center gap-2 flex-shrink-0">
               <button onClick={() => handleEdit(item)} className="px-4 py-2 text-sm font-bold text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors">Edit</button>
-              <button onClick={() => handleDelete(item.id)} className="px-4 py-2 text-sm font-bold text-red-600 hover:bg-red-50 rounded-lg transition-colors">Delete</button>
+              <button onClick={() => handleDelete(item)} className="px-4 py-2 text-sm font-bold text-red-600 hover:bg-red-50 rounded-lg transition-colors">Delete</button>
             </div>
           </div>
         ))}
