@@ -14,10 +14,12 @@ import Admission from './Admission';
 import News from './News';
 import Events from './Events';
 import Achievements from './Achievements';
+import AnsarTimes from './AnsarTimes';
 import Contact from './Contact';
 import Gallery from './Gallery';
 import AdminUpdates from './AdminUpdates';
 import AdminAchievements from './AdminAchievements';
+import AdminAnsarTimes from './AdminAnsarTimes';
 import AdminGallery from './AdminGallery';
 import AdminLeadership from './AdminLeadership';
 import AdminNotices from './AdminNotices';
@@ -468,7 +470,7 @@ export default function App() {
         <Route path="/ansar-sprouts" element={<DynamicPage slug="ansar-sprouts" />} />
         <Route path="/extension-services" element={<DynamicPage slug="extension-services" />} />
         <Route path="/life-at-ansar" element={<DynamicPage slug="life-at-ansar" />} />
-        <Route path="/ansar-times" element={<DynamicPage slug="ansar-times" />} />
+        <Route path="/ansar-times" element={<AnsarTimes />} />
         <Route path="/alumni" element={<DynamicPage slug="alumni" />} />
         <Route path="/achievements" element={<Achievements />} />
         <Route path="/sop" element={<DynamicPage slug="sop" />} />
@@ -495,6 +497,7 @@ export default function App() {
                   <Route path="/pages" element={<Navigate to="/admin/dashboard" replace />} />
                   <Route path="/updates" element={<AdminUpdates />} />
                   <Route path="/achievements" element={<AdminAchievements />} />
+                  <Route path="/ansar-times" element={<AdminAnsarTimes />} />
                   <Route path="/leadership" element={<AdminLeadership />} />
                   <Route path="/academics" element={<AdminAcademics />} />
                   <Route path="/public-disclosure" element={<AdminPublicDisclosure />} />

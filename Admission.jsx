@@ -69,7 +69,7 @@ function AdmissionPaymentPortal() {
         </div>
         <div className="min-w-0">
           <p className="text-sm font-black uppercase tracking-widest text-amber-700">Online Portal</p>
-          <h2 className="mt-2 text-2xl font-extrabold text-slate-950">Admissions & Payments</h2>
+          <h2 className="mt-2 whitespace-nowrap text-xl font-extrabold text-slate-950">Admission Portal</h2>
           <p className="mt-2 text-sm leading-relaxed text-slate-600">Use the official AT Campus portal for admission-related services and online payments.</p>
         </div>
       </div>
@@ -79,7 +79,7 @@ function AdmissionPaymentPortal() {
         rel="noopener noreferrer"
         className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-amber-500 px-5 py-3 text-sm font-bold text-white shadow-md transition-colors hover:bg-amber-600"
       >
-        Open Admission & Payments Portal
+        <span className="whitespace-nowrap">Open Portal</span>
         <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 17 17 7M8 7h9v9" />
         </svg>
@@ -148,14 +148,14 @@ export default function Admission() {
           <p className="text-emerald-600 font-bold uppercase tracking-wider text-sm mb-2">Admissions Portal</p>
           <h1 className="text-4xl lg:text-6xl font-extrabold text-slate-900 mb-6 leading-tight">Join the Ansar Family</h1>
           <p className="text-xl text-slate-600 font-light leading-relaxed mb-8">We offer a fair, transparent, and merit-based admissions process aligned with NEP guidelines. Discover a community where every student thrives.</p>
-          <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Link to="/contact" className="inline-flex items-center justify-center bg-emerald-600 text-white font-bold px-8 py-4 rounded-full shadow-lg hover:bg-emerald-700 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+          <div className="flex flex-col items-center justify-center gap-3 sm:flex-row sm:flex-wrap">
+            <Link to="/contact" className="inline-flex items-center justify-center whitespace-nowrap bg-emerald-600 text-white font-bold px-8 py-4 rounded-full shadow-lg hover:bg-emerald-700 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
               Contact Admissions Office
             </Link>
-            <a href={ADMISSION_PAYMENT_PORTAL_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center rounded-full bg-amber-500 px-8 py-4 font-bold text-white shadow-lg transition-all duration-300 hover:-translate-y-1 hover:bg-amber-600 hover:shadow-xl">
+            <a href={ADMISSION_PAYMENT_PORTAL_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center whitespace-nowrap rounded-full bg-amber-500 px-8 py-4 font-bold text-white shadow-lg transition-all duration-300 hover:-translate-y-1 hover:bg-amber-600 hover:shadow-xl">
               Admission & Payments
             </a>
-            <a href={feeStructureUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-8 py-4 font-bold text-slate-900 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-emerald-200 hover:text-emerald-700">
+            <a href={feeStructureUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center whitespace-nowrap rounded-full border border-slate-200 bg-white px-8 py-4 font-bold text-slate-900 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-emerald-200 hover:text-emerald-700">
               View Fee Structure
             </a>
           </div>
@@ -212,7 +212,7 @@ export default function Admission() {
               <h2 className="text-xl font-bold text-emerald-950 mb-3">Fees & Financial Aid</h2>
               <p className="text-slate-600 text-sm mb-6">Ansar Charitable Trust delivers free education to orphans and targeted financial aid to disadvantaged learners.</p>
               <div className="grid grid-cols-1 gap-3">
-                <a href={feeStructureUrl} target="_blank" rel="noopener noreferrer" className="w-full rounded-xl bg-slate-900 px-4 py-3 font-bold text-white shadow-md transition-colors hover:bg-slate-800">
+                <a href={feeStructureUrl} target="_blank" rel="noopener noreferrer" className="w-full rounded-xl bg-slate-900 px-4 py-3 text-sm font-bold text-white shadow-md transition-colors hover:bg-slate-800 sm:text-base">
                   View {feeStructureTitle}
                 </a>
                 <button 

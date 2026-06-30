@@ -7,6 +7,7 @@ export const GOOGLE_SHEETS_DATABASE = {
     publicDisclosure: ['', 'publicDisclosure', 'MandatoryDisclosure', 'PublicDisclosure'],
     updates: ['updates', 'Updates'],
     events: ['updates', 'Updates'],
-    achievements: ['achievements', 'Achievements']
+    achievements: ['achievements', 'Achievements'],
+    ansarTimes: ['ansarTimes', 'AnsarTimes', 'Ansar Times']
   }
 };

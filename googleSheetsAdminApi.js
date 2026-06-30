@@ -45,6 +45,6 @@ export function saveSheetRecord(collectionName, record) {
   return postToSheets('save', { collectionName, record });
 }
 
-export function deleteSheetRecord(collectionName, id) {
-  return postToSheets('delete', { collectionName, id });
+export function deleteSheetRecord(collectionName, id, record) {
+  return postToSheets('delete', { collectionName, id, record });
 }

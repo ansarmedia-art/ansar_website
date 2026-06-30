@@ -29,6 +29,7 @@ export default function AdminLayout({ children, user, onLogout }) {
   const getModuleTitle = () => {
     if (path.includes('/updates')) return 'News & Events';
     if (path.includes('/achievements')) return 'Achievements';
+    if (path.includes('/ansar-times')) return 'Ansar Times';
     if (path.includes('/leadership')) return 'Leadership';
     if (path.includes('/academics')) return 'Academics & Admissions';
     if (path.includes('/public-disclosure')) return 'Mandatory Disclosure';
@@ -62,6 +63,7 @@ export default function AdminLayout({ children, user, onLogout }) {
           <Link to="/admin/dashboard" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'Dashboard' ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>Dashboard</Link>
           <Link to="/admin/updates" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'News & Events' ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>News & Events</Link>
           <Link to="/admin/achievements" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'Achievements' ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>Achievements</Link>
+          <Link to="/admin/ansar-times" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'Ansar Times' ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>Ansar Times</Link>
           <Link to="/admin/leadership" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'Leadership' ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>Leadership</Link>
           <Link to="/admin/academics" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'Academics & Admissions' ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>Academics & Admissions</Link>
           <Link to="/admin/public-disclosure" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'Mandatory Disclosure' ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>Mandatory Disclosure</Link>

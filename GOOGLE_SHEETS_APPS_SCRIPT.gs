@@ -35,6 +35,14 @@ const SHEET_COLUMNS = {
     'documentUrl',
     'order',
     'published'
+  ],
+  ansarTimes: [
+    'id',
+    'year',
+    'month',
+    'monthIndex',
+    'pdfUrl',
+    'published'
   ]
 };
 
@@ -142,7 +150,10 @@ function deleteRecord_(body) {
   if (!sheet) return;
 
   const headers = readHeaders_(sheet);
-  const rowNumber = findRowById_(sheet, headers, body.id);
+  let rowNumber = findRowById_(sheet, headers, body.id);
+  if (!rowNumber && collectionName === 'ansarTimes') {
+    rowNumber = findAnsarTimesRow_(sheet, headers, body.record || {});
+  }
   if (rowNumber) sheet.deleteRow(rowNumber);
 }
 
@@ -209,6 +220,28 @@ function findRowById_(sheet, headers, id) {
   for (let index = 0; index < values.length; index += 1) {
     if (String(values[index][0]) === target) return index + 2;
   }
+  return null;
+}
+
+function findAnsarTimesRow_(sheet, headers, record) {
+  const yearColumn = headers.indexOf('year') + 1;
+  const monthColumn = headers.indexOf('month') + 1;
+  if (!yearColumn || !monthColumn || !record.year || !record.month) return null;
+
+  const lastRow = sheet.getLastRow();
+  if (lastRow < 2) return null;
+
+  const values = sheet.getRange(2, 1, lastRow - 1, headers.length).getValues();
+  const targetYear = String(record.year).trim();
+  const targetMonth = String(record.month).trim().toLowerCase();
+
+  for (let index = 0; index < values.length; index += 1) {
+    const row = values[index];
+    const rowYear = String(row[yearColumn - 1]).trim();
+    const rowMonth = String(row[monthColumn - 1]).trim().toLowerCase();
+    if (rowYear === targetYear && rowMonth === targetMonth) return index + 2;
+  }
+
   return null;
 }
 

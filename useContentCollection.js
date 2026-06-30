@@ -4,9 +4,36 @@ import { db } from './firebase-init';
 import { GOOGLE_SHEETS_DATABASE } from './googleSheetsConfig';
 
 const SHEET_CACHE = new Map();
+const SHEET_CACHE_CLEAR_EVENT = 'ansar-sheets-cache-cleared';
+const SHEET_CACHE_CLEAR_KEY = 'ansarSheetsCacheClearedAt';
 
 export function clearGoogleSheetsCache() {
   SHEET_CACHE.clear();
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent(SHEET_CACHE_CLEAR_EVENT));
+    try {
+      window.localStorage.setItem(SHEET_CACHE_CLEAR_KEY, String(Date.now()));
+    } catch (error) {
+      console.warn('Unable to broadcast Sheets cache refresh:', error);
+    }
+  }
+}
+
+export function subscribeGoogleSheetsRefresh(callback) {
+  if (typeof window === 'undefined') return () => {};
+
+  const onLocalRefresh = () => callback();
+  const onStorage = (event) => {
+    if (event.key === SHEET_CACHE_CLEAR_KEY) callback();
+  };
+
+  window.addEventListener(SHEET_CACHE_CLEAR_EVENT, onLocalRefresh);
+  window.addEventListener('storage', onStorage);
+
+  return () => {
+    window.removeEventListener(SHEET_CACHE_CLEAR_EVENT, onLocalRefresh);
+    window.removeEventListener('storage', onStorage);
+  };
 }
 
 function normalizeHeader(header) {
@@ -62,7 +89,8 @@ function coerceRow(row, collectionName, rowIndex) {
     studentname: 'studentName',
     facebookurl: 'facebookUrl',
     instagramurl: 'instagramUrl',
-    youtubeurl: 'youtubeUrl'
+    youtubeurl: 'youtubeUrl',
+    pdfurl: 'pdfUrl'
   };
 
   const item = {};
@@ -74,6 +102,8 @@ function coerceRow(row, collectionName, rowIndex) {
   item.id = String(item.id || item.slug || slugify(item.title) || `${collectionName}-${rowIndex + 1}`);
   if (item.slug) item.slug = slugify(item.slug);
   if (item.order !== '' && item.order != null) item.order = Number(item.order) || 0;
+  if (item.year !== '' && item.year != null) item.year = Number(item.year) || item.year;
+  if (item.monthIndex !== '' && item.monthIndex != null) item.monthIndex = Number(item.monthIndex) || 0;
   if ('published' in item) item.published = parseBoolean(item.published, true);
   ['imageUrls', 'eventImages', 'sections', 'premisesImages', 'kgImages', 'mandatoryDisclosureSections'].forEach((key) => {
     if (item[key]) item[key] = splitList(item[key]);
@@ -96,6 +126,7 @@ function hasDisplayableContent(item) {
     'date',
     'documentUrl',
     'fileUrl',
+    'pdfUrl',
     'imageUrl',
     'coverImageUrl',
     'thumbnailUrl',
