@@ -16,16 +16,23 @@ export default function NewsCard({ id, title, excerpt, thumbnailUrl, coverImageU
       <div className="absolute inset-0 bg-gradient-to-tr from-emerald-50 to-teal-50/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-10" />
       
       {/* Image with fallback skeleton */}
-      <div className="relative w-full bg-[#f7f9fa] overflow-hidden flex-shrink-0 border-b border-slate-100" style={{ minHeight: '224px' }}>
+      <div className="relative w-full aspect-[4/3] bg-slate-100 overflow-hidden flex-shrink-0 border-b border-slate-100">
         {targetImage ? (
           <>
+            <img
+              src={targetImage}
+              alt=""
+              aria-hidden="true"
+              className="absolute inset-0 h-full w-full scale-110 object-cover opacity-20 blur-xl"
+              loading={priority ? 'eager' : 'lazy'}
+              decoding="async"
+            />
             <img 
               src={targetImage} 
               alt={title} 
               width="640"
-              height="360"
-              style={{ width: '100%', height: '224px', objectFit: 'cover', backgroundColor: '#f7f9fa', display: 'block', margin: '0 auto' }}
-              className="transition-transform duration-300 group-hover:scale-105"
+              height="480"
+              className="relative z-[1] h-full w-full object-contain p-2 transition-transform duration-300 group-hover:scale-[1.02]"
               loading={priority ? 'eager' : 'lazy'}
               decoding="async"
               fetchPriority={priority ? 'high' : 'auto'}

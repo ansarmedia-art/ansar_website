@@ -4,6 +4,7 @@ import Hero from './Hero';
 import NewsCard from './NewsCard';
 import NoticePopup from './NoticePopup';
 import AchievementsTicker from './AchievementsTicker';
+import SchoolChatbot from './SchoolChatbot';
 import { useSettings } from './SettingsContext';
 import { useContentCollection } from './useContentCollection';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -238,6 +239,7 @@ export default function Home() {
   return (
     <Layout isHome={true}>
       <NoticePopup />
+      <SchoolChatbot />
       <Hero 
         title="Empowering Minds, Enriching Futures" 
         subtitle="At Ansar English School, we nurture curious learners, ethical leaders, and responsible global citizens prepared to thrive in an ever-evolving world."

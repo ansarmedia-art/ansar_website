@@ -1,4 +1,5 @@
 import { initializeApp } from 'firebase/app';
+import { getAI, GoogleAIBackend } from 'firebase/ai';
 import { getFirestore, enableIndexedDbPersistence } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 
@@ -13,6 +14,7 @@ const firebaseConfig = {
 };
 
 export const app = initializeApp(firebaseConfig);
+export const ai = getAI(app, { backend: new GoogleAIBackend() });
 export const db = getFirestore(app);
 export const auth = getAuth(app);
 
