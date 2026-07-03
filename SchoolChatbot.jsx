@@ -20,10 +20,10 @@ const NAVIGATION_GUIDE = [
 ];
 
 const QUICK_QUESTIONS = [
-  'How can I contact the school?',
-  'Guide me for admission',
-  'Show latest news',
-  'Where can I find fee details?'
+  'Tell me about Ansar English School',
+  'Explain the school leadership',
+  'Guide me through this website',
+  'Guide me for admission'
 ];
 
 const SCHOOL_PROFILE_CONTEXT = [
@@ -71,9 +71,22 @@ function formatItems(items, fields) {
     .join('\n');
 }
 
+function getContentDateTime(item) {
+  const dateTime = Date.parse(item?.date);
+  if (!Number.isNaN(dateTime)) return dateTime;
+  if (item?.createdAt?.toMillis) return item.createdAt.toMillis();
+  if (item?.createdAt?.seconds) return item.createdAt.seconds * 1000;
+  return Number.MIN_SAFE_INTEGER;
+}
+
 function buildSiteContext({ settings, updates, achievements, disclosures, ansarTimes, pages, leadership }) {
-  const news = updates.filter(item => item.published !== false && (item.category === 'News' || !item.category));
-  const events = updates.filter(item => item.published !== false && item.category === 'Events');
+  const news = updates
+    .filter(item => item.published !== false && (item.category === 'News' || !item.category))
+    .sort((a, b) => getContentDateTime(b) - getContentDateTime(a));
+  const events = updates
+    .filter(item => item.published !== false && item.category === 'Events')
+    .sort((a, b) => getContentDateTime(b) - getContentDateTime(a));
+  const dateOrderedAchievements = [...achievements].sort((a, b) => getContentDateTime(b) - getContentDateTime(a));
   const pageSummaries = pages
     .filter(page => page?.published !== false)
     .slice(0, 8)
@@ -105,9 +118,9 @@ function buildSiteContext({ settings, updates, achievements, disclosures, ansarT
     `Principal: ${settings?.principalName || 'Ms. Sajidha Razak'} ${settings?.principalQualifications || ''}.`,
     `Leadership and staff from admin/settings:\n${leadershipSummary || juniorPrincipals || 'Director, Principal, Junior Principals, teachers, and support staff are represented on the website/admin panel.'}`,
     `Junior Principals from settings:\n${juniorPrincipals || 'Junior principal details are available on the home page when configured.'}`,
-    `Latest news:\n${formatItems(news, ['date', 'title', 'description']) || 'No published news currently loaded.'}`,
-    `Latest events:\n${formatItems(events, ['date', 'title', 'description']) || 'No published events currently loaded.'}`,
-    `Achievements:\n${formatItems(achievements, ['date', 'title', 'studentName', 'description']) || 'No published achievements currently loaded.'}`,
+    `News by date:\n${formatItems(news, ['date', 'title', 'description']) || 'No published news currently loaded.'}`,
+    `Events by date:\n${formatItems(events, ['date', 'title', 'description']) || 'No published events currently loaded.'}`,
+    `Achievements:\n${formatItems(dateOrderedAchievements, ['date', 'title', 'studentName', 'description']) || 'No published achievements currently loaded.'}`,
     `Public disclosure documents:\n${formatItems(disclosures, ['section', 'title']) || 'No public disclosure documents currently loaded.'}`,
     `Ansar Times:\n${formatItems(ansarTimes, ['year', 'month']) || 'No magazine issues currently loaded.'}`,
     `Admin-managed pages:\n${pageSummaries || 'No extra admin pages currently loaded.'}`,
@@ -118,6 +131,28 @@ function buildSiteContext({ settings, updates, achievements, disclosures, ansarT
 function findNavigationMatches(question) {
   const normalized = question.toLowerCase();
   return NAVIGATION_GUIDE.filter(item => item.keywords.some(keyword => normalized.includes(keyword))).slice(0, 3);
+}
+
+function isDetailedSchoolQuestion(question) {
+  const normalized = question.toLowerCase();
+  return [
+    'institution',
+    'school',
+    'ansar',
+    'about',
+    'history',
+    'leader',
+    'leadership',
+    'principal',
+    'director',
+    'trust',
+    'trustee',
+    'website',
+    'site',
+    'navigate',
+    'facilities',
+    'campus'
+  ].some(keyword => normalized.includes(keyword));
 }
 
 function getFallbackAnswer(question, context) {
@@ -133,11 +168,11 @@ function getFallbackAnswer(question, context) {
   }
 
   if (lower.includes('history') || lower.includes('founded') || lower.includes('started') || lower.includes('trust')) {
-    return 'Ansar English School is the flagship educational institution of Ansari Charitable Trust in Perumpilavu. The Trust was registered in 1979, the school was registered in 1982, received CBSE affiliation in 1988, became Senior Secondary in 1990, and received NABET accreditation in 2024. Please open the About page for the full timeline and trustee details.';
+    return 'Ansar English School is the flagship educational institution of Ansari Charitable Trust in Perumpilavu, Thrissur. The Trust was registered in 1979, the school was registered in 1982, received CBSE affiliation in 1988, became Senior Secondary in 1990, and received NABET accreditation in 2024. The institution presents itself as a value-based CBSE school with a strong focus on academics, discipline, student development, facilities, community service, and sustainable growth. You can open the About page for the full timeline, trustee details, and institutional profile.';
   }
 
   if (lower.includes('leader') || lower.includes('principal') || lower.includes('director') || lower.includes('staff')) {
-    return `The school leadership shown on the website includes ${context.includes('Director:') ? 'the Director, Principal, Junior Principals, trustees, teachers, and support staff' : 'the Director, Principal, Junior Principals, trustees, teachers, and support staff'}. Ansar has 270+ educators/staff members supporting over 4,600 students. Please open the About or home page for profile details.`;
+    return 'The school leadership shown on the website includes the Director, Principal, Junior Principals, trustees, teachers, and support staff. The website highlights Dr. Najeeb Mohamad as Director and Ms. Sajidha Razak as Principal when configured through settings, along with junior principal profiles and trustee information. Ansar has 270+ educators and staff members supporting over 4,600 students. For profile photos, qualifications, messages, and current leadership details, please open the Home and About pages.';
   }
 
   if (lower.includes('facility') || lower.includes('facilities') || lower.includes('lab') || lower.includes('library') || lower.includes('sports') || lower.includes('transport')) {
@@ -148,13 +183,17 @@ function getFallbackAnswer(question, context) {
     return 'Ansar Media and Production is the school\'s in-house media unit. It supports photography, videography, drone videography, podcasts, graphic designing, editing, event documentation, reels, social media creatives, and institutional presentations. You can find it under Explore > Ansar Media and Production.';
   }
 
+  if (lower.includes('website') || lower.includes('site') || lower.includes('navigate') || lower.includes('page')) {
+    return 'This website is organized to help visitors learn about Ansar English School and quickly reach important information. The main sections include About, Academics, Admission, News, Events, Gallery, Achievements, Ansar Times, Mandatory Public Disclosure, Contact, and special pages such as Sports, ATL, Ansar Sprouts, Life at Ansar, and Ansar Media and Production. Use the navigation menu for general pages, News and Events for updates by date, Achievements for student accomplishments, and Contact for phone, email, address, map, and inquiries.';
+  }
+
   if (lower.includes('news') || lower.includes('event') || lower.includes('achievement')) {
     return 'The latest school updates are available in News, Events, and Achievements. I can guide you to the relevant page from the shortcuts below.';
   }
 
   return matches.length
     ? `I can guide you to ${matches.map(match => match.label).join(', ')}. Please choose one of the links below.`
-    : 'Good day. I can help with admissions, fee details, academics, news, events, achievements, public disclosure documents, Ansar Times, and contact information. Please ask your question in a little more detail.';
+    : 'Good day. I can help with detailed information about Ansar English School, the institution history, leadership, facilities, admissions, academics, website navigation, news, events, achievements, public disclosure documents, Ansar Times, and contact information. Please ask your question in a little more detail.';
 }
 
 export default function SchoolChatbot() {
@@ -165,13 +204,13 @@ export default function SchoolChatbot() {
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
-      text: 'Good day. Welcome to Ansar English School. I can guide you through admissions, academics, news, events, achievements, public disclosures, Ansar Times, and contact details. How may I assist you?'
+      text: 'Good day. Welcome to Ansar English School. I can explain the institution, leadership, website sections, admissions, academics, news, events, achievements, public disclosures, Ansar Times, and contact details. How may I assist you?'
     }
   ]);
   const conversationRef = useRef([]);
 
-  const { data: updates } = useContentCollection('updates', 'createdAt', 'desc', { limit: 18 });
-  const { data: achievements } = useContentCollection('achievements', 'date', 'desc', { limit: 8 });
+  const { data: updates } = useContentCollection('updates', null);
+  const { data: achievements } = useContentCollection('achievements', null);
   const { data: disclosures } = useContentCollection('publicDisclosure', 'order', 'asc', { limit: 12 });
   const { data: ansarTimes } = useContentCollection('ansarTimes', 'year', 'desc', { limit: 8 });
   const { data: leadership } = useContentCollection('leadership', 'order', 'asc', { firestoreOnly: true });
@@ -198,15 +237,19 @@ export default function SchoolChatbot() {
     setLoading(true);
 
     try {
+      const detailedMode = isDetailedSchoolQuestion(question);
       const model = getGenerativeModel(ai, {
         model: CHAT_MODEL,
-        generationConfig: { maxOutputTokens: 420 }
+        generationConfig: { maxOutputTokens: detailedMode ? 900 : 420 }
       });
       const conversation = [...conversationRef.current, userMessage].slice(-8);
       const prompt = [
         'You are the formal, helpful website assistant for Ansar English School.',
         'Answer only from the provided website/admin/sheet context. If information is missing, say so and guide the visitor to Contact.',
-        'Keep replies concise, polite, and navigation-oriented. Mention relevant page names and paths when useful.',
+        detailedMode
+          ? 'For questions about the institution, leadership, history, facilities, or website navigation, give a detailed, well-structured answer in 2 to 5 short paragraphs. Include relevant facts, names, milestones, page names, and helpful next steps from the context.'
+          : 'Keep replies concise, polite, and navigation-oriented. Mention relevant page names and paths when useful.',
+        'Do not answer in one line when the visitor asks to explain the institution, leaders, or website. Use clear headings or short paragraphs when that makes the answer easier to read.',
         'Do not invent dates, fees, phone numbers, or policies.',
         `Website context:\n${siteContext}`,
         `Conversation:\n${conversation.map(message => `${message.role}: ${message.text}`).join('\n')}`,

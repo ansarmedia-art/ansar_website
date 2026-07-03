@@ -56,6 +56,8 @@ const HISTORY_HIGHLIGHTS = [
   ['4,600+', 'students in a vibrant learning community']
 ];
 
+const HISTORY_IMAGE_URL = 'https://i.ibb.co/4nr6rs9n/DJI-20260625171033-0002-D.jpg';
+
 const ACT_TRUSTEES = [
   { name: 'MAMMUNNI K K', role: 'Chairman', imageUrl: '/trustees/act-member-01.png' },
   { name: 'V T ABDULLAH KOYA THANGAL', role: 'Acting Chairman', imageUrl: '/trustees/act-member-02.png' },
@@ -151,6 +153,17 @@ function AboutSidebar() {
       <a href="https://www.p4panorama.com/360-virtual-tour/ansar-school/" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center rounded-xl bg-emerald-600 px-5 py-3 text-center text-sm font-bold text-white shadow-lg transition-colors hover:bg-emerald-700">
         Take a 360&deg; Virtual Tour
       </a>
+      <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
+        <p className="text-xs font-extrabold uppercase tracking-widest text-emerald-600">At a glance</p>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+          {['NABET accredited', 'CBSE senior secondary', 'Value-based learning', 'Inclusive campus life'].map(item => (
+            <div key={item} className="flex items-center gap-3 rounded-xl bg-slate-50 p-3">
+              <span className="h-2.5 w-2.5 rounded-full bg-amber-400 ring-4 ring-amber-100" />
+              <span className="text-sm font-bold text-slate-700">{item}</span>
+            </div>
+          ))}
+        </div>
+      </div>
     </>
   );
 }
@@ -222,6 +235,16 @@ function HistoryAndTrustees({ historyText, trustees = [] }) {
               <p className="mt-5 text-lg leading-relaxed text-emerald-950/75">
                 {hasCustomHistory ? 'A continuing journey of education, service, and community trust.' : DEFAULT_HISTORY_INTRO}
               </p>
+            </div>
+            <div className="overflow-hidden rounded-2xl border border-white/70 bg-white shadow-lg">
+              <div className="relative aspect-[4/3] bg-emerald-950">
+                <img src={HISTORY_IMAGE_URL} alt="Aerial view of Ansar English School campus" className="absolute inset-0 h-full w-full object-cover" loading="lazy" />
+                <div className="absolute inset-0 bg-gradient-to-t from-emerald-950/70 via-emerald-950/5 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-5">
+                  <p className="text-xs font-black uppercase tracking-widest text-amber-300">Campus View</p>
+                  <p className="mt-1 text-lg font-extrabold leading-tight text-white">A learning community shaped by service and growth.</p>
+                </div>
+              </div>
             </div>
             {!hasCustomHistory && (
               <div className="grid grid-cols-2 gap-3">

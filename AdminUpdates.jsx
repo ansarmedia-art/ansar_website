@@ -8,6 +8,14 @@ import { softDeleteRecord } from './adminUndo';
 
 const MAX_EVENT_IMAGES = 100;
 
+function getDateTime(item) {
+  const dateTime = Date.parse(item.date);
+  if (!Number.isNaN(dateTime)) return dateTime;
+  if (item.createdAt?.toMillis) return item.createdAt.toMillis();
+  if (item.createdAt?.seconds) return item.createdAt.seconds * 1000;
+  return Number.MIN_SAFE_INTEGER;
+}
+
 // Utility to clean raw Google Image Search URLs
 const cleanImageUrl = (url) => {
   if (!url || typeof url !== 'string') return '';
@@ -33,7 +41,8 @@ const cleanImageUrl = (url) => {
 
 export default function AdminUpdates() {
   const [refreshKey, setRefreshKey] = useState(0);
-  const { data: items, loading } = useContentCollection('updates', 'date', 'desc', { refreshKey });
+  const { data: items, loading } = useContentCollection('updates', null, 'asc', { refreshKey });
+  const dateOrderedItems = [...items].sort((a, b) => getDateTime(b) - getDateTime(a));
   
   const initialFormState = { category: 'News', title: '', description: '', date: '', coverImageUrl: '', eventImages: [''], instagramUrl: '', facebookUrl: '', youtubeUrl: '', published: true };
   const [formData, setFormData] = useState(initialFormState);
@@ -312,7 +321,7 @@ export default function AdminUpdates() {
 
       <div className="space-y-4">
         <h3 className="font-bold text-lg text-slate-800 mb-4">Current Publications</h3>
-        {loading ? <p className="text-slate-500">Loading...</p> : items.map(item => (
+        {loading ? <p className="text-slate-500">Loading...</p> : dateOrderedItems.map(item => (
           <div key={item.id} className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm flex items-center gap-4 hover:border-emerald-300 hover:shadow-md transition-all duration-300">
             
             {/* Defensive Thumbnail Rendering */}

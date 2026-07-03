@@ -81,6 +81,14 @@ function AnimatedCounter({ target, suffix = "" }) {
   return <span ref={ref}>{count}{suffix}</span>;
 }
 
+function getContentDateTime(item) {
+  const dateTime = Date.parse(item.date);
+  if (!Number.isNaN(dateTime)) return dateTime;
+  if (item.createdAt?.toMillis) return item.createdAt.toMillis();
+  if (item.createdAt?.seconds) return item.createdAt.seconds * 1000;
+  return Number.MIN_SAFE_INTEGER;
+}
+
 function VerticalCarousel({ images, onImageClick }) {
   const [index, setIndex] = useState(0);
   const validImages = (images || []).filter(img => img && img.trim() !== '');
@@ -156,19 +164,20 @@ function LeadershipProfile({ profile, reverse = false }) {
     >
       <div className={`relative min-h-[20rem] bg-emerald-950 ${reverse ? 'lg:order-2' : ''}`}>
         {imageUrl ? (
-          <img src={imageUrl} alt={profile.name} className="absolute inset-0 h-full w-full object-cover" loading="lazy" />
+          <img src={imageUrl} alt={profile.name} className="absolute inset-0 h-full w-full object-cover object-center" loading="lazy" />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center bg-emerald-950 text-emerald-100">
             <svg className="h-20 w-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0zM12 14a7 7 0 0 0-7 7h14a7 7 0 0 0-7-7z" /></svg>
           </div>
         )}
+        <div className={`pointer-events-none absolute inset-y-0 hidden w-8 lg:block ${reverse ? 'left-0 bg-gradient-to-r' : 'right-0 bg-gradient-to-l'} from-white/55 via-white/20 to-white/0`} />
       </div>
       <div className="flex flex-col justify-center p-7 sm:p-10">
         <p className="text-sm font-black uppercase tracking-widest text-emerald-600">{profile.role}</p>
         <h3 className="mt-2 text-3xl font-extrabold text-emerald-950">{profile.name}</h3>
         {profile.qualifications && <p className="mt-2 font-bold text-amber-600">{profile.qualifications}</p>}
         {profile.message ? (
-          <p className="mt-6 whitespace-pre-wrap text-base leading-relaxed text-slate-600 sm:text-lg">{profile.message}</p>
+          <p className="mt-6 whitespace-pre-wrap text-base leading-relaxed text-slate-600 sm:text-lg lg:text-base xl:text-lg">{profile.message}</p>
         ) : (
           <p className="mt-6 text-base leading-relaxed text-slate-500">A message from this office will be updated soon.</p>
         )}
@@ -178,27 +187,38 @@ function LeadershipProfile({ profile, reverse = false }) {
 }
 
 function JuniorPrincipalTile({ leader, index }) {
+  const qualification = leader.qualification || leader.qualifications || '';
+  const role = leader.role || 'Junior Principal';
+  const section = leader.section || leader.detail || '';
+  const frameShape = {
+    clipPath: 'polygon(0 0, calc(100% - 1.35rem) 0, 100% 1.35rem, 100% 100%, 1.35rem 100%, 0 calc(100% - 1.35rem))'
+  };
+
   return (
     <motion.article
       initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.3 }}
       transition={{ duration: 0.5, delay: Math.min(index * 0.08, 0.32) }}
-      className="group overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-emerald-200 hover:shadow-xl"
+      className="group overflow-hidden border border-emerald-100 bg-white shadow-lg shadow-slate-900/10 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl"
+      style={frameShape}
     >
-      <div className="relative aspect-[4/5] bg-slate-100">
-        {leader.imageUrl ? (
-          <img src={leader.imageUrl} alt={leader.name} className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
-        ) : (
-          <div className="absolute inset-0 flex items-center justify-center text-slate-300">
-            <svg className="h-12 w-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0zM12 14a7 7 0 0 0-7 7h14a7 7 0 0 0-7-7z" /></svg>
-          </div>
-        )}
-      </div>
-      <div className="p-5 text-center">
-        <h4 className="text-lg font-extrabold text-slate-900">{leader.name}</h4>
-        {(leader.qualification || leader.qualifications) && <p className="mt-1 text-sm font-semibold text-amber-600">{leader.qualification || leader.qualifications}</p>}
-        <p className="mt-1 text-sm font-bold text-emerald-600">{leader.section}</p>
+      <div className="flex h-full flex-col">
+        <div className="relative aspect-[4/5] overflow-hidden bg-emerald-950">
+          {leader.imageUrl ? (
+            <img src={leader.imageUrl} alt={leader.name} className="absolute inset-0 h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-105" loading="lazy" />
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center bg-emerald-950 text-emerald-100">
+              <svg className="h-12 w-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0zM12 14a7 7 0 0 0-7 7h14a7 7 0 0 0-7-7z" /></svg>
+            </div>
+          )}
+        </div>
+        <div className="flex flex-1 flex-col justify-center p-5 sm:p-6">
+          <p className="text-[10px] font-black uppercase tracking-widest text-emerald-600">{role}</p>
+          <h4 className="mt-2 text-xl font-extrabold leading-tight text-emerald-950">{leader.name}</h4>
+          {qualification && <p className="mt-2 text-sm font-bold leading-snug text-amber-600">{qualification}</p>}
+          {section && <p className="mt-2 text-sm font-bold text-slate-600">{section}</p>}
+        </div>
       </div>
     </motion.article>
   );
@@ -208,9 +228,11 @@ export default function Home() {
   const settings = useSettings();
   const [lightboxImage, setLightboxImage] = useState(null);
   const { data: leadershipData } = useContentCollection('leadership', 'order', 'asc', { firestoreOnly: true });
-  const { data: updates } = useContentCollection('updates', 'createdAt', 'desc', { limit: 12 });
+  const { data: updates } = useContentCollection('updates', null);
 
-  const publishedUpdates = updates.filter(item => item.published !== false);
+  const publishedUpdates = updates
+    .filter(item => item.published !== false)
+    .sort((a, b) => getContentDateTime(b) - getContentDateTime(a));
   const homeNews = publishedUpdates.filter(item => item.category === 'News' || !item.category).slice(0, 3);
   const homeEvents = publishedUpdates.filter(item => item.category === 'Events').slice(0, 3);
   const activeLeaders = leadershipData.length ? leadershipData.filter(l => l.published !== false) : FALLBACK_LEADERS;
@@ -367,9 +389,9 @@ export default function Home() {
           <LeadershipProfile profile={directorProfile} />
           <LeadershipProfile profile={principalProfile} reverse />
           {juniorPrincipals.length > 0 && (
-            <div className="pt-6">
-              <h3 className="mb-6 text-center text-2xl font-extrabold text-slate-900">Junior Principals</h3>
-              <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-5">
+            <div className="pt-8">
+              <h3 className="mb-8 text-center text-3xl font-extrabold text-emerald-950">Junior Principals</h3>
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
                 {juniorPrincipals.map((leader, index) => (
                   <JuniorPrincipalTile key={`${leader.name || 'junior'}-${index}`} leader={leader} index={index} />
                 ))}

@@ -4,12 +4,20 @@ import EventCard from './EventCard';
 import { useNavigate } from 'react-router-dom';
 import { useContentCollection } from './useContentCollection';
 
+function getDateTime(item) {
+  const dateTime = Date.parse(item.date);
+  if (!Number.isNaN(dateTime)) return dateTime;
+  if (item.createdAt?.toMillis) return item.createdAt.toMillis();
+  if (item.createdAt?.seconds) return item.createdAt.seconds * 1000;
+  return Number.MIN_SAFE_INTEGER;
+}
+
 export default function Events() {
-  const { data: updates, loading, error } = useContentCollection('updates', 'createdAt', 'desc');
+  const { data: updates, loading, error } = useContentCollection('updates', null);
   const navigate = useNavigate();
   const events = updates
     .filter(item => item.published !== false && item.category === 'Events')
-    .sort((a, b) => (Date.parse(b.createdAt || b.date) || 0) - (Date.parse(a.createdAt || a.date) || 0));
+    .sort((a, b) => getDateTime(b) - getDateTime(a));
 
   return (
     <Layout>

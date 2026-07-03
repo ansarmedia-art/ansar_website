@@ -8,10 +8,20 @@ import { softDeleteRecord } from './adminUndo';
 
 const MAX_EVENT_IMAGES = 100;
 
+function getDateTime(item) {
+  const dateTime = Date.parse(item.date);
+  if (!Number.isNaN(dateTime)) return dateTime;
+  if (item.createdAt?.toMillis) return item.createdAt.toMillis();
+  if (item.createdAt?.seconds) return item.createdAt.seconds * 1000;
+  return Number.MIN_SAFE_INTEGER;
+}
+
 export default function AdminEvents() {
   const [refreshKey, setRefreshKey] = useState(0);
-  const { data: allItems, loading } = useContentCollection('events', 'date', 'desc', { refreshKey });
-  const items = allItems.filter(item => item._contentSource === 'firestore' || item.category === 'Events');
+  const { data: allItems, loading } = useContentCollection('events', null, 'asc', { refreshKey });
+  const items = allItems
+    .filter(item => item._contentSource === 'firestore' || item.category === 'Events')
+    .sort((a, b) => getDateTime(b) - getDateTime(a));
   
   const initialFormState = { title: '', description: '', date: '', imageUrls: [''], published: true };
   const [formData, setFormData] = useState(initialFormState);

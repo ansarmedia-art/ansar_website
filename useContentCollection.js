@@ -152,7 +152,11 @@ function sortRows(rows, orderByField, orderDir) {
     const aTime = getTimeValue(aValue);
     const bTime = getTimeValue(bValue);
 
-    if (aTime && bTime) return (aTime - bTime) * direction;
+    if (aTime != null || bTime != null) {
+      if (aTime == null) return 1;
+      if (bTime == null) return -1;
+      return (aTime - bTime) * direction;
+    }
     if (typeof aValue === 'number' && typeof bValue === 'number') return (aValue - bValue) * direction;
     return String(aValue || '').localeCompare(String(bValue || '')) * direction;
   });
@@ -162,7 +166,7 @@ function getTimeValue(value) {
   if (value?.toMillis) return value.toMillis();
   if (value?.seconds) return value.seconds * 1000;
   const parsed = Date.parse(value);
-  return Number.isNaN(parsed) ? 0 : parsed;
+  return Number.isNaN(parsed) ? null : parsed;
 }
 
 function mergeRows(firestoreRows, sheetRows) {

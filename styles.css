@@ -678,9 +678,33 @@ input:focus, textarea:focus, select:focus {
   0% { transform: translateX(120%); opacity: 0; }
   100% { transform: translateX(0); opacity: 1; }
 }
+
+@keyframes floatingIconAura {
+  0%, 100% {
+    transform: scale(0.9) rotate(0deg);
+    opacity: 0.12;
+  }
+  50% {
+    transform: scale(1.04) rotate(6deg);
+    opacity: 0.28;
+  }
+}
+
 .floating-panel-container {
   opacity: 0; /* Prevent FOUC before animation starts */
   animation: slideInPanel 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.floating-icon-aura {
+  animation: floatingIconAura 4.5s ease-in-out infinite;
+  transform-origin: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .floating-icon-aura {
+    animation: none;
+    opacity: 0.16;
+  }
 }
 
 /* ========================================================

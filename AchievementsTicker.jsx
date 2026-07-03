@@ -3,10 +3,11 @@ import { Link } from 'react-router-dom';
 import { useContentCollection } from './useContentCollection';
 
 function getAchievementTime(item) {
+  const dateTime = Date.parse(item.date);
+  if (!Number.isNaN(dateTime)) return dateTime;
   if (item.createdAt?.toMillis) return item.createdAt.toMillis();
   if (item.createdAt?.seconds) return item.createdAt.seconds * 1000;
-  if (item.date) return new Date(item.date).getTime() || 0;
-  return 0;
+  return Number.MIN_SAFE_INTEGER;
 }
 
 export default function AchievementsTicker() {

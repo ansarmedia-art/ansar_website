@@ -9,16 +9,17 @@ import { softDeleteRecord } from './adminUndo';
 const MAX_ACHIEVEMENT_IMAGES = 30;
 
 function getAchievementTime(item) {
+  const dateTime = Date.parse(item.date);
+  if (!Number.isNaN(dateTime)) return dateTime;
   if (item.createdAt?.toMillis) return item.createdAt.toMillis();
   if (item.createdAt?.seconds) return item.createdAt.seconds * 1000;
-  if (item.date) return new Date(item.date).getTime() || 0;
-  return 0;
+  return Number.MIN_SAFE_INTEGER;
 }
 
 export default function AdminAchievements() {
   const [refreshKey, setRefreshKey] = useState(0);
-  const { data: items, loading } = useContentCollection('achievements', null, 'desc', { refreshKey });
-  const newestFirstItems = [...items].sort((a, b) => getAchievementTime(b) - getAchievementTime(a));
+  const { data: items, loading } = useContentCollection('achievements', null, 'asc', { refreshKey });
+  const dateOrderedItems = [...items].sort((a, b) => getAchievementTime(b) - getAchievementTime(a));
   
   const initialFormState = { title: '', description: '', imageUrls: [''], date: '', studentName: '', published: true };
   const [formData, setFormData] = useState(initialFormState);
@@ -229,7 +230,7 @@ export default function AdminAchievements() {
 
       <div className="space-y-4">
         <h3 className="font-bold text-lg text-slate-800 mb-4">Current Achievements</h3>
-        {loading ? <p className="text-slate-500">Loading achievements...</p> : newestFirstItems.map(item => (
+        {loading ? <p className="text-slate-500">Loading achievements...</p> : dateOrderedItems.map(item => (
           <div key={item.id} className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm flex items-center justify-between hover:border-emerald-200 transition-colors">
             <div>
               <h4 className="font-bold text-slate-900">{item.title}</h4>
