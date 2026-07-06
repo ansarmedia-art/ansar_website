@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { BrowserRouter as Router, Routes, Route, useParams, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useParams, Navigate, useLocation, Link } from 'react-router-dom';
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { doc, setDoc, serverTimestamp, collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 import { auth, db } from './firebase-init';
@@ -131,6 +131,107 @@ const MEDIA_SERVICES = [
   }
 ];
 
+const LEARNING_FEATURES = {
+  'cctv-enabled-safety': {
+    title: 'CCTV-enabled safety',
+    kicker: 'Safe campus',
+    icon: 'shield',
+    image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=90&w=2400&auto=format&fit=crop',
+    description: 'A monitored learning environment helps students move through the campus with confidence. Safety systems support staff supervision and create a secure setting for academic and co-curricular activity.',
+    points: ['CCTV-supported campus monitoring', 'Structured supervision around key areas', 'A calm environment for focused learning']
+  },
+  'smart-classrooms': {
+    title: 'Spacious classrooms with smart boards',
+    kicker: 'Interactive learning',
+    icon: 'screen',
+    image: 'https://images.unsplash.com/photo-1588072432836-e10032774350?q=90&w=2400&auto=format&fit=crop',
+    description: 'Roomy classrooms and smart-board support help teachers blend explanation, visual learning, discussion, and practice. The setup keeps lessons clear, engaging, and easier to follow.',
+    points: ['Spacious rooms for comfortable learning', 'Smart-board enabled explanations', 'Better visual support for concepts']
+  },
+  'qualified-support-staff': {
+    title: 'Qualified support staff',
+    kicker: 'Care and guidance',
+    icon: 'users',
+    image: 'https://images.unsplash.com/photo-1577896851231-70ef18881754?q=90&w=2400&auto=format&fit=crop',
+    description: 'Support staff help maintain a smooth daily rhythm for students, teachers, and families. Their presence strengthens care, coordination, and readiness across the school day.',
+    points: ['Student-focused assistance through the day', 'Coordination that supports teachers and learners', 'A dependable campus support system']
+  },
+  'digital-classrooms': {
+    title: 'Digital classrooms',
+    kicker: 'Technology-enabled',
+    icon: 'laptop',
+    image: 'https://images.unsplash.com/photo-1584697964192-8f473eed4f56?q=90&w=2400&auto=format&fit=crop',
+    description: 'Digital classrooms make lessons more dynamic with multimedia, visual references, and modern teaching tools. Students get richer context while teachers can present ideas with clarity.',
+    points: ['Multimedia-supported classroom sessions', 'Digital resources for deeper understanding', 'Modern tools that enrich regular lessons']
+  },
+  'special-play-area': {
+    title: 'Special play area',
+    kicker: 'Joyful growth',
+    icon: 'smile',
+    image: 'https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?q=90&w=2400&auto=format&fit=crop',
+    description: 'A dedicated play area gives younger learners space to move, imagine, and build social confidence. Play is treated as a meaningful part of physical, emotional, and creative development.',
+    points: ['Dedicated space for active play', 'Supports social and motor-skill development', 'Encourages confidence through joyful activity']
+  },
+  'advanced-labs': {
+    title: 'Purpose-built advanced labs',
+    kicker: 'Hands-on discovery',
+    icon: 'flask',
+    image: 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?q=90&w=2400&auto=format&fit=crop',
+    description: 'Purpose-built labs help students move from theory to observation, experimentation, and analysis. The learning experience becomes practical, curious, and grounded in real exploration.',
+    points: ['Spaces designed for practical learning', 'Hands-on science and skill development', 'Encourages observation, testing, and inquiry']
+  },
+  'multi-sports-play-area': {
+    title: 'Multi-sports play area',
+    kicker: 'Fitness and teamwork',
+    icon: 'trophy',
+    image: 'https://images.unsplash.com/photo-1526232761682-d26e03ac148e?q=90&w=2400&auto=format&fit=crop',
+    description: 'The multi-sports play area supports fitness, coordination, teamwork, and healthy competition. Students get structured opportunities to participate, practice, and build sporting spirit.',
+    points: ['Space for multiple sports and activities', 'Builds stamina, teamwork, and discipline', 'Encourages regular physical participation']
+  },
+  'wi-fi-learning-environment': {
+    title: 'Wi-Fi enabled learning environment',
+    kicker: 'Connected campus',
+    icon: 'wifi',
+    image: 'https://images.unsplash.com/photo-1497366754035-f200968a6e72?q=90&w=2400&auto=format&fit=crop',
+    description: 'A Wi-Fi enabled environment supports digital access for teaching, learning, administration, and communication. It keeps the campus ready for modern academic needs.',
+    points: ['Connectivity for digital teaching tools', 'Supports academic and administrative workflows', 'Helps classrooms stay resource-ready']
+  },
+  'safe-school-transport': {
+    title: 'Safe school transport',
+    kicker: 'Reliable travel',
+    icon: 'bus',
+    image: 'https://images.unsplash.com/photo-1570125909232-eb263c188f7e?q=90&w=2400&auto=format&fit=crop',
+    description: 'Safe school transport supports dependable student travel between home and campus. The service is designed around regularity, care, and parent confidence.',
+    points: ['Reliable transport support for students', 'Care-focused daily travel routines', 'Designed for family confidence and convenience']
+  }
+};
+
+function LearningIcon({ name, className = 'h-8 w-8' }) {
+  const shared = { className, fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24', 'aria-hidden': 'true' };
+  const pathProps = { strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: '1.8' };
+
+  switch (name) {
+    case 'screen':
+      return <svg {...shared}><rect width="20" height="14" x="2" y="3" rx="2" {...pathProps} /><path {...pathProps} d="M8 21h8M12 17v4m-2-9 6-4v8l-6-4Z" /></svg>;
+    case 'users':
+      return <svg {...shared}><path {...pathProps} d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" strokeWidth="1.8" /><path {...pathProps} d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" /></svg>;
+    case 'laptop':
+      return <svg {...shared}><path {...pathProps} d="M20 16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9m16 0H4m16 0 1.3 2.6a1 1 0 0 1-.9 1.4H3.6a1 1 0 0 1-.9-1.4L4 16" /></svg>;
+    case 'smile':
+      return <svg {...shared}><circle cx="12" cy="12" r="10" strokeWidth="1.8" /><path {...pathProps} d="M8 14s1.5 2 4 2 4-2 4-2" /><path {...pathProps} d="M9 9h.01M15 9h.01" /></svg>;
+    case 'flask':
+      return <svg {...shared}><path {...pathProps} d="M10 2v7.3L3 20.1A1.9 1.9 0 0 0 4.6 23h14.8a1.9 1.9 0 0 0 1.6-2.9L14 9.3V2M8.5 2h7M7 15h10" /></svg>;
+    case 'trophy':
+      return <svg {...shared}><path {...pathProps} d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6m12 5h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M10 14.7V17a2 2 0 0 1-2 2H6m8-4.3V17a2 2 0 0 0 2 2h2M18 4c0 3-2 5.5-5 5.5h-2C8 9.5 6 7 6 4V2h12v2Z" /></svg>;
+    case 'wifi':
+      return <svg {...shared}><path {...pathProps} d="M5 12.55a11 11 0 0 1 14.08 0M1.42 9a16 16 0 0 1 21.16 0M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01" /></svg>;
+    case 'bus':
+      return <svg {...shared}><path {...pathProps} d="M8 6v6m7-6v6M2 12h19.6M18 18h3s.5-1.7.8-2.8c.1-.4.2-.8.2-1.2s-.1-.8-.2-1.2l-1.4-5C20.1 6.8 19.1 6 18 6H4a2 2 0 0 0-2 2v10h3" /><circle cx="7" cy="18" r="2" strokeWidth="1.8" /><circle cx="17" cy="18" r="2" strokeWidth="1.8" /></svg>;
+    default:
+      return <svg {...shared}><path {...pathProps} d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1v7Z" /><path {...pathProps} d="M12 8v4M12 16h.01" /></svg>;
+  }
+}
+
 function ScrollToTop() {
   const { pathname, hash } = useLocation();
 
@@ -196,6 +297,77 @@ function AnsarMediaProductionPage() {
               </article>
             );
           })}
+        </section>
+      </main>
+    </Layout>
+  );
+}
+
+function LearningFeaturePage() {
+  const { slug } = useParams();
+  const feature = LEARNING_FEATURES[slug];
+
+  if (!feature) {
+    return (
+      <Layout>
+        <main className="mx-auto max-w-4xl px-4 py-24 text-center">
+          <p className="text-sm font-black uppercase tracking-widest text-emerald-600">Student-Centric Learning</p>
+          <h1 className="mt-3 text-3xl font-extrabold text-slate-900">Learning feature not found</h1>
+          <p className="mt-4 text-lg leading-relaxed text-slate-600">The campus feature you are looking for is not available.</p>
+          <Link to="/#student-centric-learning" className="mt-8 inline-flex items-center justify-center rounded-xl bg-emerald-700 px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-emerald-800">
+            Back to learning features
+          </Link>
+        </main>
+      </Layout>
+    );
+  }
+
+  return (
+    <Layout>
+      <main className="mx-auto max-w-7xl px-4 py-12 lg:py-20">
+        <section className="relative min-h-[28rem] overflow-hidden rounded-3xl bg-emerald-950 text-white shadow-2xl">
+          <img
+            src={feature.image}
+            alt={`${feature.title} at Ansar English School`}
+            className="absolute inset-0 h-full w-full object-cover opacity-45"
+            loading="eager"
+            decoding="async"
+            fetchPriority="high"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-emerald-950 via-emerald-950/88 to-slate-950/45" />
+          <div className="relative z-10 flex min-h-[28rem] max-w-4xl flex-col justify-center px-6 py-16 sm:px-10 lg:px-14">
+            <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-400 text-emerald-950 shadow-lg">
+              <LearningIcon name={feature.icon} className="h-9 w-9" />
+            </div>
+            <p className="text-sm font-extrabold uppercase tracking-widest text-amber-300">{feature.kicker}</p>
+            <h1 className="mt-3 text-4xl font-extrabold leading-tight lg:text-6xl">{feature.title}</h1>
+            <p className="mt-6 max-w-3xl text-lg leading-relaxed text-emerald-50/90 lg:text-xl">{feature.description}</p>
+          </div>
+        </section>
+
+        <section className="mt-14 grid grid-cols-1 gap-10 lg:grid-cols-[1fr_22rem] lg:items-start">
+          <div>
+            <p className="text-sm font-black uppercase tracking-widest text-emerald-600">Student-Centric Learning</p>
+            <h2 className="mt-3 text-3xl font-extrabold text-emerald-950 lg:text-5xl">Built around student comfort, curiosity, and confidence</h2>
+            <p className="mt-6 text-lg leading-relaxed text-slate-600">
+              Each facility supports the school day in a practical way: safer movement, clearer lessons, stronger participation, and more opportunities for students to learn by seeing, doing, playing, and collaborating.
+            </p>
+          </div>
+
+          <aside className="rounded-2xl border border-emerald-100 bg-emerald-50 p-6">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white text-emerald-700 shadow-sm">
+              <LearningIcon name={feature.icon} className="h-7 w-7" />
+            </div>
+            <h3 className="mt-5 text-xl font-extrabold text-emerald-950">Highlights</h3>
+            <ul className="mt-4 space-y-3">
+              {feature.points.map(point => (
+                <li key={point} className="flex gap-3 text-sm font-semibold leading-relaxed text-slate-700">
+                  <span className="mt-1.5 h-2 w-2 flex-none rounded-full bg-amber-500" />
+                  <span>{point}</span>
+                </li>
+              ))}
+            </ul>
+          </aside>
         </section>
       </main>
     </Layout>
@@ -475,6 +647,7 @@ export default function App() {
         <Route path="/achievements" element={<Achievements />} />
         <Route path="/sop" element={<DynamicPage slug="sop" />} />
         <Route path="/mandatory-public-disclosure" element={<MandatoryDisclosure />} />
+        <Route path="/learning/:slug" element={<LearningFeaturePage />} />
         <Route path="/:slug" element={<DynamicPage />} />
         
         {/* Placeholder detail routes for News/Events cards */}
