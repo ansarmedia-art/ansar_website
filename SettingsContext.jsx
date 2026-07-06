@@ -21,6 +21,7 @@ Principal
 Ansar English School, Perumpilavu`;
 
 const DEFAULT_FEE_STRUCTURE_URL = 'https://drive.google.com/file/d/1BlRQIlD4U4RjRGvVIq2Kah4xYxNjChoa/view?usp=drive_link';
+const DEFAULT_PODCAST_URL = 'https://www.youtube.com/channel/UCINzivjyBDxX2O8vzGpUOCg/';
 
 export const SettingsProvider = ({ children }) => {
   const [settings, setSettings] = useState({
@@ -31,6 +32,7 @@ export const SettingsProvider = ({ children }) => {
     youtubeUrl: 'https://youtube.com',
     twitterUrl: 'https://twitter.com',
     whatsappChannelUrl: '',
+    podcastUrl: DEFAULT_PODCAST_URL,
     premisesImages: [''],
     kgImages: [''],
     visionText: 'To empower students with academic rigor, skill and ethical leadership to serve society.',

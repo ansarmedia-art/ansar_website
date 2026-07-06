@@ -1,6 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useSettings } from './SettingsContext';
 
+function PodcastIcon({ className = "w-6 h-6" }) {
+  return (
+    <svg className={`${className} relative z-10 flex-shrink-0`} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3Z" />
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 10v2a7 7 0 0 0 14 0v-2" />
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 19v3" />
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 22h8" />
+    </svg>
+  );
+}
+
 export default function FloatingSocials() {
   const settings = useSettings();
   const [isScrolledPast, setIsScrolledPast] = useState(false);
@@ -45,6 +56,10 @@ export default function FloatingSocials() {
       <a href={settings?.youtubeUrl || "#"} target="_blank" rel="noopener noreferrer" className="group relative flex items-center justify-center p-2.5 text-slate-400 hover:text-white bg-white hover:bg-[#FF0000] rounded-xl transition-all duration-300 shadow-sm hover:shadow-lg">
         <span className="floating-icon-aura absolute inset-0 rounded-xl bg-[#FF0000]"></span>
         <svg className="w-6 h-6 relative z-10 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path fillRule="evenodd" d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z" clipRule="evenodd" /></svg>
+      </a>
+      <a href={settings?.podcastUrl || "https://www.youtube.com/channel/UCINzivjyBDxX2O8vzGpUOCg/"} target="_blank" rel="noopener noreferrer" aria-label="Podcast Channel" className="group relative flex items-center justify-center p-2.5 text-slate-400 hover:text-white bg-white hover:bg-emerald-600 rounded-xl transition-all duration-300 shadow-sm hover:shadow-lg">
+        <span className="floating-icon-aura absolute inset-0 rounded-xl bg-emerald-600"></span>
+        <PodcastIcon />
       </a>
       <a href={settings?.twitterUrl || "#"} target="_blank" rel="noopener noreferrer" className="group relative flex items-center justify-center p-2.5 text-slate-400 hover:text-white bg-white hover:bg-[#000000] rounded-xl transition-all duration-300 shadow-sm hover:shadow-lg">
         <span className="floating-icon-aura absolute inset-0 rounded-xl bg-[#000000]"></span>

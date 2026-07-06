@@ -12,6 +12,7 @@ export default function AdminSettings() {
     youtubeUrl: '',
     twitterUrl: '',
     whatsappChannelUrl: '',
+    podcastUrl: 'https://www.youtube.com/channel/UCINzivjyBDxX2O8vzGpUOCg/',
     premisesImages: [''],
     kgImages: [''],
     visionText: '',
@@ -35,6 +36,9 @@ export default function AdminSettings() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState('');
+  const juniorPrincipalItems = Array.isArray(formData.juniorPrincipals)
+    ? formData.juniorPrincipals
+    : [{ name: '', qualification: '', section: '', imageUrl: '' }];
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -82,6 +86,26 @@ export default function AdminSettings() {
     if (current.length <= 1) return;
     setFormData(prev => ({ ...prev, juniorPrincipals: current.filter((_, i) => i !== index) }));
   };
+
+  const moveJuniorPrincipal = (index, direction) => {
+    const current = Array.isArray(formData.juniorPrincipals) ? formData.juniorPrincipals : [];
+    const targetIndex = index + direction;
+    if (targetIndex < 0 || targetIndex >= current.length) return;
+
+    const next = [...current];
+    [next[index], next[targetIndex]] = [next[targetIndex], next[index]];
+    setFormData(prev => ({ ...prev, juniorPrincipals: next }));
+  };
+
+  const normalizeJuniorPrincipals = (leaders) => {
+    const current = Array.isArray(leaders) ? leaders : [];
+    return current.map((leader, index) => ({
+      ...leader,
+      qualification: leader.qualification || leader.qualifications || '',
+      order: index + 1
+    }));
+  };
+
   const addArrayItem = (field) => {
     setFormData(prev => ({ ...prev, [field]: [...prev[field], ''] }));
   };
@@ -98,6 +122,7 @@ export default function AdminSettings() {
     try {
       await setDoc(doc(db, 'settings', 'global'), {
         ...formData,
+        juniorPrincipals: normalizeJuniorPrincipals(formData.juniorPrincipals),
         updatedAt: serverTimestamp()
       }, { merge: true });
       setMessage('Settings updated successfully!');
@@ -110,7 +135,7 @@ export default function AdminSettings() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="mx-auto max-w-6xl">
       <div className="bg-white p-8 rounded-2xl shadow-xl border border-emerald-100">
         <h2 className="text-xl font-bold mb-8 text-slate-800">Global Website Settings</h2>
         
@@ -192,14 +217,28 @@ export default function AdminSettings() {
               </div>
             </div>
             <div className="space-y-3 rounded-xl border border-white bg-white p-4 shadow-sm">
-              <h4 className="font-bold text-emerald-800">Junior Principals</h4>
-              {(Array.isArray(formData.juniorPrincipals) ? formData.juniorPrincipals : [{ name: '', qualification: '', section: '', imageUrl: '' }]).map((leader, index) => (
-                <div key={`junior-${index}`} className="grid grid-cols-1 gap-2 border-b border-slate-100 pb-3 md:grid-cols-[1fr_1fr_1fr_1.3fr_auto]">
-                  <input value={leader.name || ''} onChange={(e) => handleJuniorPrincipalChange(index, 'name', e.target.value)} placeholder="Name" className="p-2 border border-slate-200 rounded-lg outline-none" />
-                  <input value={leader.qualification || leader.qualifications || ''} onChange={(e) => handleJuniorPrincipalChange(index, 'qualification', e.target.value)} placeholder="Qualifications" className="p-2 border border-slate-200 rounded-lg outline-none" />
-                  <input value={leader.section || ''} onChange={(e) => handleJuniorPrincipalChange(index, 'section', e.target.value)} placeholder="Section" className="p-2 border border-slate-200 rounded-lg outline-none" />
-                  <input value={leader.imageUrl || ''} onChange={(e) => handleJuniorPrincipalChange(index, 'imageUrl', e.target.value)} placeholder="Image URL" className="p-2 border border-slate-200 rounded-lg outline-none" />
-                  <button type="button" onClick={() => removeJuniorPrincipal(index)} disabled={(formData.juniorPrincipals || []).length <= 1} className="px-3 py-2 text-sm font-bold text-red-600 hover:bg-red-50 rounded-lg disabled:opacity-50">Remove</button>
+              <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                <h4 className="font-bold text-emerald-800">Junior Principals</h4>
+                <p className="text-xs font-bold uppercase tracking-wide text-slate-400">Use Up / Down to set website order</p>
+              </div>
+              {juniorPrincipalItems.map((leader, index) => (
+                <div key={`junior-${index}`} className="space-y-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="inline-flex h-9 w-fit items-center rounded-lg bg-slate-100 px-3 text-sm font-black text-slate-600">
+                      #{index + 1}
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <button type="button" onClick={() => moveJuniorPrincipal(index, -1)} disabled={index === 0} className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-bold text-slate-700 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40">Up</button>
+                      <button type="button" onClick={() => moveJuniorPrincipal(index, 1)} disabled={index === juniorPrincipalItems.length - 1} className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-bold text-slate-700 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40">Down</button>
+                      <button type="button" onClick={() => removeJuniorPrincipal(index)} disabled={juniorPrincipalItems.length <= 1} className="rounded-lg border border-red-100 px-3 py-2 text-sm font-bold text-red-600 transition-colors hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50">Remove</button>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 gap-3 lg:grid-cols-2 xl:grid-cols-4">
+                    <input value={leader.name || ''} onChange={(e) => handleJuniorPrincipalChange(index, 'name', e.target.value)} placeholder="Name" className="min-w-0 rounded-lg border border-slate-200 p-3 outline-none focus:ring-2 focus:ring-emerald-500" />
+                    <input value={leader.qualification || leader.qualifications || ''} onChange={(e) => handleJuniorPrincipalChange(index, 'qualification', e.target.value)} placeholder="Qualifications" className="min-w-0 rounded-lg border border-slate-200 p-3 outline-none focus:ring-2 focus:ring-emerald-500" />
+                    <input value={leader.section || ''} onChange={(e) => handleJuniorPrincipalChange(index, 'section', e.target.value)} placeholder="Section" className="min-w-0 rounded-lg border border-slate-200 p-3 outline-none focus:ring-2 focus:ring-emerald-500" />
+                    <input value={leader.imageUrl || ''} onChange={(e) => handleJuniorPrincipalChange(index, 'imageUrl', e.target.value)} placeholder="Image URL" className="min-w-0 rounded-lg border border-slate-200 p-3 outline-none focus:ring-2 focus:ring-emerald-500" />
+                  </div>
                 </div>
               ))}
               <button type="button" onClick={addJuniorPrincipal} className="text-sm font-bold text-emerald-600 hover:bg-emerald-50 py-2 px-3 rounded-lg">+ Add Junior Principal</button>
@@ -246,7 +285,7 @@ export default function AdminSettings() {
           <div className="space-y-4 p-5 bg-slate-50 border border-slate-100 rounded-xl">
             <h3 className="font-extrabold text-slate-900 mb-2">Social Media Handles</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {['facebookUrl', 'instagramUrl', 'youtubeUrl', 'twitterUrl', 'whatsappChannelUrl'].map(network => (
+              {['facebookUrl', 'instagramUrl', 'youtubeUrl', 'twitterUrl', 'whatsappChannelUrl', 'podcastUrl'].map(network => (
                 <div key={network}>
                   <label className="block text-sm font-bold text-slate-700 mb-2 capitalize">{network.replace('Url', '')}</label>
                   <input name={network} type="url" value={formData[network]} onChange={handleChange} className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" />

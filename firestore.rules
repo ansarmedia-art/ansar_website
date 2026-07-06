@@ -226,7 +226,7 @@ service cloud.firestore {
       return hasOnlyAllowedFields([
                'schoolName', 'email', 'phone', 'address', 'logoUrl', 
                'siteDescription', 'siteKeywords', 'heroTitle', 
-               'facebookUrl', 'instagramUrl', 'youtubeUrl', 'twitterUrl', 'whatsappChannelUrl', 
+               'facebookUrl', 'instagramUrl', 'youtubeUrl', 'twitterUrl', 'whatsappChannelUrl', 'podcastUrl', 
                'premisesImages', 'kgImages', 'visionText', 'missionText', 'feeStructurePdfUrl',
                'directorName', 'directorQualifications', 'directorRole', 'directorImageUrl', 'directorMessage',
                'principalName', 'principalQualifications', 'principalRole', 'principalImageUrl', 'principalMessage',
@@ -266,6 +266,7 @@ service cloud.firestore {
              isValidUrl('youtubeUrl') &&
              isValidUrl('twitterUrl') &&
              isValidUrl('whatsappChannelUrl') &&
+             isValidUrl('podcastUrl') &&
              isOptionalTimestamp('createdAt') &&
              isOptionalTimestamp('updatedAt');
     }

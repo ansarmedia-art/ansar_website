@@ -164,7 +164,13 @@ function LeadershipProfile({ profile, reverse = false }) {
     >
       <div className={`relative min-h-[20rem] bg-emerald-950 ${reverse ? 'lg:order-2' : ''}`}>
         {imageUrl ? (
-          <img src={imageUrl} alt={profile.name} className="absolute inset-0 h-full w-full object-cover object-center" loading="lazy" />
+          <img
+            src={imageUrl}
+            alt={profile.name}
+            className="absolute inset-0 h-full w-full object-cover"
+            style={{ objectPosition: reverse ? '75% center' : 'center' }}
+            loading="lazy"
+          />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center bg-emerald-950 text-emerald-100">
             <svg className="h-20 w-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0zM12 14a7 7 0 0 0-7 7h14a7 7 0 0 0-7-7z" /></svg>
@@ -222,6 +228,24 @@ function JuniorPrincipalTile({ leader, index }) {
       </div>
     </motion.article>
   );
+}
+
+function getJuniorPrincipalGridClass(count) {
+  return count === 7
+    ? 'grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-8'
+    : 'grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5';
+}
+
+function getJuniorPrincipalItemClass(count, index) {
+  if (count !== 7) return '';
+
+  const centeredSecondRow = {
+    4: 'lg:col-start-2',
+    5: 'lg:col-start-4',
+    6: 'lg:col-start-6'
+  };
+
+  return `lg:col-span-2 ${centeredSecondRow[index] || ''}`;
 }
 
 export default function Home() {
@@ -320,7 +344,7 @@ export default function Home() {
       <AnimatedSection className="mt-32">
         <div className="text-center mb-12">
           <p className="text-emerald-600 font-black uppercase tracking-widest text-sm mb-3">Campus Infrastructure</p>
-          <h2 className="text-4xl lg:text-5xl font-extrabold text-emerald-950">Student-centric learning</h2>
+          <h2 className="text-4xl lg:text-5xl font-extrabold text-emerald-950">Student-Centric Learning</h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 auto-rows-[160px]">
           {FALLBACK_FEATURES.map((feature, i) => (
@@ -391,9 +415,11 @@ export default function Home() {
           {juniorPrincipals.length > 0 && (
             <div className="pt-8">
               <h3 className="mb-8 text-center text-3xl font-extrabold text-emerald-950">Junior Principals</h3>
-              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
+              <div className={getJuniorPrincipalGridClass(juniorPrincipals.length)}>
                 {juniorPrincipals.map((leader, index) => (
-                  <JuniorPrincipalTile key={`${leader.name || 'junior'}-${index}`} leader={leader} index={index} />
+                  <div key={`${leader.name || 'junior'}-${index}`} className={getJuniorPrincipalItemClass(juniorPrincipals.length, index)}>
+                    <JuniorPrincipalTile leader={leader} index={index} />
+                  </div>
                 ))}
               </div>
             </div>
