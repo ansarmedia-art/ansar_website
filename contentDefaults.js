@@ -21,6 +21,21 @@ export const DEFAULT_SPORTS_PAGE = {
       title: 'Horse Riding',
       description: 'Confidence-building riding exposure that supports balance, posture, focus, and responsible care.',
       imageUrl: ''
+    },
+    {
+      title: 'Kabadi',
+      description: 'Strength, agility, teamwork, and quick decision-making through structured kabadi practice.',
+      imageUrl: ''
+    },
+    {
+      title: 'Taekwondo',
+      description: 'Martial arts training that develops discipline, flexibility, self-control, confidence, and physical fitness.',
+      imageUrl: ''
+    },
+    {
+      title: 'Skating',
+      description: 'Balance, coordination, endurance, and confidence building through guided skating sessions.',
+      imageUrl: ''
     }
   ]
 };

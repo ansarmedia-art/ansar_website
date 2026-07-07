@@ -44,6 +44,23 @@ export default function AdminAcademics() {
     setFormData(prev => ({ ...prev, [listName]: next }));
   };
 
+  const addSport = () => {
+    setFormData(prev => ({
+      ...prev,
+      sportsItems: [
+        ...prev.sportsItems,
+        { title: '', description: '', imageUrl: '' }
+      ]
+    }));
+  };
+
+  const removeSport = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      sportsItems: prev.sportsItems.filter((_, itemIndex) => itemIndex !== index)
+    }));
+  };
+
   const normalizeItems = (items) => items.map(item => ({
     title: item.title || '',
     description: item.description || '',
@@ -108,7 +125,17 @@ export default function AdminAcademics() {
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
               {formData.sportsItems.map((sport, index) => (
                 <div key={`sport-${index}`} className="space-y-3 rounded-xl border border-white bg-white p-4 shadow-sm">
-                  <h4 className="font-bold text-emerald-800">{sport.title || `Sport ${index + 1}`}</h4>
+                  <div className="flex items-center justify-between gap-3">
+                    <h4 className="font-bold text-emerald-800">{sport.title || `Sport ${index + 1}`}</h4>
+                    <button
+                      type="button"
+                      onClick={() => removeSport(index)}
+                      disabled={formData.sportsItems.length <= 1}
+                      className="rounded-lg border border-red-100 px-3 py-2 text-sm font-bold text-red-600 transition-colors hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                      Remove
+                    </button>
+                  </div>
                   <input value={sport.title || ''} onChange={(event) => handleListChange('sportsItems', index, 'title', event.target.value)} placeholder="Sport title" className="w-full rounded-lg border border-slate-200 p-3 outline-none focus:ring-2 focus:ring-emerald-500" />
                   <textarea value={sport.description || ''} onChange={(event) => handleListChange('sportsItems', index, 'description', event.target.value)} placeholder="Sport description" className="h-24 w-full rounded-lg border border-slate-200 p-3 outline-none focus:ring-2 focus:ring-emerald-500" />
                   <input value={sport.imageUrl || ''} onChange={(event) => handleListChange('sportsItems', index, 'imageUrl', event.target.value)} placeholder="Image URL" className="w-full rounded-lg border border-slate-200 p-3 outline-none focus:ring-2 focus:ring-emerald-500" />
@@ -116,6 +143,9 @@ export default function AdminAcademics() {
                 </div>
               ))}
             </div>
+            <button type="button" onClick={addSport} className="rounded-lg bg-white px-4 py-2 text-sm font-bold text-emerald-700 shadow-sm ring-1 ring-emerald-100 transition-colors hover:bg-emerald-50">
+              + Add Sport
+            </button>
           </section>
 
           <section className="space-y-4 rounded-xl border border-slate-100 bg-slate-50 p-6">
