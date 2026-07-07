@@ -8,6 +8,7 @@ export default {
     extend: {
       fontFamily: {
         sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+        title: ['"Nexa Bold"', '"Nexa"', '"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
       },
       colors: {
         // Hijacking "emerald" classes and replacing with Institutional Deep Blue

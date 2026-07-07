@@ -201,9 +201,19 @@ const LEARNING_FEATURES = {
     title: 'Safe school transport',
     kicker: 'Reliable travel',
     icon: 'bus',
-    image: 'https://images.unsplash.com/photo-1570125909232-eb263c188f7e?q=90&w=2400&auto=format&fit=crop',
-    description: 'Safe school transport supports dependable student travel between home and campus. The service is designed around regularity, care, and parent confidence.',
-    points: ['Reliable transport support for students', 'Care-focused daily travel routines', 'Designed for family confidence and convenience']
+    image: 'https://i.ibb.co/XfX9K6Yv/D3-ZTUDIO-PR0.jpg',
+    galleryImages: [
+      'https://i.ibb.co/XfX9K6Yv/D3-ZTUDIO-PR0.jpg',
+      'https://i.ibb.co/mC8JsJD8/D3-ZTUDIO-PR0-2.jpg',
+      'https://i.ibb.co/0y8kKwBz/D3-ZTUDIO-PR0-3.jpg',
+      'https://i.ibb.co/fbFfzHV/D3-ZTUDIO-PR0-4.jpg'
+    ],
+    description: 'Safe school transport at Ansar English School provides dependable daily travel support for students across different routes. The facility is planned around safety, punctuality, care, and parent confidence.',
+    body: [
+      'Ansar English School operates 30+ school buses across different routes, helping students travel between home and campus in a regular, organized, and comfortable way. The transport facility is designed to make the school day easier for families while ensuring that students can reach the campus on time and return home through a dependable route system.',
+      'Every bus has staff members assigned to look after students throughout the journey. Their presence helps maintain discipline, assist younger children, guide boarding and dropping routines, and support student safety from the time they enter the bus until they reach their destination. With careful coordination, route coverage, and attentive supervision, the school transport facility reflects Ansar English School\'s commitment to student care beyond the classroom.'
+    ],
+    points: ['30+ school buses running on different routes', 'Staff present in every bus to care for students', 'Organized travel routines for safe daily movement']
   }
 };
 
@@ -231,6 +241,74 @@ function LearningIcon({ name, className = 'h-8 w-8' }) {
     default:
       return <svg {...shared}><path {...pathProps} d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1v7Z" /><path {...pathProps} d="M12 8v4M12 16h.01" /></svg>;
   }
+}
+
+function LearningImageCarousel({ feature }) {
+  const images = feature.galleryImages?.length ? feature.galleryImages : [feature.image].filter(Boolean);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const hasMultipleImages = images.length > 1;
+  const currentImage = images[activeIndex] || feature.image;
+
+  const goToPrevious = () => {
+    setActiveIndex((current) => (current === 0 ? images.length - 1 : current - 1));
+  };
+
+  const goToNext = () => {
+    setActiveIndex((current) => (current === images.length - 1 ? 0 : current + 1));
+  };
+
+  return (
+    <div className="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
+      <div className="relative aspect-[4/3] bg-slate-100">
+        <img
+          src={currentImage}
+          alt={`${feature.title} facility view ${activeIndex + 1}`}
+          className="absolute inset-0 h-full w-full object-cover"
+          loading="lazy"
+          decoding="async"
+        />
+        {hasMultipleImages && (
+          <>
+            <button
+              type="button"
+              onClick={goToPrevious}
+              className="absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-emerald-950 shadow-md ring-1 ring-black/5 transition-colors hover:bg-white"
+              aria-label="Previous facility image"
+            >
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 18 9 12l6-6" />
+              </svg>
+            </button>
+            <button
+              type="button"
+              onClick={goToNext}
+              className="absolute right-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-emerald-950 shadow-md ring-1 ring-black/5 transition-colors hover:bg-white"
+              aria-label="Next facility image"
+            >
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m9 18 6-6-6-6" />
+              </svg>
+            </button>
+          </>
+        )}
+      </div>
+
+      {hasMultipleImages && (
+        <div className="flex items-center justify-center gap-2 px-4 py-4">
+          {images.map((image, index) => (
+            <button
+              key={image}
+              type="button"
+              onClick={() => setActiveIndex(index)}
+              className={`h-2.5 rounded-full transition-all ${activeIndex === index ? 'w-8 bg-emerald-700' : 'w-2.5 bg-slate-300 hover:bg-slate-400'}`}
+              aria-label={`Show facility image ${index + 1}`}
+              aria-current={activeIndex === index ? 'true' : undefined}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 function ScrollToTop() {
@@ -350,25 +428,33 @@ function LearningFeaturePage() {
           <div>
             <p className="text-sm font-black uppercase tracking-widest text-emerald-600">Student-Centric Learning</p>
             <h2 className="mt-3 text-3xl font-extrabold text-emerald-950 lg:text-5xl">Built around student comfort, curiosity, and confidence</h2>
-            <p className="mt-6 text-lg leading-relaxed text-slate-600">
-              Each facility supports the school day in a practical way: safer movement, clearer lessons, stronger participation, and more opportunities for students to learn by seeing, doing, playing, and collaborating.
-            </p>
+            {(feature.body || [
+              'Each facility supports the school day in a practical way: safer movement, clearer lessons, stronger participation, and more opportunities for students to learn by seeing, doing, playing, and collaborating.'
+            ]).map((paragraph) => (
+              <p key={paragraph} className="mt-6 text-lg leading-relaxed text-slate-600">
+                {paragraph}
+              </p>
+            ))}
           </div>
 
-          <aside className="rounded-2xl border border-emerald-100 bg-emerald-50 p-6">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white text-emerald-700 shadow-sm">
-              <LearningIcon name={feature.icon} className="h-7 w-7" />
-            </div>
-            <h3 className="mt-5 text-xl font-extrabold text-emerald-950">Highlights</h3>
-            <ul className="mt-4 space-y-3">
-              {feature.points.map(point => (
-                <li key={point} className="flex gap-3 text-sm font-semibold leading-relaxed text-slate-700">
-                  <span className="mt-1.5 h-2 w-2 flex-none rounded-full bg-amber-500" />
-                  <span>{point}</span>
-                </li>
-              ))}
-            </ul>
-          </aside>
+          <div className="space-y-6">
+            <LearningImageCarousel feature={feature} />
+
+            <aside className="rounded-2xl border border-emerald-100 bg-emerald-50 p-6">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white text-emerald-700 shadow-sm">
+                <LearningIcon name={feature.icon} className="h-7 w-7" />
+              </div>
+              <h3 className="mt-5 text-xl font-extrabold text-emerald-950">Highlights</h3>
+              <ul className="mt-4 space-y-3">
+                {feature.points.map(point => (
+                  <li key={point} className="flex gap-3 text-sm font-semibold leading-relaxed text-slate-700">
+                    <span className="mt-1.5 h-2 w-2 flex-none rounded-full bg-amber-500" />
+                    <span>{point}</span>
+                  </li>
+                ))}
+              </ul>
+            </aside>
+          </div>
         </section>
       </main>
     </Layout>
