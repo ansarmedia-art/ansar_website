@@ -1,12 +1,15 @@
 {
   "name": "Ansar English School Perumpilavu",
   "short_name": "Ansar School",
-  "description": "News, events, notices, and updates from Ansar English School.",
+  "description": "Ansar English School, Perumpilavu is a leading CBSE Senior Secondary School in Thrissur, Kerala.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "background_color": "#f8fbff",
-  "theme_color": "#0b3c5d",
+  "theme_color": "#047857",
+  "categories": ["education", "school"],
+  "lang": "en-IN",
+  "orientation": "portrait-primary",
   "icons": [
     {
       "src": "/ansar-logo.png",

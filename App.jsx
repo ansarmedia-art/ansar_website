@@ -40,6 +40,135 @@ const ADMIN_EMAILS = [
   'ansarschooloffice@gmail.com'
 ];
 
+const SITE_URL = 'https://ansarschool.in';
+const DEFAULT_SEO = {
+  title: 'Best CBSE School in Thrissur, Kerala | Ansar English School',
+  description: 'Ansar English School, Perumpilavu is a leading CBSE Senior Secondary School in Thrissur, Kerala with NABET accreditation, 42+ years of excellence, modern facilities, and value-based education.',
+  keywords: 'best CBSE school in Thrissur, CBSE school Thrissur Kerala, Ansar English School, CBSE school Perumpilavu, top school in Thrissur, senior secondary school Kerala'
+};
+
+const ROUTE_SEO = {
+  '/': DEFAULT_SEO,
+  '/about': {
+    title: 'About Ansar English School | CBSE School in Thrissur',
+    description: 'Learn about Ansar English School, a NABET accredited CBSE Senior Secondary School in Perumpilavu, Thrissur with a legacy of academic excellence and value-based education.',
+    keywords: 'about Ansar English School, NABET accredited school Thrissur, CBSE Senior Secondary School Thrissur'
+  },
+  '/academics': {
+    title: 'CBSE Academics in Thrissur | Ansar English School',
+    description: 'Explore the CBSE curriculum, smart classrooms, labs, enrichment programmes, and academic pathway at Ansar English School, Perumpilavu, Thrissur.',
+    keywords: 'CBSE curriculum Thrissur, CBSE academics Kerala, Ansar English School academics'
+  },
+  '/admission': {
+    title: 'CBSE School Admission in Thrissur | Ansar English School',
+    description: 'Apply for admission to Ansar English School, Perumpilavu, a leading CBSE school in Thrissur, Kerala with strong academics, facilities, and student care.',
+    keywords: 'CBSE school admission Thrissur, school admission Perumpilavu, Ansar English School admission'
+  },
+  '/contact': {
+    title: 'Contact Ansar English School | Perumpilavu, Thrissur',
+    description: 'Contact Ansar English School, Perumpilavu, Karikkad P.O, Thrissur, Kerala for admission queries, campus location, phone, email, and school office support.',
+    keywords: 'Ansar English School contact, CBSE school Perumpilavu address, school in Thrissur phone'
+  },
+  '/gallery': {
+    title: 'Campus Gallery | Ansar English School Thrissur',
+    description: 'View photos and campus moments from Ansar English School, a CBSE Senior Secondary School in Perumpilavu, Thrissur, Kerala.',
+    keywords: 'Ansar English School gallery, CBSE school campus Thrissur, Perumpilavu school photos'
+  },
+  '/news': {
+    title: 'School News | Ansar English School Thrissur',
+    description: 'Latest news, announcements, achievements, and updates from Ansar English School, Perumpilavu, Thrissur.',
+    keywords: 'Ansar English School news, Thrissur school updates, CBSE school news Kerala'
+  },
+  '/events': {
+    title: 'School Events | Ansar English School Thrissur',
+    description: 'Explore school events, celebrations, competitions, and activities at Ansar English School, Perumpilavu, Thrissur.',
+    keywords: 'Ansar English School events, CBSE school events Thrissur, Perumpilavu school activities'
+  },
+  '/achievements': {
+    title: 'Achievements | Ansar English School Thrissur',
+    description: 'Student achievements, academic honours, competitions, and milestones from Ansar English School, Perumpilavu, Thrissur.',
+    keywords: 'Ansar English School achievements, CBSE school achievements Thrissur, student achievements Kerala'
+  },
+  '/mandatory-public-disclosure': {
+    title: 'Mandatory Public Disclosure | Ansar English School',
+    description: 'CBSE mandatory public disclosure documents and official school information for Ansar English School, Perumpilavu, Thrissur.',
+    keywords: 'CBSE mandatory public disclosure Ansar English School, school disclosure Thrissur'
+  }
+};
+
+function setMetaTag(selector, attributes) {
+  let tag = document.head.querySelector(selector);
+  if (!tag) {
+    tag = document.createElement('meta');
+    document.head.appendChild(tag);
+  }
+  Object.entries(attributes).forEach(([key, value]) => tag.setAttribute(key, value));
+}
+
+function setLinkTag(selector, attributes) {
+  let tag = document.head.querySelector(selector);
+  if (!tag) {
+    tag = document.createElement('link');
+    document.head.appendChild(tag);
+  }
+  Object.entries(attributes).forEach(([key, value]) => tag.setAttribute(key, value));
+}
+
+function getSeoForPath(pathname) {
+  if (pathname.startsWith('/admin')) {
+    return {
+      ...DEFAULT_SEO,
+      title: 'Admin Portal | Ansar English School',
+      description: 'Authorized administration portal for Ansar English School.',
+      noIndex: true
+    };
+  }
+  if (pathname.startsWith('/news/')) return ROUTE_SEO['/news'];
+  if (pathname.startsWith('/events/')) return ROUTE_SEO['/events'];
+  if (pathname.startsWith('/achievements/')) return ROUTE_SEO['/achievements'];
+  if (pathname.startsWith('/learning/')) {
+    return {
+      title: 'Learning Facilities | Ansar English School Thrissur',
+      description: 'Explore learning facilities, smart classrooms, labs, safety, transport, and student support at Ansar English School, Perumpilavu, Thrissur.',
+      keywords: 'CBSE school facilities Thrissur, smart classrooms Thrissur, school transport Perumpilavu'
+    };
+  }
+  return ROUTE_SEO[pathname] || {
+    title: 'Ansar English School | CBSE School in Thrissur, Kerala',
+    description: 'Explore Ansar English School, a CBSE Senior Secondary School in Perumpilavu, Thrissur, Kerala known for academic excellence, student care, and value-based education.',
+    keywords: DEFAULT_SEO.keywords
+  };
+}
+
+function SiteSeo() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    const seo = getSeoForPath(pathname);
+    const canonicalPath = pathname === '/' ? '/' : pathname.replace(/\/$/, '');
+    const canonicalUrl = `${SITE_URL}${canonicalPath}`;
+    const imageUrl = `${SITE_URL}/ansar-logo.png`;
+
+    document.title = seo.title;
+    setMetaTag('meta[name="description"]', { name: 'description', content: seo.description });
+    setMetaTag('meta[name="keywords"]', { name: 'keywords', content: seo.keywords || DEFAULT_SEO.keywords });
+    setMetaTag('meta[name="robots"]', {
+      name: 'robots',
+      content: seo.noIndex ? 'noindex, nofollow' : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'
+    });
+    setLinkTag('link[rel="canonical"]', { rel: 'canonical', href: canonicalUrl });
+    setMetaTag('meta[property="og:title"]', { property: 'og:title', content: seo.title });
+    setMetaTag('meta[property="og:description"]', { property: 'og:description', content: seo.description });
+    setMetaTag('meta[property="og:url"]', { property: 'og:url', content: canonicalUrl });
+    setMetaTag('meta[property="og:image"]', { property: 'og:image', content: imageUrl });
+    setMetaTag('meta[name="twitter:title"]', { name: 'twitter:title', content: seo.title });
+    setMetaTag('meta[name="twitter:description"]', { name: 'twitter:description', content: seo.description });
+    setMetaTag('meta[name="twitter:image"]', { name: 'twitter:image', content: imageUrl });
+  }, [pathname]);
+
+  return null;
+}
+
 const SAMPLE_PAGES = {
   'sports-page': {
     title: 'Sports',
@@ -758,6 +887,7 @@ export default function App() {
   return (
     <SettingsProvider>
     <Router>
+      <SiteSeo />
       <ScrollToTop />
       <Routes>
         {/* Public Website Routes */}
