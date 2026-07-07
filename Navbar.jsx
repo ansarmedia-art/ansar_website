@@ -50,7 +50,7 @@ export default function Navbar() {
               />
             </span>
             <div className="hidden sm:flex flex-col border-l-2 border-white/25 pl-3 ml-1">
-              <span className="block font-extrabold text-white text-lg leading-tight tracking-tight">Ansar English School</span>
+              <span className="block text-lg font-extrabold uppercase leading-tight tracking-wide text-white">ANSAR ENGLISH SCHOOL</span>
               <div className="flex items-center gap-2 mt-0.5">
                 <span className="block text-emerald-100 text-[10px] font-bold uppercase tracking-widest">Perumpilavu</span>
                 <span className="block bg-amber-100 text-amber-800 text-[9px] font-bold px-1.5 py-0.5 rounded-sm uppercase tracking-widest">NABET Accredited</span>
@@ -83,7 +83,7 @@ export default function Navbar() {
                     <Link key={page.id || page.slug} to={`/${page.slug}`} onClick={() => setIsMoreOpen(false)} className="px-4 py-2 text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">{page.title}</Link>
                   ))}
                   <div className="border-t border-slate-100 my-1"></div>
-                  <Link to="/admin" className="px-4 py-2 text-sm font-bold text-emerald-700 hover:bg-emerald-50 transition-colors">Login / Account</Link>
+                  <Link to="/admin" className="px-4 py-2 text-sm font-bold text-emerald-700 hover:bg-emerald-50 transition-colors">Admin Login</Link>
                 </div>
               )}
             </div>
@@ -121,7 +121,7 @@ export default function Navbar() {
             ))}
             <Link to="/contact" onClick={() => setIsOpen(false)} className="block rounded-lg px-4 py-3 text-base text-white font-bold hover:bg-white/10 hover:text-amber-300">Contact Us</Link>
             <div className="mt-2 border-t border-white/10 pt-2">
-              <Link to="/admin" onClick={() => setIsOpen(false)} className="block rounded-lg px-4 py-3 text-base text-amber-300 font-extrabold hover:bg-white/10 hover:text-white">Login / Account</Link>
+              <Link to="/admin" onClick={() => setIsOpen(false)} className="block rounded-lg px-4 py-3 text-base text-amber-300 font-extrabold hover:bg-white/10 hover:text-white">Admin Login</Link>
             </div>
           </div>
         </div>

@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from './firebase-init';
+import { DEFAULT_ACADEMIC_SECTIONS, DEFAULT_SPORTS_PAGE, mergeListWithDefaults } from './contentDefaults';
 
 const SettingsContext = createContext();
 
@@ -67,6 +68,10 @@ export const SettingsProvider = ({ children }) => {
     feeStructurePdfUrl: DEFAULT_FEE_STRUCTURE_URL,
     sustainabilityDesc: 'At our school, the Year of Sustainability is dedicated to nurturing environmentally responsible and socially conscious learners. Through awareness, action, and innovation, we encourage students to embrace sustainable practices and become active contributors to a greener future.',
     sustainabilityLogoUrl: '',
+    sportsPageTitle: DEFAULT_SPORTS_PAGE.title,
+    sportsPageDescription: DEFAULT_SPORTS_PAGE.description,
+    sportsItems: DEFAULT_SPORTS_PAGE.items,
+    academicSections: DEFAULT_ACADEMIC_SECTIONS,
     _isLoaded: false
   });
 
@@ -79,6 +84,10 @@ export const SettingsProvider = ({ children }) => {
           ...savedSettings,
           feeStructureTitle: savedSettings.feeStructureTitle || prev.feeStructureTitle,
           feeStructurePdfUrl: savedSettings.feeStructurePdfUrl || prev.feeStructurePdfUrl,
+          sportsPageTitle: savedSettings.sportsPageTitle || prev.sportsPageTitle,
+          sportsPageDescription: savedSettings.sportsPageDescription || prev.sportsPageDescription,
+          sportsItems: mergeListWithDefaults(savedSettings.sportsItems, DEFAULT_SPORTS_PAGE.items),
+          academicSections: mergeListWithDefaults(savedSettings.academicSections, DEFAULT_ACADEMIC_SECTIONS),
           _isLoaded: true
         }));
       } else {

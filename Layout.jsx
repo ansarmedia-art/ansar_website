@@ -2,6 +2,7 @@ import React from 'react';
 import Navbar from './Navbar';
 import Footer from './Footer';
 import FloatingSocials from './FloatingSocials';
+import InstallPrompt from './InstallPrompt';
 
 export default function Layout({ children, isHome = false }) {
   return (
@@ -14,6 +15,7 @@ export default function Layout({ children, isHome = false }) {
       </main>
       
       <Footer />
+      <InstallPrompt />
       
       {/* Sticky Socials dock only renders on the Home screen */}
       {isHome && <FloatingSocials />}

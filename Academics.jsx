@@ -3,6 +3,7 @@ import Layout from './Layout';
 import ContentPageLayout from './ContentPageLayout';
 import { useFirestoreCollection } from './useFirestoreCollection';
 import { useSettings } from './SettingsContext';
+import { DEFAULT_ACADEMIC_SECTIONS, mergeListWithDefaults } from './contentDefaults';
 
 const ACADEMIC_FOCUS = [
   {
@@ -17,13 +18,6 @@ const ACADEMIC_FOCUS = [
     title: 'Competitive Readiness',
     body: 'Focused support for board exams, skill development, and entrance-oriented preparation.'
   }
-];
-
-const LEARNING_STAGES = [
-  ['Ansar Sprouts', 'Play-based early learning for confidence, language, movement, and social growth.'],
-  ['Primary School', 'Strong foundations in literacy, numeracy, environmental awareness, and expression.'],
-  ['Middle School', 'Concept clarity, analytical thinking, communication skills, and guided exploration.'],
-  ['Senior Secondary', 'Subject depth, practical work, projects, and focused CBSE exam preparation.']
 ];
 
 function AcademicsHighlights() {
@@ -42,6 +36,62 @@ function AcademicsHighlights() {
             <p className="mt-3 text-sm leading-relaxed text-slate-600">{item.body}</p>
           </div>
         ))}
+      </div>
+    </section>
+  );
+}
+
+function SectionImage({ imageUrl, title }) {
+  if (imageUrl) {
+    return (
+      <img
+        src={imageUrl}
+        alt={`${title} at Ansar English School`}
+        className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+        loading="lazy"
+        decoding="async"
+      />
+    );
+  }
+
+  return (
+    <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-emerald-50 via-white to-amber-50 text-center">
+      <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white text-emerald-700 shadow-sm ring-1 ring-emerald-100">
+        <svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M4 19.5V5.75A2.75 2.75 0 0 1 6.75 3H20v14H6.75A2.75 2.75 0 0 0 4 19.75M4 19.5A1.5 1.5 0 0 0 5.5 21H20M8 7h8M8 11h6" />
+        </svg>
+      </div>
+      <p className="mt-4 text-xs font-black uppercase tracking-widest text-slate-400">Image Holder</p>
+      <p className="mt-1 px-6 text-sm font-bold text-slate-600">{title}</p>
+    </div>
+  );
+}
+
+function AcademicSections({ sections }) {
+  return (
+    <section className="mt-16">
+      <div className="mx-auto mb-10 max-w-3xl text-center">
+        <p className="text-sm font-black uppercase tracking-widest text-emerald-600">Academic Sections</p>
+        <h2 className="mt-3 text-3xl font-extrabold text-slate-900 lg:text-4xl">A pathway for every stage of learning</h2>
+        <p className="mt-4 text-base leading-relaxed text-slate-600">Each section has its own learning rhythm, mentoring approach, and space for future photographs from the admin panel.</p>
+      </div>
+
+      <div className="space-y-8">
+        {sections.map((section, index) => {
+          const reverse = index % 2 === 1;
+          return (
+            <article key={`${section.title}-${index}`} className="grid grid-cols-1 items-stretch overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm md:grid-cols-2">
+              <div className={`group relative min-h-72 overflow-hidden bg-slate-100 ${reverse ? 'md:order-2' : ''}`}>
+                <SectionImage imageUrl={section.imageUrl} title={section.title} />
+              </div>
+              <div className="flex flex-col justify-center p-7 sm:p-10">
+                <p className="text-xs font-black uppercase tracking-widest text-amber-600">Section {index + 1}</p>
+                <h3 className="mt-3 text-2xl font-extrabold text-slate-900 lg:text-3xl">{section.title}</h3>
+                <p className="mt-4 text-base leading-relaxed text-slate-600">{section.description}</p>
+              </div>
+            </article>
+          );
+        })}
       </div>
     </section>
   );
@@ -81,6 +131,7 @@ export default function Academics() {
   const { data: pages } = useFirestoreCollection('pages');
   const page = pages.find(p => p.slug === 'academics');
   const settings = useSettings();
+  const academicSections = mergeListWithDefaults(settings?.academicSections, DEFAULT_ACADEMIC_SECTIONS);
 
   const handlePdfDownload = (url) => {
     if (!url) return;
@@ -107,6 +158,7 @@ export default function Academics() {
             dangerouslySetInnerHTML={{ __html: page.bodyHtml }}
           />
           <AcademicsHighlights />
+          <AcademicSections sections={academicSections} />
         </ContentPageLayout>
       </Layout>
     );
@@ -156,17 +208,7 @@ export default function Academics() {
 
         <AcademicsHighlights />
 
-        <div className="mb-16 mt-16">
-          <h2 className="text-3xl font-extrabold text-slate-900 mb-8 text-center">The 4 Stages of Learning</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {LEARNING_STAGES.map(([title, body]) => (
-              <div key={title} className="academics-card bg-white p-8 rounded-2xl shadow-sm border border-slate-100 border-t-4 border-t-emerald-400">
-                <h3 className="text-xl font-bold text-slate-900 mb-3">{title}</h3>
-                <p className="text-slate-600 text-sm leading-relaxed">{body}</p>
-              </div>
-            ))}
-          </div>
-        </div>
+        <AcademicSections sections={academicSections} />
       </div>
     </Layout>
   );

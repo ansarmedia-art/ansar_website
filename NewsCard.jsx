@@ -10,13 +10,13 @@ export default function NewsCard({ id, title, excerpt, thumbnailUrl, coverImageU
   return (
     <div 
       onClick={() => navigate(`/${type}/${id}`)}
-      className="relative cursor-pointer bg-white rounded-xl shadow-sm hover:shadow-2xl hover:shadow-emerald-500/10 transition-all duration-500 overflow-hidden border border-slate-100 group flex flex-col h-full transform hover:-translate-y-2"
+      className="relative isolate cursor-pointer bg-white rounded-xl shadow-sm hover:shadow-2xl hover:shadow-emerald-500/10 transition-all duration-500 overflow-hidden border border-slate-100 group flex flex-col h-full transform hover:-translate-y-2"
     >
       {/* Liquid Flow Animation Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-tr from-emerald-50 to-teal-50/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-10" />
+      <div className="absolute inset-0 z-0 bg-gradient-to-tr from-emerald-50 to-teal-50/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
       
       {/* Image with fallback skeleton */}
-      <div className="relative w-full aspect-[4/3] bg-slate-100 overflow-hidden flex-shrink-0 border-b border-slate-100">
+      <div className="relative z-10 w-full aspect-[4/3] bg-slate-100 overflow-hidden flex-shrink-0 border-b border-slate-100">
         {targetImage ? (
           <>
             <img
@@ -56,7 +56,7 @@ export default function NewsCard({ id, title, excerpt, thumbnailUrl, coverImageU
       </div>
       
       {/* Content Area */}
-      <div className="p-6 flex flex-col flex-grow">
+      <div className="relative z-10 p-6 flex flex-col flex-grow">
         <span className="text-xs font-bold text-emerald-600 tracking-wider uppercase mb-2">{date}</span>
         <h3 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-emerald-700 transition-colors line-clamp-2">{title}</h3>
         <p className="text-slate-600 text-sm flex-grow line-clamp-3 leading-relaxed">{excerpt}</p>
@@ -67,7 +67,7 @@ export default function NewsCard({ id, title, excerpt, thumbnailUrl, coverImageU
           url={shareUrl}
           title={title}
           text={excerpt}
-          className="mt-3 w-full border border-slate-200 bg-white px-4 py-2.5 text-slate-700 hover:bg-slate-50"
+          className="mt-3 w-full border border-slate-200 bg-white px-4 py-2.5 text-slate-700 duration-300 hover:-translate-y-0.5 hover:border-emerald-600 hover:bg-emerald-600 hover:text-white hover:shadow-md"
         />
       </div>
     </div>

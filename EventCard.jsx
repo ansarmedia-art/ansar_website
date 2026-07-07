@@ -7,12 +7,12 @@ export default function EventCard({ id, title, description, date, thumbnailUrl, 
   const shareUrl = `${window.location.origin}/${type}/${id}`;
 
   return (
-    <div className="relative bg-white rounded-xl shadow-sm hover:shadow-2xl hover:shadow-emerald-500/10 transition-all duration-500 overflow-hidden border border-slate-100 group flex flex-col h-full transform hover:-translate-y-2">
+    <div className="relative isolate bg-white rounded-xl shadow-sm hover:shadow-2xl hover:shadow-emerald-500/10 transition-all duration-500 overflow-hidden border border-slate-100 group flex flex-col h-full transform hover:-translate-y-2">
       {/* Liquid Flow Animation Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-tr from-emerald-50/80 to-teal-50/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-10" />
+      <div className="absolute inset-0 z-0 bg-gradient-to-tr from-emerald-50/80 to-teal-50/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
       {/* Image Grid Presentation */}
-      <div className="relative w-full bg-[#f7f9fa] overflow-hidden flex-shrink-0 border-b border-slate-100" style={{ minHeight: '224px' }}>
+      <div className="relative z-10 w-full bg-[#f7f9fa] overflow-hidden flex-shrink-0 border-b border-slate-100" style={{ minHeight: '224px' }}>
         {primaryImage && !imgError ? (
           <img
             src={primaryImage}
@@ -35,7 +35,7 @@ export default function EventCard({ id, title, description, date, thumbnailUrl, 
       </div>
 
       {/* Content Area */}
-      <div className="p-6 flex flex-col flex-grow">
+      <div className="relative z-10 p-6 flex flex-col flex-grow">
         {date && <span className="text-xs font-bold text-emerald-600 tracking-wider uppercase mb-2">{date}</span>}
         <h3 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-emerald-700 transition-colors line-clamp-2">{title}</h3>
         <p className="text-slate-600 text-sm flex-grow line-clamp-3 leading-relaxed">{description}</p>
@@ -46,7 +46,7 @@ export default function EventCard({ id, title, description, date, thumbnailUrl, 
           url={shareUrl}
           title={title}
           text={description}
-          className="mt-3 w-full border border-slate-200 bg-white px-4 py-2.5 text-slate-700 hover:bg-slate-50"
+          className="mt-3 w-full border border-slate-200 bg-white px-4 py-2.5 text-slate-700 duration-300 hover:-translate-y-0.5 hover:border-emerald-600 hover:bg-emerald-600 hover:text-white hover:shadow-md"
         />
       </div>
     </div>

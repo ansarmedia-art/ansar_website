@@ -1,0 +1,18 @@
+{
+  "name": "Ansar English School Perumpilavu",
+  "short_name": "Ansar School",
+  "description": "News, events, notices, and updates from Ansar English School.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f8fbff",
+  "theme_color": "#0b3c5d",
+  "icons": [
+    {
+      "src": "/ansar-logo.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

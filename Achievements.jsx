@@ -56,7 +56,7 @@ function AchievementCard({ achievement, priority = false }) {
           url={shareUrl}
           title={achievement.title}
           text={achievement.description}
-          className="mt-3 w-full border border-slate-200 bg-white px-4 py-2.5 text-slate-700 hover:bg-slate-50"
+          className="mt-3 w-full border border-slate-200 bg-white px-4 py-2.5 text-slate-700 duration-300 hover:-translate-y-0.5 hover:border-emerald-600 hover:bg-emerald-600 hover:text-white hover:shadow-md"
         />
       </div>
     </div>

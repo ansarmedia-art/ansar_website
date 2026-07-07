@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, useParams, Navigate, useLocation, Link } from 'react-router-dom';
-import { onAuthStateChanged, signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { onAuthStateChanged, signInWithEmailAndPassword, signOut, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { doc, setDoc, serverTimestamp, collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 import { auth, db } from './firebase-init';
 import { useContentCollection } from './useContentCollection';
@@ -29,7 +29,8 @@ import AdminSettings from './AdminSettings';
 import AdminPublicDisclosure from './AdminPublicDisclosure';
 import MandatoryDisclosure from './MandatoryDisclosure';
 import ContentPageLayout from './ContentPageLayout';
-import { SettingsProvider } from './SettingsContext';
+import { SettingsProvider, useSettings } from './SettingsContext';
+import { DEFAULT_SPORTS_PAGE, mergeListWithDefaults } from './contentDefaults';
 
 // --- AUTHORIZED ADMIN EMAILS ---
 const ADMIN_EMAILS = [
@@ -419,22 +420,73 @@ function DynamicPage({ slug: propSlug }) {
   );
 }
 
+function SportsPage() {
+  const settings = useSettings();
+  const sportsItems = mergeListWithDefaults(settings?.sportsItems, DEFAULT_SPORTS_PAGE.items);
+  const title = settings?.sportsPageTitle || DEFAULT_SPORTS_PAGE.title;
+  const description = settings?.sportsPageDescription || DEFAULT_SPORTS_PAGE.description;
+
+  return (
+    <Layout>
+      <main className="mx-auto max-w-7xl px-4 py-12 lg:py-20">
+        <section className="relative overflow-hidden rounded-3xl bg-emerald-950 text-white shadow-2xl">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(245,158,11,0.22),transparent_34%),linear-gradient(135deg,#0b3c5d,#071827)]" />
+          <div className="relative z-10 max-w-4xl px-6 py-16 sm:px-10 lg:px-14 lg:py-24">
+            <p className="text-sm font-extrabold uppercase tracking-widest text-amber-300">Sports Programme</p>
+            <h1 className="mt-3 text-4xl font-extrabold leading-tight lg:text-6xl">{title}</h1>
+            <p className="mt-6 max-w-3xl text-lg leading-relaxed text-emerald-50/90 lg:text-xl">{description}</p>
+          </div>
+        </section>
+
+        <section className="mt-14 grid grid-cols-1 gap-6 md:grid-cols-2">
+          {sportsItems.map((sport, index) => (
+            <article key={`${sport.title}-${index}`} className="group overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+              <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
+                {sport.imageUrl ? (
+                  <img
+                    src={sport.imageUrl}
+                    alt={`${sport.title} at Ansar English School`}
+                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    loading={index < 2 ? 'eager' : 'lazy'}
+                    decoding="async"
+                  />
+                ) : (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-emerald-50 via-white to-amber-50 text-center">
+                    <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white text-emerald-700 shadow-sm ring-1 ring-emerald-100">
+                      <svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6 5.6 18.4" />
+                        <circle cx="12" cy="12" r="9" strokeWidth="1.8" />
+                      </svg>
+                    </div>
+                    <p className="mt-4 text-xs font-black uppercase tracking-widest text-slate-400">Image Holder</p>
+                    <p className="mt-1 text-sm font-bold text-slate-600">{sport.title}</p>
+                  </div>
+                )}
+              </div>
+              <div className="p-6 sm:p-8">
+                <p className="text-xs font-black uppercase tracking-widest text-amber-600">Ansar Sports</p>
+                <h2 className="mt-3 text-2xl font-extrabold text-slate-900">{sport.title}</h2>
+                <p className="mt-4 text-base leading-relaxed text-slate-600">{sport.description}</p>
+              </div>
+            </article>
+          ))}
+        </section>
+      </main>
+    </Layout>
+  );
+}
+
 // --- SECURE ADMIN LOGIN COMPONENT ---
 function AdminLogin() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [isSignUp, setIsSignUp] = useState(false);
 
   const handleEmailAuth = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
     try {
-      if (isSignUp) {
-        await createUserWithEmailAndPassword(auth, e.target.email.value, e.target.password.value);
-      } else {
-        await signInWithEmailAndPassword(auth, e.target.email.value, e.target.password.value);
-      }
+      await signInWithEmailAndPassword(auth, e.target.email.value, e.target.password.value);
     } catch (err) {
       setError(err.message || "Authentication failed. Please try again.");
     }
@@ -458,7 +510,8 @@ function AdminLogin() {
       <div className="bg-white p-8 md:p-10 rounded-2xl shadow-2xl w-full max-w-md border-t-4 border-emerald-500">
         <div className="text-center mb-8">
           <p className="text-emerald-600 font-bold uppercase tracking-wider text-sm mb-2">Secure Access</p>
-          <h1 className="text-2xl font-extrabold text-slate-900">{isSignUp ? 'Create Account' : 'Admin Portal'}</h1>
+          <h1 className="text-2xl font-extrabold text-slate-900">Admin Portal</h1>
+          <p className="mt-2 text-sm font-medium leading-relaxed text-slate-500">This login is only for authorized school administrators.</p>
         </div>
         {error && <p className="bg-red-50 text-red-600 p-3 rounded-lg mb-6 text-sm font-medium border border-red-100">{error}</p>}
         
@@ -491,16 +544,9 @@ function AdminLogin() {
           <input name="password" type="password" required className="w-full mb-8 p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none" />
           
           <button disabled={loading} type="submit" className="w-full bg-emerald-600 text-white font-bold py-3.5 rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-70">
-            {loading ? "Processing..." : (isSignUp ? "Sign Up" : "Sign In")}
+            {loading ? "Processing..." : "Sign In"}
           </button>
         </form>
-
-        <p className="mt-6 text-center text-sm text-slate-600">
-          {isSignUp ? "Already have an account? " : "Don't have an account? "}
-          <button onClick={() => setIsSignUp(!isSignUp)} className="text-emerald-600 font-bold hover:underline">
-            {isSignUp ? "Sign In" : "Create one"}
-          </button>
-        </p>
       </div>
     </div>
   );
@@ -637,7 +683,7 @@ export default function App() {
         <Route path="/events" element={<Events />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/gallery" element={<Gallery />} />
-        <Route path="/sports-page" element={<DynamicPage slug="sports-page" />} />
+        <Route path="/sports-page" element={<SportsPage />} />
         <Route path="/atl" element={<DynamicPage slug="atl" />} />
         <Route path="/ansar-sprouts" element={<DynamicPage slug="ansar-sprouts" />} />
         <Route path="/extension-services" element={<DynamicPage slug="extension-services" />} />

@@ -1,29 +1,70 @@
-import React, { useState, useEffect } from 'react';
-import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
+import React, { useEffect, useState } from 'react';
+import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { db } from './firebase-init';
+import ImgBbUrlImporter from './ImgBbUrlImporter';
+import { DEFAULT_ACADEMIC_SECTIONS, DEFAULT_SPORTS_PAGE, mergeListWithDefaults } from './contentDefaults';
 
 export default function AdminAcademics() {
-  const [pdfUrl, setPdfUrl] = useState('');
+  const [formData, setFormData] = useState({
+    feeStructurePdfUrl: '',
+    sportsPageTitle: DEFAULT_SPORTS_PAGE.title,
+    sportsPageDescription: DEFAULT_SPORTS_PAGE.description,
+    sportsItems: DEFAULT_SPORTS_PAGE.items,
+    academicSections: DEFAULT_ACADEMIC_SECTIONS
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState('');
 
   useEffect(() => {
     const fetchSettings = async () => {
       const docSnap = await getDoc(doc(db, 'settings', 'global'));
-      if (docSnap.exists() && docSnap.data().feeStructurePdfUrl) {
-        setPdfUrl(docSnap.data().feeStructurePdfUrl);
-      }
+      if (!docSnap.exists()) return;
+
+      const data = docSnap.data();
+      setFormData(prev => ({
+        ...prev,
+        feeStructurePdfUrl: data.feeStructurePdfUrl || prev.feeStructurePdfUrl,
+        sportsPageTitle: data.sportsPageTitle || prev.sportsPageTitle,
+        sportsPageDescription: data.sportsPageDescription || prev.sportsPageDescription,
+        sportsItems: mergeListWithDefaults(data.sportsItems, DEFAULT_SPORTS_PAGE.items),
+        academicSections: mergeListWithDefaults(data.academicSections, DEFAULT_ACADEMIC_SECTIONS)
+      }));
     };
     fetchSettings();
   }, []);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleListChange = (listName, index, field, value) => {
+    const next = [...formData[listName]];
+    next[index] = { ...next[index], [field]: value };
+    setFormData(prev => ({ ...prev, [listName]: next }));
+  };
+
+  const normalizeItems = (items) => items.map(item => ({
+    title: item.title || '',
+    description: item.description || '',
+    imageUrl: item.imageUrl || ''
+  }));
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
     setIsSubmitting(true);
     setMessage('');
+
     try {
-      await setDoc(doc(db, 'settings', 'global'), { feeStructurePdfUrl: pdfUrl, updatedAt: serverTimestamp() }, { merge: true });
-      setMessage('Fee Structure PDF updated successfully!');
+      await setDoc(doc(db, 'settings', 'global'), {
+        feeStructurePdfUrl: formData.feeStructurePdfUrl,
+        sportsPageTitle: formData.sportsPageTitle,
+        sportsPageDescription: formData.sportsPageDescription,
+        sportsItems: normalizeItems(formData.sportsItems),
+        academicSections: normalizeItems(formData.academicSections),
+        updatedAt: serverTimestamp()
+      }, { merge: true });
+      setMessage('Academics and sports page content updated successfully!');
       setTimeout(() => setMessage(''), 3000);
     } catch (error) {
       setMessage('Error saving: ' + error.message);
@@ -33,21 +74,75 @@ export default function AdminAcademics() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="bg-white p-8 rounded-2xl shadow-xl border border-emerald-100">
-        <h2 className="text-xl font-bold mb-6 text-slate-800">Academics & Admissions Tools</h2>
-        {message && <div className={`p-4 mb-6 rounded-lg font-bold text-sm ${message.includes('Error') ? 'bg-red-50 text-red-600' : 'bg-emerald-50 text-emerald-700'}`}>{message}</div>}
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-4 p-6 bg-slate-50 border border-slate-100 rounded-xl">
-            <h3 className="font-extrabold text-slate-900 mb-2">Admission Documentation</h3>
+    <div className="mx-auto max-w-6xl">
+      <div className="rounded-2xl border border-emerald-100 bg-white p-8 shadow-xl">
+        <h2 className="mb-6 text-xl font-bold text-slate-800">Academics & Sports Page Editor</h2>
+        {message && <div className={`mb-6 rounded-lg p-4 text-sm font-bold ${message.includes('Error') ? 'bg-red-50 text-red-600' : 'bg-emerald-50 text-emerald-700'}`}>{message}</div>}
+
+        <form onSubmit={handleSubmit} className="space-y-8">
+          <section className="space-y-4 rounded-xl border border-slate-100 bg-slate-50 p-6">
+            <h3 className="font-extrabold text-slate-900">Admission Documentation</h3>
             <div>
-              <label className="block text-sm font-bold text-slate-700 mb-2">Latest Fee Structure (Google Drive PDF URL)</label>
-              <input type="url" value={pdfUrl} onChange={(e) => setPdfUrl(e.target.value)} placeholder="https://drive.google.com/file/d/..." className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" />
-              <p className="text-xs text-slate-500 mt-2">Paste the shareable link to the PDF. It will automatically convert to a direct download on the frontend.</p>
+              <label className="mb-2 block text-sm font-bold text-slate-700">Latest Fee Structure (Google Drive PDF URL)</label>
+              <input name="feeStructurePdfUrl" type="url" value={formData.feeStructurePdfUrl} onChange={handleChange} placeholder="https://drive.google.com/file/d/..." className="w-full rounded-lg border border-slate-200 p-3 outline-none focus:ring-2 focus:ring-emerald-500" />
+              <p className="mt-2 text-xs text-slate-500">Paste the shareable link to the PDF. The frontend will use this for the fee structure button.</p>
             </div>
-          </div>
-          <button type="submit" disabled={isSubmitting} className="w-full px-6 py-3.5 bg-emerald-600 text-white font-bold rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50 text-lg shadow-md">
-            {isSubmitting ? 'Saving...' : 'Deploy Updates'}
+          </section>
+
+          <section className="space-y-4 rounded-xl border border-slate-100 bg-slate-50 p-6">
+            <div>
+              <p className="text-xs font-black uppercase tracking-widest text-emerald-600">Sports Page</p>
+              <h3 className="mt-1 font-extrabold text-slate-900">Sports page text and images</h3>
+            </div>
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+              <div>
+                <label className="mb-2 block text-sm font-bold text-slate-700">Page Title</label>
+                <input name="sportsPageTitle" value={formData.sportsPageTitle} onChange={handleChange} className="w-full rounded-lg border border-slate-200 p-3 outline-none focus:ring-2 focus:ring-emerald-500" />
+              </div>
+              <div>
+                <label className="mb-2 block text-sm font-bold text-slate-700">Page Description</label>
+                <textarea name="sportsPageDescription" value={formData.sportsPageDescription} onChange={handleChange} className="h-24 w-full rounded-lg border border-slate-200 p-3 outline-none focus:ring-2 focus:ring-emerald-500" />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+              {formData.sportsItems.map((sport, index) => (
+                <div key={`sport-${index}`} className="space-y-3 rounded-xl border border-white bg-white p-4 shadow-sm">
+                  <h4 className="font-bold text-emerald-800">{sport.title || `Sport ${index + 1}`}</h4>
+                  <input value={sport.title || ''} onChange={(event) => handleListChange('sportsItems', index, 'title', event.target.value)} placeholder="Sport title" className="w-full rounded-lg border border-slate-200 p-3 outline-none focus:ring-2 focus:ring-emerald-500" />
+                  <textarea value={sport.description || ''} onChange={(event) => handleListChange('sportsItems', index, 'description', event.target.value)} placeholder="Sport description" className="h-24 w-full rounded-lg border border-slate-200 p-3 outline-none focus:ring-2 focus:ring-emerald-500" />
+                  <input value={sport.imageUrl || ''} onChange={(event) => handleListChange('sportsItems', index, 'imageUrl', event.target.value)} placeholder="Image URL" className="w-full rounded-lg border border-slate-200 p-3 outline-none focus:ring-2 focus:ring-emerald-500" />
+                  <ImgBbUrlImporter onExtracted={(url) => handleListChange('sportsItems', index, 'imageUrl', url)} />
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="space-y-4 rounded-xl border border-slate-100 bg-slate-50 p-6">
+            <div>
+              <p className="text-xs font-black uppercase tracking-widest text-emerald-600">Academics Page</p>
+              <h3 className="mt-1 font-extrabold text-slate-900">Section descriptions and image holders</h3>
+            </div>
+            <div className="space-y-4">
+              {formData.academicSections.map((section, index) => (
+                <div key={`academic-section-${index}`} className="grid grid-cols-1 gap-4 rounded-xl border border-white bg-white p-4 shadow-sm lg:grid-cols-[1fr_1.3fr]">
+                  <div className="space-y-3">
+                    <div className="inline-flex rounded-lg bg-slate-100 px-3 py-2 text-sm font-black text-slate-600">#{index + 1}</div>
+                    <input value={section.title || ''} onChange={(event) => handleListChange('academicSections', index, 'title', event.target.value)} placeholder="Section title" className="w-full rounded-lg border border-slate-200 p-3 outline-none focus:ring-2 focus:ring-emerald-500" />
+                    <input value={section.imageUrl || ''} onChange={(event) => handleListChange('academicSections', index, 'imageUrl', event.target.value)} placeholder="Image URL" className="w-full rounded-lg border border-slate-200 p-3 outline-none focus:ring-2 focus:ring-emerald-500" />
+                    <ImgBbUrlImporter onExtracted={(url) => handleListChange('academicSections', index, 'imageUrl', url)} />
+                  </div>
+                  <div>
+                    <label className="mb-2 block text-sm font-bold text-slate-700">Description</label>
+                    <textarea value={section.description || ''} onChange={(event) => handleListChange('academicSections', index, 'description', event.target.value)} className="h-40 w-full rounded-lg border border-slate-200 p-3 outline-none focus:ring-2 focus:ring-emerald-500" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <button type="submit" disabled={isSubmitting} className="w-full rounded-lg bg-emerald-600 px-6 py-3.5 text-lg font-bold text-white shadow-md transition-colors hover:bg-emerald-700 disabled:opacity-50">
+            {isSubmitting ? 'Saving...' : 'Deploy Page Updates'}
           </button>
         </form>
       </div>
