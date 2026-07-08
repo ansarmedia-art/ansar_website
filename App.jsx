@@ -288,7 +288,7 @@ const SAMPLE_PAGES = {
     title: 'Alumni',
     eyebrow: 'Ansar Community',
     subtitle: 'Stories, connections, and achievements from the Ansar alumni community.',
-    heroImage: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?q=90&w=2400&auto=format&fit=crop',
+    heroImage: '/alumni/odyssey-alumni-group.jpg',
     intro: 'The alumni community carries the Ansar story beyond the campus. Former students remain an important part of the school family through memories, achievements, mentorship, and continued connection.',
     highlights: ['Alumni connections', 'Mentorship and memories', 'Community events'],
     sections: [
