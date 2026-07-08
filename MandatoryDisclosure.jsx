@@ -16,6 +16,15 @@ const DEFAULT_DISCLOSURE_SECTIONS = [
   'Others'
 ];
 
+const DISCLOSURE_SECTION_DETAILS = {
+  'General Information': 'Basic institutional information such as school name, address, affiliation details, school code, principal details, and official contact information.',
+  Infrastructure: 'Campus and facility information including classrooms, laboratories, library resources, sanitation facilities, safety provisions, and other infrastructure details.',
+  Academics: 'Academic information related to curriculum, classes offered, subject options, assessment practices, academic planning, and school performance details.',
+  'Staff Details': 'Teaching and administrative staff information, qualifications, staffing structure, and details required for public disclosure.',
+  Documents: 'Official certificates, approvals, recognition documents, affiliation records, safety certificates, and other statutory documents for reference.',
+  Others: 'Additional public information, declarations, policies, and supporting details shared by the school administration.'
+};
+
 function getDisclosureSections(settings) {
   const sections = Array.isArray(settings?.mandatoryDisclosureSections)
     ? settings.mandatoryDisclosureSections
@@ -116,9 +125,36 @@ export default function MandatoryDisclosure() {
               ))}
             </div>
           ) : (
-            <div className="rounded-2xl border border-slate-100 bg-white p-10 text-center shadow-sm">
-              <h2 className="text-2xl font-extrabold text-slate-900">Documents will be updated soon</h2>
-              <p className="mt-3 text-slate-600">Mandatory public disclosure files will appear here once published.</p>
+            <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start">
+              <div>
+                <div className="border-l-4 border-amber-400 bg-white py-2 pl-6">
+                  <p className="text-lg leading-relaxed text-slate-700 lg:text-xl">
+                    This page is reserved for the school's CBSE mandatory public disclosure information. The document links are managed by the school administration and will be displayed in their relevant categories when published.
+                  </p>
+                </div>
+
+                <div className="mt-10 grid grid-cols-1 gap-5 md:grid-cols-2">
+                  {disclosureSections.map((section, index) => (
+                    <article key={section} className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-emerald-100 hover:shadow-xl">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-50 text-sm font-black text-emerald-700 ring-1 ring-emerald-100">
+                        {String(index + 1).padStart(2, '0')}
+                      </div>
+                      <h2 className="mt-5 text-2xl font-extrabold text-slate-900">{section}</h2>
+                      <p className="mt-4 text-base leading-relaxed text-slate-600">
+                        {DISCLOSURE_SECTION_DETAILS[section] || 'Relevant public disclosure information and supporting documents for this category will be organized here.'}
+                      </p>
+                    </article>
+                  ))}
+                </div>
+              </div>
+
+              <aside className="rounded-2xl border border-emerald-100 bg-emerald-50 p-6">
+                <p className="text-xs font-extrabold uppercase tracking-widest text-emerald-700">Public Access</p>
+                <h2 className="mt-3 text-xl font-extrabold text-slate-900">Disclosure Desk</h2>
+                <p className="mt-3 text-sm leading-relaxed text-slate-600">
+                  For document verification or official disclosure queries, please contact the school office during working hours.
+                </p>
+              </aside>
             </div>
           )}
         </section>

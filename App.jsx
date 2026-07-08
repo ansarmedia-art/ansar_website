@@ -177,23 +177,107 @@ const SAMPLE_PAGES = {
   },
   atl: {
     title: 'ATL',
+    eyebrow: 'Innovation Lab',
     subtitle: 'Innovation, tinkering, STEM exploration, and student-led problem solving.',
-    sections: ['Lab Overview', 'Student Projects', 'Innovation Challenges', 'Gallery']
+    heroImage: 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=90&w=2400&auto=format&fit=crop',
+    intro: 'The Atal Tinkering Lab culture at Ansar encourages students to observe problems, build prototypes, test ideas, and learn through experimentation. It gives young learners a practical space to connect science, technology, design, and teamwork.',
+    highlights: ['Hands-on STEM learning', 'Prototype-based projects', 'Student innovation challenges'],
+    sections: [
+      {
+        title: 'Lab Overview',
+        body: 'ATL activities introduce students to practical tools, model making, electronics, coding basics, robotics thinking, and design-led problem solving in a supervised learning environment.'
+      },
+      {
+        title: 'Student Projects',
+        body: 'Learners are encouraged to convert classroom concepts into working models, simple machines, digital ideas, science exhibits, and solutions inspired by real community needs.'
+      },
+      {
+        title: 'Innovation Challenges',
+        body: 'Competitions, exhibitions, brainstorming sessions, and challenge-based tasks help students develop curiosity, planning skills, collaboration, and confidence in presenting their ideas.'
+      },
+      {
+        title: 'Learning Outcomes',
+        body: 'The programme strengthens observation, experimentation, critical thinking, communication, responsible use of technology, and the courage to improve an idea through repeated trials.'
+      }
+    ]
   },
   'ansar-sprouts': {
     title: 'Ansar Sprouts',
+    eyebrow: 'Early Years',
     subtitle: 'A joyful early learning environment for foundational growth.',
-    sections: ['Learning Approach', 'Daily Activities', 'Parent Connect', 'Classroom Moments']
+    heroImage: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=90&w=2400&auto=format&fit=crop',
+    intro: 'Ansar Sprouts is designed for the youngest learners, where care, play, language, movement, imagination, and social confidence come together. The environment supports children as they begin school life with warmth and steady routines.',
+    highlights: ['Play-based learning', 'Language and motor development', 'Caring classroom routines'],
+    sections: [
+      {
+        title: 'Learning Approach',
+        body: 'The early years programme balances guided play, stories, songs, art, number awareness, nature-based conversations, and classroom habits that prepare children for confident schooling.'
+      },
+      {
+        title: 'Daily Activities',
+        body: 'Children take part in circle time, creative work, movement games, sensory activities, picture reading, rhymes, simple conversations, and age-appropriate group tasks.'
+      },
+      {
+        title: 'Parent Connect',
+        body: 'Teachers maintain supportive communication with parents so that each child receives consistent care, encouragement, and attention across home and school.'
+      },
+      {
+        title: 'Classroom Moments',
+        body: 'The section celebrates small milestones: speaking clearly, sharing with friends, finishing a task, exploring colors and shapes, and gaining independence in everyday routines.'
+      }
+    ]
   },
   'extension-services': {
     title: 'Extension Services',
+    eyebrow: 'Community Outreach',
     subtitle: 'Community outreach, student service, and support initiatives.',
-    sections: ['Service Areas', 'Programmes', 'Community Impact', 'How We Participate']
+    heroImage: 'https://images.unsplash.com/photo-1559027615-cd4628902d4a?q=90&w=2400&auto=format&fit=crop',
+    intro: 'Extension Services connects the school community with meaningful social responsibility. Through outreach, awareness, support activities, and service learning, students understand that education also includes compassion and civic responsibility.',
+    highlights: ['Service learning', 'Awareness programmes', 'Community participation'],
+    sections: [
+      {
+        title: 'Service Areas',
+        body: 'The school supports initiatives related to health awareness, environmental care, social responsibility, student volunteering, charitable drives, and community well-being.'
+      },
+      {
+        title: 'Programmes',
+        body: 'Activities may include campaigns, visits, donation drives, cleanliness initiatives, awareness talks, collaborative projects, and student-led service events.'
+      },
+      {
+        title: 'Community Impact',
+        body: 'These initiatives help students develop empathy, leadership, teamwork, gratitude, and a better understanding of the society around them.'
+      },
+      {
+        title: 'How We Participate',
+        body: 'Students participate through clubs, class groups, school events, guided volunteering, and age-appropriate outreach activities coordinated by teachers and school leadership.'
+      }
+    ]
   },
   'life-at-ansar': {
     title: 'Life at Ansar',
+    eyebrow: 'Campus Culture',
     subtitle: 'A look into campus culture, clubs, celebrations, and student life.',
-    sections: ['Campus Life', 'Clubs & Activities', 'Celebrations', 'Student Voices']
+    heroImage: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=90&w=2400&auto=format&fit=crop',
+    intro: 'Life at Ansar is shaped by learning, friendships, discipline, celebrations, creativity, faith in values, and opportunities beyond the classroom. The campus experience helps students grow as confident, responsible, and expressive individuals.',
+    highlights: ['Active student life', 'Clubs and celebrations', 'Balanced campus routines'],
+    sections: [
+      {
+        title: 'Campus Life',
+        body: 'The school day brings together academics, assemblies, mentoring, sports, arts, library time, lab work, peer interaction, and structured routines that help students feel grounded.'
+      },
+      {
+        title: 'Clubs & Activities',
+        body: 'Clubs and co-curricular activities give students space to discover interests in language, science, arts, technology, environment, leadership, service, and performance.'
+      },
+      {
+        title: 'Celebrations',
+        body: 'School celebrations, special days, competitions, exhibitions, cultural programmes, and observances create shared memories while building confidence and participation.'
+      },
+      {
+        title: 'Student Voices',
+        body: 'Students are encouraged to speak, perform, lead, write, create, and contribute so that school life becomes a platform for expression as well as achievement.'
+      }
+    ]
   },
   'ansar-times': {
     title: 'Ansar Times',
@@ -202,13 +286,55 @@ const SAMPLE_PAGES = {
   },
   alumni: {
     title: 'Alumni',
+    eyebrow: 'Ansar Community',
     subtitle: 'Stories, connections, and achievements from the Ansar alumni community.',
-    sections: ['Alumni Network', 'Success Stories', 'Events', 'Get Connected']
+    heroImage: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?q=90&w=2400&auto=format&fit=crop',
+    intro: 'The alumni community carries the Ansar story beyond the campus. Former students remain an important part of the school family through memories, achievements, mentorship, and continued connection.',
+    highlights: ['Alumni connections', 'Mentorship and memories', 'Community events'],
+    sections: [
+      {
+        title: 'Alumni Network',
+        body: 'The network helps former students stay connected with the institution, teachers, classmates, and the wider Ansar community.'
+      },
+      {
+        title: 'Success Stories',
+        body: 'Alumni achievements in higher education, professions, entrepreneurship, public service, arts, sports, and social life inspire current students to dream with purpose.'
+      },
+      {
+        title: 'Events',
+        body: 'Reunions, interactive sessions, career conversations, campus visits, and special gatherings create opportunities for alumni to return, share, and contribute.'
+      },
+      {
+        title: 'Get Connected',
+        body: 'Former students can reach out to the school office to update their details, share achievements, contribute to student guidance, or participate in alumni initiatives.'
+      }
+    ]
   },
   sop: {
     title: 'SOP',
+    eyebrow: 'School Procedures',
     subtitle: 'Standard operating procedures and essential school guidelines.',
-    sections: ['General Guidelines', 'Student Safety', 'Academic Procedures', 'Campus Protocols']
+    heroImage: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?q=90&w=2400&auto=format&fit=crop',
+    intro: 'The SOP page provides a clear reference for expected routines, safety practices, academic processes, communication channels, and campus protocols followed at Ansar English School.',
+    highlights: ['Clear daily routines', 'Safety-first procedures', 'Academic and campus discipline'],
+    sections: [
+      {
+        title: 'General Guidelines',
+        body: 'Students are expected to follow school timings, uniform standards, attendance rules, respectful conduct, classroom discipline, and instructions issued by teachers and school authorities.'
+      },
+      {
+        title: 'Student Safety',
+        body: 'Safety procedures cover supervised movement, transport routines, visitor control, emergency readiness, first-aid support, and responsible behaviour in classrooms, corridors, labs, and playgrounds.'
+      },
+      {
+        title: 'Academic Procedures',
+        body: 'Academic routines include lesson planning, assignments, assessments, practical work, parent communication, progress review, remedial support, and examination-related instructions.'
+      },
+      {
+        title: 'Campus Protocols',
+        body: 'Campus protocols help maintain order during arrival, dispersal, assemblies, events, library use, laboratory sessions, sports activities, and interactions with school facilities.'
+      }
+    ]
   },
   'mandatory-public-disclosure': {
     title: 'Mandatory Public Disclosure',
@@ -216,7 +342,7 @@ const SAMPLE_PAGES = {
     sections: ['General Information', 'Documents', 'Academic Information', 'Infrastructure Details']
   },
   'ansar-media-production': {
-    title: 'Ansar Media and Production',
+    title: 'ANSAR MEDIA PRODUCTIONS',
     subtitle: 'An in-house media production unit documenting campus life, student achievements, institutional milestones, and creative communication at Ansar English School.',
     sections: ['Photography', 'Videography', 'Drone Videography', 'Podcast', 'Graphic Designing', 'Editing']
   }
@@ -459,13 +585,13 @@ function AnsarMediaProductionPage() {
         <section className="relative overflow-hidden rounded-3xl bg-slate-950 text-white shadow-2xl">
           <img
             src="https://images.unsplash.com/photo-1497366754035-f200968a6e72?q=90&w=3840&auto=format&fit=crop"
-            alt="Ansar Media and Production studio workspace"
+            alt="ANSAR MEDIA PRODUCTIONS studio workspace"
             className="absolute inset-0 h-full w-full object-cover opacity-30"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/88 to-emerald-950/50" />
           <div className="relative z-10 max-w-4xl px-6 py-16 sm:px-10 lg:px-14 lg:py-24">
             <p className="mb-3 text-sm font-extrabold uppercase tracking-widest text-amber-300">In-house Media Unit</p>
-            <h1 className="text-4xl font-extrabold leading-tight lg:text-6xl">Ansar Media and Production</h1>
+            <h1 className="text-4xl font-extrabold leading-tight lg:text-6xl">ANSAR MEDIA PRODUCTIONS</h1>
             <p className="mt-6 max-w-3xl text-lg leading-relaxed text-slate-100/85 lg:text-xl">
               A dedicated creative unit for photography, videography, drone visuals, podcasts, graphic design, and editing at Ansar English School.
             </p>
@@ -476,7 +602,7 @@ function AnsarMediaProductionPage() {
           <p className="text-sm font-black uppercase tracking-widest text-emerald-600">Creative documentation</p>
           <h2 className="mt-3 text-3xl font-extrabold text-slate-900 lg:text-5xl">Capturing, creating, and sharing the Ansar story</h2>
           <p className="mt-5 text-lg leading-relaxed text-slate-600">
-            Ansar Media and Production works as the institution's own media studio, supporting academic, cultural, social, and administrative communication with professional visual content.
+            ANSAR MEDIA PRODUCTIONS works as the institution's own media studio, supporting academic, cultural, social, and administrative communication with professional visual content.
           </p>
         </section>
 
@@ -489,7 +615,7 @@ function AnsarMediaProductionPage() {
                   <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-slate-100 shadow-xl">
                     <img
                       src={service.image}
-                      alt={`${service.title} at Ansar Media and Production`}
+                      alt={`${service.title} at ANSAR MEDIA PRODUCTIONS`}
                       className="absolute inset-0 h-full w-full object-cover"
                       loading={index < 2 ? 'eager' : 'lazy'}
                       decoding="async"
@@ -607,19 +733,78 @@ function DynamicPage({ slug: propSlug }) {
   if (!page && samplePage) {
     return (
       <Layout>
-        <div className="max-w-6xl mx-auto py-12 lg:py-20 px-4">
-          <div className="max-w-3xl mb-12">
-            <p className="text-emerald-600 font-bold uppercase tracking-wider text-sm mb-3">Ansar English School</p>
-            <h1 className="text-4xl lg:text-5xl font-extrabold text-slate-900 mb-5">{samplePage.title}</h1>
-            <p className="text-xl text-slate-600 leading-relaxed">{samplePage.subtitle}</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {samplePage.sections.map(section => (
-              <section key={section} className="border border-slate-100 bg-white p-8 rounded-xl shadow-sm">
-                <h2 className="text-xl font-extrabold text-slate-900 mb-3">{section}</h2>
-                <p className="text-slate-600 leading-relaxed">Content for this section will be updated soon.</p>
-              </section>
-            ))}
+        <div className="mx-auto max-w-7xl px-4 py-12 lg:py-20">
+          <section className="relative overflow-hidden rounded-3xl bg-emerald-950 text-white shadow-2xl">
+            {samplePage.heroImage && (
+              <img
+                src={samplePage.heroImage}
+                alt={`${samplePage.title} at Ansar English School`}
+                className="absolute inset-0 h-full w-full object-cover opacity-35"
+                loading="eager"
+                decoding="async"
+                fetchPriority="high"
+              />
+            )}
+            <div className="absolute inset-0 bg-gradient-to-r from-emerald-950 via-emerald-950/90 to-slate-950/50" />
+            <div className="relative z-10 max-w-4xl px-6 py-16 sm:px-10 lg:px-14 lg:py-24">
+              <p className="text-sm font-extrabold uppercase tracking-widest text-amber-300">{samplePage.eyebrow || 'Ansar English School'}</p>
+              <h1 className="mt-3 text-4xl font-extrabold leading-tight lg:text-6xl">{samplePage.title}</h1>
+              <p className="mt-6 max-w-3xl text-lg leading-relaxed text-emerald-50/90 lg:text-xl">{samplePage.subtitle}</p>
+            </div>
+          </section>
+
+          <div className="mt-14 grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start">
+            <div>
+              {samplePage.intro && (
+                <section className="border-l-4 border-amber-400 bg-white py-2 pl-6">
+                  <p className="text-lg leading-relaxed text-slate-700 lg:text-xl">{samplePage.intro}</p>
+                </section>
+              )}
+
+              <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-2">
+                {samplePage.sections.map((section, index) => {
+                  const title = typeof section === 'string' ? section : section.title;
+                  const body = typeof section === 'string' ? '' : section.body;
+
+                  return (
+                    <section key={title} className="group rounded-2xl border border-slate-100 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-emerald-100 hover:shadow-xl sm:p-8">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-50 text-sm font-black text-emerald-700 ring-1 ring-emerald-100">
+                        {String(index + 1).padStart(2, '0')}
+                      </div>
+                      <h2 className="mt-5 text-2xl font-extrabold text-slate-900">{title}</h2>
+                      <p className="mt-4 text-base leading-relaxed text-slate-600">
+                        {body || 'This section is being prepared by the school team.'}
+                      </p>
+                    </section>
+                  );
+                })}
+              </div>
+            </div>
+
+            <aside className="space-y-5">
+              {samplePage.highlights?.length ? (
+                <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-6">
+                  <p className="text-xs font-extrabold uppercase tracking-widest text-emerald-700">Highlights</p>
+                  <ul className="mt-5 space-y-4">
+                    {samplePage.highlights.map(highlight => (
+                      <li key={highlight} className="flex gap-3 text-sm font-bold leading-relaxed text-slate-700">
+                        <span className="mt-1.5 h-2 w-2 flex-none rounded-full bg-amber-500" />
+                        <span>{highlight}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
+
+              <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
+                <p className="text-xs font-extrabold uppercase tracking-widest text-amber-600">School Office</p>
+                <h2 className="mt-3 text-xl font-extrabold text-slate-900">Need more details?</h2>
+                <p className="mt-3 text-sm leading-relaxed text-slate-600">For programme-specific information, parents and students may contact the school office during working hours.</p>
+                <Link to="/contact" className="mt-5 inline-flex items-center justify-center rounded-xl bg-emerald-700 px-4 py-3 text-sm font-bold text-white transition-colors hover:bg-emerald-800">
+                  Contact Office
+                </Link>
+              </div>
+            </aside>
           </div>
         </div>
       </Layout>

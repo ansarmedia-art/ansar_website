@@ -7,7 +7,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+        sans: ['"Nexa Light"', '"Nexa"', '"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
         title: ['"Nexa Bold"', '"Nexa"', '"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
       },
       colors: {

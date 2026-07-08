@@ -7,7 +7,7 @@ import NotificationsBell from './NotificationsBell';
 const LEGACY_EXPLORE_LINKS = [
   { title: 'Gallery', slug: 'gallery' },
   { title: 'Achievements', slug: 'achievements' },
-  { title: 'Ansar Media and Production', slug: 'ansar-media-production' },
+  { title: 'ANSAR MEDIA PRODUCTIONS', slug: 'ansar-media-production' },
   { title: 'Sports', slug: 'sports-page' },
   { title: 'ATL', slug: 'atl' },
   { title: 'Ansar Sprouts', slug: 'ansar-sprouts' },

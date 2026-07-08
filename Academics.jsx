@@ -175,7 +175,7 @@ export default function Academics() {
         
         <div className="relative w-full h-64 sm:h-96 rounded-3xl overflow-hidden shadow-2xl mb-20 group">
           <div className="absolute inset-0 bg-slate-900/20 group-hover:bg-transparent transition-colors duration-500 z-10"></div>
-          <img src="https://images.unsplash.com/photo-1497633762265-9d179a990aa6?q=80&w=2000&auto=format&fit=crop" alt="Academics at Ansar" className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700" />
+          <img src="/academics/D3ZTUDIO_PR0-02-18.jpg" alt="Students writing in class at Ansar English School" className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700" />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-20">
