@@ -971,8 +971,11 @@ header, section, footer, main, .container, .row, .grid-wrapper {
 
 .achievement-ticker-scroll {
   scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 .achievement-ticker-scroll::-webkit-scrollbar {
   display: none;
+  width: 0;
+  height: 0;
 }

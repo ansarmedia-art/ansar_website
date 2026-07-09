@@ -32,7 +32,7 @@ const SCHOOL_PROFILE_CONTEXT = [
   'Trust and service: The school is shaped by Ansari Charitable Trust, whose wider service ecosystem includes education, healthcare, social welfare, an orphanage, a special school, and women\'s education initiatives.',
   'Scale: The campus serves over 4,600 students with 270+ educators/staff members and has 40+ years of service in value-based education.',
   'Affiliation and accreditation: Ansar English School is affiliated with CBSE, New Delhi, and is NABET accredited. The site presents it as the first school in Thrissur accredited by NABET.',
-  'Facilities: CCTV-enabled safety, spacious classrooms with smart boards, qualified support staff, digital classrooms, special play area, advanced labs, multi-sports play area, Wi-Fi enabled learning environment, safe school transport, ATL tinkering/innovation spaces, science and computer labs, language enrichment, exam preparation support, and a library with more than 34,000 books and learning resources.',
+  'Facilities: a safe and secure CCTV-supported campus, future-ready learning spaces with smart boards, a dedicated support team, joyful play zone, experiential learning labs, Champions Arena, safe school transport, healthy dining spaces, ATL tinkering/innovation spaces, science and computer labs, language enrichment, exam preparation support, and a library with more than 34,000 books and learning resources.',
   'Academic pathway: Ansar Sprouts for foundational early learning, Primary School for literacy/numeracy/environmental awareness, Middle School for concept clarity and analytical thinking, and Senior Secondary for subject depth, practical work, projects, and CBSE exam preparation.',
   'Campus life: The school supports sports, arts, innovation, entrepreneurship, environmental stewardship, community engagement, Student Police Cadet, NSS, clubs, NIOS, life skills, leadership, and co-curricular programmes.',
   'Ansar Media and Production: An in-house media unit for photography, videography, drone videography, podcast production, graphic designing, editing, event documentation, social media creatives, reels, institutional presentations, and communication support for school activities.',
@@ -176,7 +176,7 @@ function getFallbackAnswer(question, context) {
   }
 
   if (lower.includes('facility') || lower.includes('facilities') || lower.includes('lab') || lower.includes('library') || lower.includes('sports') || lower.includes('transport')) {
-    return 'Ansar facilities include smart/digital classrooms, CCTV-enabled safety, advanced science and computer labs, ATL innovation space, language enrichment, a library with 34,000+ resources, multi-sports play areas, Wi-Fi enabled learning, special play areas, qualified support staff, and safe school transport.';
+    return 'Ansar facilities include a safe and secure CCTV-supported campus, future-ready learning spaces with smart boards, experiential learning labs, ATL innovation space, language enrichment, a library with 34,000+ resources, Champions Arena, joyful play zones, dedicated support staff, healthy dining spaces, and safe school transport.';
   }
 
   if (lower.includes('media') || lower.includes('production') || lower.includes('photography') || lower.includes('videography') || lower.includes('podcast')) {

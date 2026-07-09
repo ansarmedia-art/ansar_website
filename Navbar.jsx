@@ -53,7 +53,7 @@ export default function Navbar() {
               <span className="block text-lg font-extrabold uppercase leading-tight tracking-wide text-white">ANSAR ENGLISH SCHOOL</span>
               <div className="flex items-center gap-2 mt-0.5">
                 <span className="block text-emerald-100 text-[10px] font-bold uppercase tracking-widest">Perumpilavu</span>
-                <span className="block bg-amber-100 text-amber-800 text-[9px] font-bold px-1.5 py-0.5 rounded-sm uppercase tracking-widest">NABET Accredited</span>
+                <span className="block rounded bg-amber-100 px-2 py-0.5 text-[11px] font-black uppercase leading-none tracking-wide text-amber-900 shadow-sm">NABET Accredited</span>
               </div>
             </div>
           </Link>

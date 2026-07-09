@@ -67,6 +67,13 @@ export default function AdminSettings() {
     setFormData(prev => ({ ...prev, [field]: newArr }));
   };
 
+  const appendArrayUrls = (field, urls) => {
+    setFormData(prev => {
+      const existing = Array.isArray(prev[field]) ? prev[field].filter(url => String(url || '').trim() !== '') : [];
+      return { ...prev, [field]: [...existing, ...urls] };
+    });
+  };
+
   const handleJuniorPrincipalChange = (index, field, value) => {
     const current = Array.isArray(formData.juniorPrincipals) ? formData.juniorPrincipals : [];
     const next = [...current];
@@ -155,6 +162,9 @@ export default function AdminSettings() {
             <div>
               <label className="block text-sm font-bold text-slate-700 mb-2">Main School Logo (Image URL)</label>
               <input name="logoUrl" type="url" value={formData.logoUrl} onChange={handleChange} className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" />
+              <div className="mt-2">
+                <ImgBbUrlImporter onExtracted={(url) => setFormData(prev => ({ ...prev, logoUrl: url }))} />
+              </div>
             </div>
           </div>
 
@@ -179,6 +189,9 @@ export default function AdminSettings() {
                     </div>
                   ))}
                   <button type="button" onClick={() => addArrayItem('premisesImages')} className="text-sm font-bold text-emerald-600 hover:bg-emerald-50 py-1 px-3 mt-1 rounded-lg">+ Add Image</button>
+                  <div className="mt-2">
+                    <ImgBbUrlImporter multiple label="Extract ImgBB URLs" onExtracted={(urls) => appendArrayUrls('premisesImages', urls)} />
+                  </div>
                 </div>
                 <div>
                   <label className="block text-sm font-bold text-slate-700 mb-2">KG Section Vertical Carousel</label>
@@ -189,6 +202,9 @@ export default function AdminSettings() {
                     </div>
                   ))}
                   <button type="button" onClick={() => addArrayItem('kgImages')} className="text-sm font-bold text-emerald-600 hover:bg-emerald-50 py-1 px-3 mt-1 rounded-lg">+ Add Image</button>
+                  <div className="mt-2">
+                    <ImgBbUrlImporter multiple label="Extract ImgBB URLs" onExtracted={(urls) => appendArrayUrls('kgImages', urls)} />
+                  </div>
                 </div>
               </div>
             </div>
@@ -239,6 +255,7 @@ export default function AdminSettings() {
                     <input value={leader.section || ''} onChange={(e) => handleJuniorPrincipalChange(index, 'section', e.target.value)} placeholder="Section" className="min-w-0 rounded-lg border border-slate-200 p-3 outline-none focus:ring-2 focus:ring-emerald-500" />
                     <input value={leader.imageUrl || ''} onChange={(e) => handleJuniorPrincipalChange(index, 'imageUrl', e.target.value)} placeholder="Image URL" className="min-w-0 rounded-lg border border-slate-200 p-3 outline-none focus:ring-2 focus:ring-emerald-500" />
                   </div>
+                  <ImgBbUrlImporter onExtracted={(url) => handleJuniorPrincipalChange(index, 'imageUrl', url)} />
                 </div>
               ))}
               <button type="button" onClick={addJuniorPrincipal} className="text-sm font-bold text-emerald-600 hover:bg-emerald-50 py-2 px-3 rounded-lg">+ Add Junior Principal</button>
@@ -274,6 +291,9 @@ export default function AdminSettings() {
               <div>
                 <label className="block text-sm font-bold text-slate-700 mb-2">Logo PNG URL</label>
                 <input name="sustainabilityLogoUrl" type="url" value={formData.sustainabilityLogoUrl} onChange={handleChange} className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" />
+                <div className="mt-2">
+                  <ImgBbUrlImporter onExtracted={(url) => setFormData(prev => ({ ...prev, sustainabilityLogoUrl: url }))} />
+                </div>
               </div>
               <div className="md:col-span-2">
                 <label className="block text-sm font-bold text-slate-700 mb-2">Sustainability Description</label>

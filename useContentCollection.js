@@ -69,6 +69,17 @@ function splitList(value) {
     .filter(Boolean);
 }
 
+function mergeChunkedListFields(item, key) {
+  const chunks = [key, `${key}2`, `${key}3`, `${key}4`]
+    .flatMap((field) => splitList(item[field]))
+    .filter(Boolean);
+
+  if (chunks.length) item[key] = [...new Set(chunks)];
+  [`${key}2`, `${key}3`, `${key}4`].forEach((field) => {
+    if (field in item) delete item[field];
+  });
+}
+
 function slugify(value) {
   return String(value || '')
     .trim()
@@ -105,9 +116,11 @@ function coerceRow(row, collectionName, rowIndex) {
   if (item.year !== '' && item.year != null) item.year = Number(item.year) || item.year;
   if (item.monthIndex !== '' && item.monthIndex != null) item.monthIndex = Number(item.monthIndex) || 0;
   if ('published' in item) item.published = parseBoolean(item.published, true);
-  ['imageUrls', 'eventImages', 'sections', 'premisesImages', 'kgImages', 'mandatoryDisclosureSections'].forEach((key) => {
+  ['imageUrls', 'eventImages', 'sections', 'premisesImages', 'kgImages', 'mandatoryDisclosureSections', 'galleryImages', 'points'].forEach((key) => {
     if (item[key]) item[key] = splitList(item[key]);
   });
+  mergeChunkedListFields(item, 'imageUrls');
+  mergeChunkedListFields(item, 'eventImages');
   return item;
 }
 
@@ -132,7 +145,8 @@ function hasDisplayableContent(item) {
     'thumbnailUrl',
     'studentName',
     'eventImages',
-    'imageUrls'
+    'imageUrls',
+    'galleryImages'
   ];
 
   return contentKeys.some((key) => {

@@ -30,11 +30,17 @@ export default function ArticleView() {
   const location = useLocation();
   const settings = useSettings();
   const isAchievement = location.pathname.startsWith('/achievements/');
-  const collectionName = isAchievement ? 'achievements' : 'updates';
+  const isSportsAchievement = location.pathname.startsWith('/sports-achievements/');
+  const collectionName = isSportsAchievement ? 'sportsAchievements' : (isAchievement ? 'achievements' : 'updates');
   const shareUrl = `${window.location.origin}${location.pathname}`;
   const { data: article, loading } = useContentDocument(collectionName, id);
 
   const [[page, direction], setPage] = useState([0, 0]);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    setPage([0, 0]);
+  }, [location.pathname, id]);
 
   // Safely extract valid images even during the loading state
   const fallbackImage = article?.coverImageUrl || article?.imageUrl;

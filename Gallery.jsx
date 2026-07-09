@@ -1,26 +1,53 @@
-import React, { useState, useEffect } from 'react';
+import React, { useMemo, useState } from 'react';
 import Layout from './Layout';
-import { collection, onSnapshot } from 'firebase/firestore';
-import { db } from './firebase-init';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useContentCollection } from './useContentCollection';
+
+function parseFlexibleDate(value) {
+  if (!value) return null;
+  if (value?.toMillis) return new Date(value.toMillis());
+  if (value?.seconds) return new Date(value.seconds * 1000);
+
+  const text = String(value).trim();
+  const ddmmyyyy = text.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{4})$/);
+  if (ddmmyyyy) {
+    const [, day, month, year] = ddmmyyyy;
+    const parsed = new Date(Number(year), Number(month) - 1, Number(day));
+    return Number.isNaN(parsed.getTime()) ? null : parsed;
+  }
+
+  const parsed = new Date(text);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
+function getItemTime(item) {
+  const parsedDate = parseFlexibleDate(item.date);
+  if (parsedDate) return parsedDate.getTime();
+  if (item.createdAt?.toMillis) return item.createdAt.toMillis();
+  if (item.createdAt?.seconds) return item.createdAt.seconds * 1000;
+  return 0;
+}
+
+function getItemYear(item) {
+  const date = parseFlexibleDate(item.date);
+  if (date) return date.getFullYear();
+  return 'Undated';
+}
 
 export default function Gallery() {
-  const [media, setMedia] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('All');
   const [selectedImg, setSelectedImg] = useState(null);
+  const { data: updates, loading: loadingUpdates } = useContentCollection('updates', null);
+  const { data: achievements, loading: loadingAchievements } = useContentCollection('achievements', null);
+  const { data: sportsAchievements, loading: loadingSportsAchievements } = useContentCollection('sportsAchievements', null);
+  const { data: galleryData, loading: loadingGallery } = useContentCollection('gallery', null);
+  const loading = loadingUpdates || loadingAchievements || loadingSportsAchievements || loadingGallery;
 
-  useEffect(() => {
-    setLoading(true);
-    let updatesData = [];
-    let achievementsData = [];
-    let galleryData = [];
-
-    const processMedia = () => {
+  const media = useMemo(() => {
       let allImages = [];
 
       // Legacy Gallery Collection support
-      galleryData.forEach(item => {
+      galleryData.filter(item => item.published !== false).forEach(item => {
         if (item.imageUrl && item.imageUrl.trim() !== '') {
           allImages.push({
             id: item.id + '-gal',
@@ -28,13 +55,14 @@ export default function Gallery() {
             title: item.title || 'Gallery Image',
             category: item.category || 'General',
             date: item.date || '',
-            timestamp: item.createdAt?.toMillis() || 0
+            year: getItemYear(item),
+            timestamp: getItemTime(item)
           });
         }
       });
 
       // Updates (News & Events) Collections
-      updatesData.forEach(item => {
+      updates.filter(item => item.published !== false).forEach(item => {
         const urls = new Set();
         if (item.coverImageUrl) urls.add(item.coverImageUrl);
         if (item.imageUrl) urls.add(item.imageUrl);
@@ -50,56 +78,66 @@ export default function Gallery() {
               title: item.title || 'School Update',
               category: item.category || 'News & Events',
               date: item.date || '',
-              timestamp: item.createdAt?.toMillis() || 0
+              year: getItemYear(item),
+              timestamp: getItemTime(item)
             });
           }
         });
       });
 
       // Achievements Collection
-      achievementsData.forEach(item => {
-        if (item.imageUrl && item.imageUrl.trim() !== '') {
+      achievements.filter(item => item.published !== false).forEach(item => {
+        const urls = new Set();
+        if (item.imageUrl) urls.add(item.imageUrl);
+        if (Array.isArray(item.imageUrls)) item.imageUrls.forEach(url => url && urls.add(url));
+        let i = 0;
+        urls.forEach(url => {
+          if (url && url.trim() !== '') {
+            allImages.push({
+              id: item.id + `-ach-${i++}`,
+              url: url,
+              title: item.title || 'Achievement',
+              category: 'Achievements',
+              date: item.date || '',
+              year: getItemYear(item),
+              timestamp: getItemTime(item)
+            });
+          }
+        });
+      });
+
+      // Sports Achievements Collection
+      sportsAchievements.filter(item => item.published !== false).forEach(item => {
+        const urls = new Set();
+        if (item.imageUrl) urls.add(item.imageUrl);
+        if (Array.isArray(item.imageUrls)) item.imageUrls.forEach(url => url && urls.add(url));
+        let i = 0;
+        urls.forEach(url => {
+          if (url && url.trim() !== '') {
           allImages.push({
-            id: item.id + '-ach',
-            url: item.imageUrl,
-            title: item.title || 'Achievement',
-            category: 'Achievements',
+              id: item.id + `-sport-ach-${i++}`,
+              url: url,
+              title: item.title || 'Sports Achievement',
+              category: 'Sports Achievements',
             date: item.date || '',
-            timestamp: item.createdAt?.toMillis() || 0
+              year: getItemYear(item),
+              timestamp: getItemTime(item)
           });
         }
+        });
       });
 
       // Sort strictly chronologically (newest first)
       allImages.sort((a, b) => b.timestamp - a.timestamp);
-      setMedia(allImages);
-      setLoading(false);
-    };
-
-    const unsubUpdates = onSnapshot(collection(db, 'updates'), (snap) => {
-      updatesData = snap.docs.map(doc => ({ id: doc.id, ...doc.data() })).filter(d => d.published !== false);
-      processMedia();
-    });
-
-    const unsubAchievements = onSnapshot(collection(db, 'achievements'), (snap) => {
-      achievementsData = snap.docs.map(doc => ({ id: doc.id, ...doc.data() })).filter(d => d.published !== false);
-      processMedia();
-    });
-    
-    const unsubGallery = onSnapshot(collection(db, 'gallery'), (snap) => {
-      galleryData = snap.docs.map(doc => ({ id: doc.id, ...doc.data() })).filter(d => d.published !== false);
-      processMedia();
-    });
-
-    return () => {
-      unsubUpdates();
-      unsubAchievements();
-      unsubGallery();
-    };
-  }, []);
+      return allImages;
+  }, [updates, achievements, sportsAchievements, galleryData]);
 
   const categories = ['All', ...new Set(media.map(item => item.category).filter(Boolean))];
   const filteredMedia = filter === 'All' ? media : media.filter(item => item.category === filter);
+  const timelineYears = [...new Set(filteredMedia.map(item => item.year))];
+  const scrollToYear = (year) => {
+    document.getElementById(`gallery-year-${year}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   // Raw Asset Fetcher (Bypasses browser compression or preview constraints)
   const handleDownload = async (url, title) => {
@@ -139,17 +177,49 @@ export default function Gallery() {
         
         {loading ? (
           <p className="text-center text-slate-500 font-bold animate-pulse">Synchronizing media assets...</p>
+        ) : !filteredMedia.length ? (
+          <p className="rounded-2xl border border-slate-100 bg-white p-10 text-center font-bold text-slate-500">No gallery images found for this filter.</p>
         ) : (
-          <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4">
-            {filteredMedia.map(item => (
-              <div key={item.id} className="break-inside-avoid relative group overflow-hidden rounded-xl shadow-sm cursor-pointer mb-4 bg-slate-100 border border-slate-200" onClick={() => setSelectedImg(item)}>
-                 <img src={item.url} alt={item.title} className="w-full h-auto block group-hover:scale-105 transition-transform duration-500" loading="lazy" />
-                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-5">
-                    <h3 className="text-white font-bold text-sm lg:text-base leading-snug line-clamp-2 drop-shadow-md">{item.title}</h3>
-                    <span className="text-emerald-400 font-bold text-xs uppercase tracking-wider mt-1 drop-shadow-md">{item.category}</span>
-                 </div>
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-[11rem_minmax(0,1fr)]">
+            <aside className="lg:sticky lg:top-28 lg:self-start">
+              <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
+                <p className="mb-3 text-xs font-black uppercase tracking-widest text-emerald-600">Timeline</p>
+                <div className="flex gap-2 overflow-x-auto pb-1 lg:flex-col lg:overflow-visible lg:pb-0">
+                  {timelineYears.map(year => (
+                    <button
+                      key={year}
+                      type="button"
+                      onClick={() => scrollToYear(year)}
+                      className="flex shrink-0 items-center justify-between gap-3 rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 text-left text-sm font-extrabold text-slate-700 transition-colors hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-800 lg:w-full"
+                    >
+                      <span>{year}</span>
+                      <span className="rounded-full bg-white px-2 py-0.5 text-xs font-black text-slate-500">{filteredMedia.filter(item => item.year === year).length}</span>
+                    </button>
+                  ))}
+                </div>
               </div>
-            ))}
+            </aside>
+            <div className="space-y-12">
+              {timelineYears.map(year => (
+                <section id={`gallery-year-${year}`} key={year} className="scroll-mt-28">
+                  <div className="mb-5 flex items-center gap-4">
+                    <h2 className="text-2xl font-black text-emerald-950">{year}</h2>
+                    <span className="h-px flex-1 bg-slate-200" />
+                  </div>
+                  <div className="columns-1 gap-4 sm:columns-2 md:columns-3 xl:columns-4">
+                    {filteredMedia.filter(item => item.year === year).map(item => (
+                      <div key={item.id} className="break-inside-avoid relative group overflow-hidden rounded-xl shadow-sm cursor-pointer mb-4 bg-slate-100 border border-slate-200" onClick={() => setSelectedImg(item)}>
+                         <img src={item.url} alt={item.title} className="w-full h-auto block group-hover:scale-105 transition-transform duration-500" loading="lazy" />
+                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-5">
+                            <h3 className="text-white font-bold text-sm lg:text-base leading-snug line-clamp-2 drop-shadow-md">{item.title}</h3>
+                            <span className="text-emerald-400 font-bold text-xs uppercase tracking-wider mt-1 drop-shadow-md">{item.category}</span>
+                         </div>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              ))}
+            </div>
           </div>
         )}
       </div>

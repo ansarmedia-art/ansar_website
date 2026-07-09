@@ -12,15 +12,14 @@ import { Link } from 'react-router-dom';
 
 // Transformed into a Bento Layout configuration using Lucide-style SVG icons
 const FALLBACK_FEATURES = [
-  { slug: 'cctv-enabled-safety', span: 'md:col-span-1 md:row-span-1', text: 'CCTV-enabled safety', icon: <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 16h.01"/></svg> },
-  { slug: 'smart-classrooms', span: 'md:col-span-2 md:row-span-1 bg-gradient-to-r from-white to-emerald-50', text: 'Spacious classrooms with smart boards', icon: <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="3" rx="2" strokeWidth="2"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 21h8"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 17v4"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m10 8 6 4-6 4Z"/></svg> },
-  { slug: 'qualified-support-staff', span: 'md:col-span-1 md:row-span-1', text: 'Qualified support staff', icon: <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4" strokeWidth="2"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M22 21v-2a4 4 0 0 0-3-3.87"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> },
-  { slug: 'digital-classrooms', span: 'md:col-span-2 md:row-span-1', text: 'Digital classrooms', icon: <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9m16 0H4m16 0 1.28 2.55a1 1 0 0 1-.9 1.45H3.62a1 1 0 0 1-.9-1.45L4 16"/></svg> },
-  { slug: 'special-play-area', span: 'md:col-span-1 md:row-span-1', text: 'Special play area', icon: <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" strokeWidth="2"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" x2="9.01" y1="9" y2="9" strokeWidth="2"/><line x1="15" x2="15.01" y1="9" y2="9" strokeWidth="2"/></svg> },
-  { slug: 'advanced-labs', span: 'md:col-span-1 md:row-span-1', text: 'Purpose-built advanced labs', icon: <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 2v7.31L2 20.5A2 2 0 0 0 3.5 24h17a2 2 0 0 0 1.5-3.5L14 9.31V2"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.5 2h7"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 9.31V6"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 9.31V6"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 14h12"/></svg> },
-  { slug: 'multi-sports-play-area', span: 'md:col-span-2 md:row-span-1', text: 'Multi-sports play area', icon: <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 22h16"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14.66V17c0 1.1-.9 2-2 2H4"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 14.66V17c0 1.1.9 2 2 2h4"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18 4c0 3-2 5.5-5 5.5h-2c-3 0-5-2.5-5-5.5V2h12z"/></svg> },
-  { slug: 'wi-fi-learning-environment', span: 'md:col-span-1 md:row-span-1', text: 'Wi-Fi enabled learning environment', icon: <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 12.55a11 11 0 0 1 14.08 0"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M1.42 9a16 16 0 0 1 21.16 0"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" x2="12.01" y1="20" y2="20" strokeWidth="2"/></svg> },
-  { slug: 'safe-school-transport', span: 'md:col-span-1 md:row-span-1', text: 'Safe school transport', icon: <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 6v6"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 6v6"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2 12h19.6"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18 18h3s.5-1.7.8-2.8c.1-.4.2-.8.2-1.2 0-.4-.1-.8-.2-1.2l-1.4-5C20.1 6.8 19.1 6 18 6H4a2 2 0 0 0-2 2v10h3"/><circle cx="7" cy="18" r="2" strokeWidth="2"/><circle cx="17" cy="18" r="2" strokeWidth="2"/></svg> }
+  { slug: 'cctv-enabled-safety', span: 'md:col-span-1 md:row-span-1', text: 'A Safe & Secure Campus', icon: <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 16h.01"/></svg> },
+  { slug: 'smart-classrooms', span: 'md:col-span-2 md:row-span-1 bg-gradient-to-r from-white to-emerald-50', text: 'Future-Ready Learning Spaces', icon: <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="3" rx="2" strokeWidth="2"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 21h8"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 17v4"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m10 8 6 4-6 4Z"/></svg> },
+  { slug: 'qualified-support-staff', span: 'md:col-span-1 md:row-span-1', text: 'Dedicated Support Team', icon: <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4" strokeWidth="2"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M22 21v-2a4 4 0 0 0-3-3.87"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> },
+  { slug: 'special-play-area', span: 'md:col-span-1 md:row-span-1', text: 'Joyful Play Zone', icon: <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" strokeWidth="2"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" x2="9.01" y1="9" y2="9" strokeWidth="2"/><line x1="15" x2="15.01" y1="9" y2="9" strokeWidth="2"/></svg> },
+  { slug: 'advanced-labs', span: 'md:col-span-1 md:row-span-1', text: 'Experiential Learning Labs', icon: <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 2v7.31L2 20.5A2 2 0 0 0 3.5 24h17a2 2 0 0 0 1.5-3.5L14 9.31V2"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.5 2h7"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 9.31V6"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 9.31V6"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 14h12"/></svg> },
+  { slug: 'multi-sports-play-area', span: 'md:col-span-2 md:row-span-1', text: "Champions' Arena", icon: <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 22h16"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14.66V17c0 1.1-.9 2-2 2H4"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 14.66V17c0 1.1.9 2 2 2h4"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18 4c0 3-2 5.5-5 5.5h-2c-3 0-5-2.5-5-5.5V2h12z"/></svg> },
+  { slug: 'safe-school-transport', span: 'md:col-span-1 md:row-span-1', text: 'Safe School Transport', icon: <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 6v6"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 6v6"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2 12h19.6"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18 18h3s.5-1.7.8-2.8c.1-.4.2-.8.2-1.2 0-.4-.1-.8-.2-1.2l-1.4-5C20.1 6.8 19.1 6 18 6H4a2 2 0 0 0-2 2v10h3"/><circle cx="7" cy="18" r="2" strokeWidth="2"/><circle cx="17" cy="18" r="2" strokeWidth="2"/></svg> },
+  { slug: 'healthy-dining-spaces', span: 'md:col-span-1 md:row-span-1', text: 'Healthy Dining Spaces', icon: <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 3v8a4 4 0 0 0 4 4v6"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 3v18"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 3v8a5 5 0 0 0 5 5h1V3"/></svg> }
 ];
 
 const FALLBACK_LEADERS = [
@@ -85,9 +84,22 @@ function AnimatedCounter({ target, suffix = "" }) {
 function getContentDateTime(item) {
   const dateTime = Date.parse(item.date);
   if (!Number.isNaN(dateTime)) return dateTime;
+  const ddmmyyyy = String(item.date || '').trim().match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{4})$/);
+  if (ddmmyyyy) {
+    const [, day, month, year] = ddmmyyyy;
+    const parsed = new Date(Number(year), Number(month) - 1, Number(day)).getTime();
+    if (!Number.isNaN(parsed)) return parsed;
+  }
   if (item.createdAt?.toMillis) return item.createdAt.toMillis();
   if (item.createdAt?.seconds) return item.createdAt.seconds * 1000;
   return Number.MIN_SAFE_INTEGER;
+}
+
+function getContentYear(item) {
+  const ddmmyyyy = String(item.date || '').trim().match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{4})$/);
+  if (ddmmyyyy) return ddmmyyyy[3];
+  const parsed = new Date(item.date);
+  return Number.isNaN(parsed.getTime()) ? 'Sports' : parsed.getFullYear();
 }
 
 function VerticalCarousel({ images, onImageClick }) {
@@ -252,14 +264,25 @@ function getJuniorPrincipalItemClass(count, index) {
 export default function Home() {
   const settings = useSettings();
   const [lightboxImage, setLightboxImage] = useState(null);
+  const sportsAchievementsRef = useRef(null);
   const { data: leadershipData } = useContentCollection('leadership', 'order', 'asc', { firestoreOnly: true });
   const { data: updates } = useContentCollection('updates', null);
+  const { data: sportsAchievements } = useContentCollection('sportsAchievements', null);
+  const { data: learningFeatures } = useContentCollection('learningFeatures', null, 'asc', { sheetsOnly: true });
 
   const publishedUpdates = updates
     .filter(item => item.published !== false)
     .sort((a, b) => getContentDateTime(b) - getContentDateTime(a));
   const homeNews = publishedUpdates.filter(item => item.category === 'News' || !item.category).slice(0, 3);
   const homeEvents = publishedUpdates.filter(item => item.category === 'Events').slice(0, 3);
+  const homeSportsAchievements = sportsAchievements
+    .filter(item => item.published !== false)
+    .sort((a, b) => getContentDateTime(b) - getContentDateTime(a))
+    .slice(0, 8);
+  const displayLearningFeatures = FALLBACK_FEATURES.map(feature => {
+    const saved = learningFeatures.find(item => item.slug === feature.slug && item.published !== false);
+    return saved?.title ? { ...feature, text: saved.title } : feature;
+  });
   const activeLeaders = leadershipData.length ? leadershipData.filter(l => l.published !== false) : FALLBACK_LEADERS;
   const legacyDirector = activeLeaders.find(leader => (leader.role || '').toLowerCase().includes('director')) || FALLBACK_LEADERS[0];
   const legacyPrincipal = activeLeaders.find(leader => (leader.role || '').toLowerCase().includes('principal') && !(leader.role || '').toLowerCase().includes('junior')) || FALLBACK_LEADERS[1];
@@ -282,6 +305,14 @@ export default function Home() {
     : activeLeaders
         .filter(leader => (leader.role || '').toLowerCase().includes('junior'))
         .map(leader => ({ name: leader.name, qualification: leader.qualification || '', section: leader.detail || leader.role, imageUrl: leader.imageUrl }));
+  const canScrollSportsAchievements = homeSportsAchievements.length > 1;
+
+  const scrollSportsAchievements = (direction) => {
+    const container = sportsAchievementsRef.current;
+    if (!container) return;
+    const distance = Math.max(280, Math.floor(container.clientWidth * 0.78));
+    container.scrollBy({ left: direction * distance, behavior: 'smooth' });
+  };
 
   return (
     <Layout isHome={true}>
@@ -348,7 +379,7 @@ export default function Home() {
           <h2 className="text-4xl lg:text-5xl font-extrabold text-emerald-950">Student-Centric Learning</h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 auto-rows-[160px]">
-          {FALLBACK_FEATURES.map((feature, i) => (
+          {displayLearningFeatures.map((feature, i) => (
             <Link key={feature.slug || i} to={`/learning/${feature.slug}`} className={`${feature.span || 'col-span-1'} ${feature.span?.includes('bg-') ? '' : 'bg-white'} p-8 rounded-[2rem] shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] border border-slate-100/50 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group relative overflow-hidden flex flex-col justify-center focus:outline-none focus:ring-4 focus:ring-emerald-200`}>
               <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50 rounded-bl-[100px] -z-10 group-hover:bg-amber-50 transition-colors duration-500"></div>
               <div className="w-14 h-14 bg-emerald-100/50 text-emerald-600 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-amber-400 group-hover:text-white transition-all duration-500 shadow-sm">
@@ -361,6 +392,69 @@ export default function Home() {
       </AnimatedSection>
 
       <AchievementsTicker />
+
+      {homeSportsAchievements.length > 0 && (
+        <AnimatedSection className="mt-24">
+          <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <p className="text-emerald-600 font-black uppercase tracking-widest text-sm mb-3">Sports Achievements</p>
+              <h2 className="text-4xl lg:text-5xl font-extrabold text-emerald-950">Champions in Motion</h2>
+            </div>
+            <div className="flex flex-wrap items-center gap-3">
+              <Link to="/sports-page#sports-achievements" className="inline-flex items-center justify-center rounded-full bg-emerald-700 px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-emerald-800">
+                View Sports Achievements
+              </Link>
+              {canScrollSportsAchievements && (
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => scrollSportsAchievements(-1)}
+                    className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-900 text-white shadow-sm transition-colors hover:bg-emerald-700"
+                    aria-label="Previous sports achievement"
+                  >
+                    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 18 9 12l6-6" />
+                    </svg>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => scrollSportsAchievements(1)}
+                    className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-900 text-white shadow-sm transition-colors hover:bg-emerald-700"
+                    aria-label="Next sports achievement"
+                  >
+                    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m9 18 6-6-6-6" />
+                    </svg>
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+          <div ref={sportsAchievementsRef} className="achievement-ticker-scroll flex gap-5 overflow-x-auto scroll-smooth" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            {homeSportsAchievements.map((item, index) => {
+              const imageUrl = item.thumbnailUrl || item.imageUrl || item.imageUrls?.[0];
+              return (
+                <Link key={item.id} to={`/sports-achievements/${item.id}`} className="group min-w-[17rem] overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl">
+                  <div className="relative aspect-[4/3] bg-slate-100">
+                    {imageUrl ? (
+                      <img src={imageUrl} alt={item.title} className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" loading={index < 2 ? 'eager' : 'lazy'} />
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center text-slate-400">
+                        <svg className="h-12 w-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6m12 5h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M18 4c0 3-2 5.5-5 5.5h-2C8 9.5 6 7 6 4V2h12z" /></svg>
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-5">
+                    <p className="text-xs font-black uppercase tracking-widest text-amber-600">{getContentYear(item)}</p>
+                    <h3 className="mt-2 line-clamp-2 text-lg font-extrabold text-slate-900 group-hover:text-emerald-700">{item.title}</h3>
+                    {item.studentName && <p className="mt-2 line-clamp-1 text-sm font-bold text-slate-500">{item.studentName}</p>}
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </AnimatedSection>
+      )}
 
       <AnimatedSection className="mt-32">
         <div className="text-center mb-12">

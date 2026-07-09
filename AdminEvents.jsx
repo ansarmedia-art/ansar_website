@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { addDoc, collection, doc, serverTimestamp, updateDoc } from 'firebase/firestore';
+import { addDoc, collection, deleteField, doc, serverTimestamp, updateDoc } from 'firebase/firestore';
 import { db } from './firebase-init';
 import { clearGoogleSheetsCache, useContentCollection } from './useContentCollection';
 import { saveSheetRecord } from './googleSheetsAdminApi';
@@ -107,7 +107,7 @@ export default function AdminEvents() {
         title: formData.title || '',
         description: formData.description || '',
         date: formData.date || '',
-        imageUrls: cleanedImageUrls,
+        image: cleanedImageUrls[0] || '',
         published: !!formData.published
       };
 
@@ -119,6 +119,7 @@ export default function AdminEvents() {
         if (editingId && (!editingItem?._contentSource || editingItem._contentSource === 'firestore' || editingItem._contentSource === 'merged')) {
           await updateDoc(doc(db, 'events', editingId), {
             ...firestorePayload,
+            imageUrls: deleteField(),
             updatedAt: serverTimestamp()
           });
         } else if (!editingId) {

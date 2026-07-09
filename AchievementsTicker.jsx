@@ -84,7 +84,7 @@ export default function AchievementsTicker() {
       </div>
 
       <div className="achievement-ticker-mask px-5">
-        <div ref={scrollerRef} className="achievement-ticker-scroll flex gap-5 overflow-x-auto scroll-smooth pb-2">
+        <div ref={scrollerRef} className="achievement-ticker-scroll flex gap-5 overflow-x-auto scroll-smooth" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
           {publishedAchievements.map((achievement, index) => {
             const imageUrl = achievement.thumbnailUrl || achievement.coverImageUrl || achievement.imageUrl;
 

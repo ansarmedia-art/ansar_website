@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Layout from './Layout';
+import { saveSheetRecord } from './googleSheetsAdminApi';
 
 export default function Contact() {
   const schoolEmail = 'hr@ansar.in';
@@ -18,7 +19,20 @@ export default function Contact() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const getIndiaDate = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
+
+  const getIndiaTimestamp = () => new Date().toLocaleString('en-IN', {
+    timeZone: 'Asia/Kolkata',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: true
+  });
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     // 1. Structure the text payload
@@ -33,6 +47,21 @@ ${formData.message}`;
 
     // 2. Encode for URL safety
     const encodedPayload = encodeURIComponent(payload);
+
+    try {
+      await saveSheetRecord('contactSubmissions', {
+        id: `contact-${Date.now()}`,
+        date: getIndiaDate(),
+        submittedAt: getIndiaTimestamp(),
+        name: formData.name.trim(),
+        phone: formData.phone.trim(),
+        email: formData.email.trim(),
+        category: formData.category,
+        message: formData.message.trim()
+      });
+    } catch (error) {
+      console.error('Unable to save contact inquiry to Google Sheets:', error);
+    }
     
     // 3. Open WhatsApp in a new tab
     const whatsappUrl = `https://wa.me/918129808051?text=${encodedPayload}`;

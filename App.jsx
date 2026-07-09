@@ -21,6 +21,8 @@ import AdminUpdates from './AdminUpdates';
 import AdminAchievements from './AdminAchievements';
 import AdminAnsarTimes from './AdminAnsarTimes';
 import AdminGallery from './AdminGallery';
+import AdminSportsAchievements from './AdminSportsAchievements';
+import AdminLearningFeatures from './AdminLearningFeatures';
 import AdminLeadership from './AdminLeadership';
 import AdminNotices from './AdminNotices';
 import AdminAcademics from './AdminAcademics';
@@ -389,7 +391,7 @@ const MEDIA_SERVICES = [
 
 const LEARNING_FEATURES = {
   'cctv-enabled-safety': {
-    title: 'CCTV-enabled safety',
+    title: 'A Safe & Secure Campus',
     kicker: 'Safe campus',
     icon: 'shield',
     image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=90&w=2400&auto=format&fit=crop',
@@ -397,7 +399,7 @@ const LEARNING_FEATURES = {
     points: ['CCTV-supported campus monitoring', 'Structured supervision around key areas', 'A calm environment for focused learning']
   },
   'smart-classrooms': {
-    title: 'Spacious classrooms with smart boards',
+    title: 'Future-Ready Learning Spaces',
     kicker: 'Interactive learning',
     icon: 'screen',
     image: 'https://images.unsplash.com/photo-1588072432836-e10032774350?q=90&w=2400&auto=format&fit=crop',
@@ -405,23 +407,15 @@ const LEARNING_FEATURES = {
     points: ['Spacious rooms for comfortable learning', 'Smart-board enabled explanations', 'Better visual support for concepts']
   },
   'qualified-support-staff': {
-    title: 'Qualified support staff',
+    title: 'Dedicated Support Team',
     kicker: 'Care and guidance',
     icon: 'users',
     image: 'https://images.unsplash.com/photo-1577896851231-70ef18881754?q=90&w=2400&auto=format&fit=crop',
     description: 'Support staff help maintain a smooth daily rhythm for students, teachers, and families. Their presence strengthens care, coordination, and readiness across the school day.',
     points: ['Student-focused assistance through the day', 'Coordination that supports teachers and learners', 'A dependable campus support system']
   },
-  'digital-classrooms': {
-    title: 'Digital classrooms',
-    kicker: 'Technology-enabled',
-    icon: 'laptop',
-    image: 'https://images.unsplash.com/photo-1584697964192-8f473eed4f56?q=90&w=2400&auto=format&fit=crop',
-    description: 'Digital classrooms make lessons more dynamic with multimedia, visual references, and modern teaching tools. Students get richer context while teachers can present ideas with clarity.',
-    points: ['Multimedia-supported classroom sessions', 'Digital resources for deeper understanding', 'Modern tools that enrich regular lessons']
-  },
   'special-play-area': {
-    title: 'Special play area',
+    title: 'Joyful Play Zone',
     kicker: 'Joyful growth',
     icon: 'smile',
     image: 'https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?q=90&w=2400&auto=format&fit=crop',
@@ -429,31 +423,23 @@ const LEARNING_FEATURES = {
     points: ['Dedicated space for active play', 'Supports social and motor-skill development', 'Encourages confidence through joyful activity']
   },
   'advanced-labs': {
-    title: 'Purpose-built advanced labs',
+    title: 'Experiential Learning Labs',
     kicker: 'Hands-on discovery',
     icon: 'flask',
-    image: 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?q=90&w=2400&auto=format&fit=crop',
+    image: 'https://i.ibb.co/zWwgGQFX/IMG-4790.jpg',
     description: 'Purpose-built labs help students move from theory to observation, experimentation, and analysis. The learning experience becomes practical, curious, and grounded in real exploration.',
     points: ['Spaces designed for practical learning', 'Hands-on science and skill development', 'Encourages observation, testing, and inquiry']
   },
   'multi-sports-play-area': {
-    title: 'Multi-sports play area',
+    title: "Champions' Arena",
     kicker: 'Fitness and teamwork',
     icon: 'trophy',
     image: 'https://images.unsplash.com/photo-1526232761682-d26e03ac148e?q=90&w=2400&auto=format&fit=crop',
     description: 'The multi-sports play area supports fitness, coordination, teamwork, and healthy competition. Students get structured opportunities to participate, practice, and build sporting spirit.',
     points: ['Space for multiple sports and activities', 'Builds stamina, teamwork, and discipline', 'Encourages regular physical participation']
   },
-  'wi-fi-learning-environment': {
-    title: 'Wi-Fi enabled learning environment',
-    kicker: 'Connected campus',
-    icon: 'wifi',
-    image: 'https://images.unsplash.com/photo-1497366754035-f200968a6e72?q=90&w=2400&auto=format&fit=crop',
-    description: 'A Wi-Fi enabled environment supports digital access for teaching, learning, administration, and communication. It keeps the campus ready for modern academic needs.',
-    points: ['Connectivity for digital teaching tools', 'Supports academic and administrative workflows', 'Helps classrooms stay resource-ready']
-  },
   'safe-school-transport': {
-    title: 'Safe school transport',
+    title: 'Safe School Transport',
     kicker: 'Reliable travel',
     icon: 'bus',
     image: 'https://i.ibb.co/XfX9K6Yv/D3-ZTUDIO-PR0.jpg',
@@ -469,6 +455,14 @@ const LEARNING_FEATURES = {
       'Every bus has staff members assigned to look after students throughout the journey. Their presence helps maintain discipline, assist younger children, guide boarding and dropping routines, and support student safety from the time they enter the bus until they reach their destination. With careful coordination, route coverage, and attentive supervision, the school transport facility reflects Ansar English School\'s commitment to student care beyond the classroom.'
     ],
     points: ['30+ school buses running on different routes', 'Staff present in every bus to care for students', 'Organized travel routines for safe daily movement']
+  },
+  'healthy-dining-spaces': {
+    title: 'Healthy Dining Spaces',
+    kicker: 'Nourishing routines',
+    icon: 'utensils',
+    image: 'https://i.ibb.co/QFQ4DMQ8/image.png',
+    description: 'Healthy dining spaces give students a clean, comfortable place to eat, refresh, and build positive food habits during the school day.',
+    points: ['Clean and organized dining areas', 'Supports healthy meal routines', 'Comfortable spaces for student refreshment']
   }
 };
 
@@ -489,10 +483,10 @@ function LearningIcon({ name, className = 'h-8 w-8' }) {
       return <svg {...shared}><path {...pathProps} d="M10 2v7.3L3 20.1A1.9 1.9 0 0 0 4.6 23h14.8a1.9 1.9 0 0 0 1.6-2.9L14 9.3V2M8.5 2h7M7 15h10" /></svg>;
     case 'trophy':
       return <svg {...shared}><path {...pathProps} d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6m12 5h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M10 14.7V17a2 2 0 0 1-2 2H6m8-4.3V17a2 2 0 0 0 2 2h2M18 4c0 3-2 5.5-5 5.5h-2C8 9.5 6 7 6 4V2h12v2Z" /></svg>;
-    case 'wifi':
-      return <svg {...shared}><path {...pathProps} d="M5 12.55a11 11 0 0 1 14.08 0M1.42 9a16 16 0 0 1 21.16 0M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01" /></svg>;
     case 'bus':
       return <svg {...shared}><path {...pathProps} d="M8 6v6m7-6v6M2 12h19.6M18 18h3s.5-1.7.8-2.8c.1-.4.2-.8.2-1.2s-.1-.8-.2-1.2l-1.4-5C20.1 6.8 19.1 6 18 6H4a2 2 0 0 0-2 2v10h3" /><circle cx="7" cy="18" r="2" strokeWidth="1.8" /><circle cx="17" cy="18" r="2" strokeWidth="1.8" /></svg>;
+    case 'utensils':
+      return <svg {...shared}><path {...pathProps} d="M4 3v8a4 4 0 0 0 4 4v6M8 3v18M14 3v8a5 5 0 0 0 5 5h1V3" /></svg>;
     default:
       return <svg {...shared}><path {...pathProps} d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1v7Z" /><path {...pathProps} d="M12 8v4M12 16h.01" /></svg>;
   }
@@ -570,9 +564,13 @@ function ScrollToTop() {
   const { pathname, hash } = useLocation();
 
   useEffect(() => {
-    if (!hash) {
+    window.setTimeout(() => {
+      if (hash) {
+        document.getElementById(hash.slice(1))?.scrollIntoView({ block: 'start', behavior: 'auto' });
+        return;
+      }
       window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-    }
+    }, 0);
   }, [pathname, hash]);
 
   return null;
@@ -639,7 +637,21 @@ function AnsarMediaProductionPage() {
 
 function LearningFeaturePage() {
   const { slug } = useParams();
-  const feature = LEARNING_FEATURES[slug];
+  const { data: learningFeatureRows } = useContentCollection('learningFeatures', null, 'asc', { sheetsOnly: true });
+  const sheetFeature = learningFeatureRows.find(item => item.slug === slug && item.published !== false);
+  const defaultFeature = LEARNING_FEATURES[slug];
+  const feature = defaultFeature ? {
+    ...defaultFeature,
+    ...sheetFeature,
+    body: Array.isArray(sheetFeature?.body)
+      ? sheetFeature.body
+      : String(sheetFeature?.body || '').split(/\r?\n/).map(item => item.trim()).filter(Boolean).length
+        ? String(sheetFeature.body || '').split(/\r?\n/).map(item => item.trim()).filter(Boolean)
+        : defaultFeature.body,
+    points: Array.isArray(sheetFeature?.points) && sheetFeature.points.length ? sheetFeature.points : defaultFeature.points,
+    galleryImages: Array.isArray(sheetFeature?.galleryImages) && sheetFeature.galleryImages.length ? sheetFeature.galleryImages : defaultFeature.galleryImages,
+    image: sheetFeature?.imageUrl || sheetFeature?.image || defaultFeature.image
+  } : null;
 
   if (!feature) {
     return (
@@ -822,9 +834,38 @@ function DynamicPage({ slug: propSlug }) {
 
 function SportsPage() {
   const settings = useSettings();
+  const { data: achievements, loading: achievementsLoading } = useContentCollection('sportsAchievements', null);
   const sportsItems = mergeListWithDefaults(settings?.sportsItems, DEFAULT_SPORTS_PAGE.items);
   const title = settings?.sportsPageTitle || DEFAULT_SPORTS_PAGE.title;
   const description = settings?.sportsPageDescription || DEFAULT_SPORTS_PAGE.description;
+  const parseSportsDate = (value) => {
+    if (!value) return null;
+    const text = String(value).trim();
+    const ddmmyyyy = text.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{4})$/);
+    if (ddmmyyyy) {
+      const [, day, month, year] = ddmmyyyy;
+      const parsed = new Date(Number(year), Number(month) - 1, Number(day));
+      return Number.isNaN(parsed.getTime()) ? null : parsed;
+    }
+    const parsed = new Date(text);
+    return Number.isNaN(parsed.getTime()) ? null : parsed;
+  };
+  const getAchievementTime = (item) => {
+    const parsedDate = parseSportsDate(item.date);
+    if (parsedDate) return parsedDate.getTime();
+    if (item.createdAt?.toMillis) return item.createdAt.toMillis();
+    if (item.createdAt?.seconds) return item.createdAt.seconds * 1000;
+    return Number.MIN_SAFE_INTEGER;
+  };
+  const getAchievementYear = (item) => {
+    const date = parseSportsDate(item.date);
+    if (date) return date.getFullYear();
+    return 'Other';
+  };
+  const publishedAchievements = achievements
+    .filter(item => item.published !== false)
+    .sort((a, b) => getAchievementTime(b) - getAchievementTime(a));
+  const achievementYears = [...new Set(publishedAchievements.map(getAchievementYear))];
 
   return (
     <Layout>
@@ -870,6 +911,60 @@ function SportsPage() {
               </div>
             </article>
           ))}
+        </section>
+
+        <section id="sports-achievements" className="mt-20 scroll-mt-24">
+          <div className="mb-10 flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <p className="text-xs font-black uppercase tracking-widest text-amber-600">Sports Achievements</p>
+              <h2 className="mt-2 text-3xl font-extrabold text-slate-900 lg:text-4xl">Year-wise Sports Highlights</h2>
+            </div>
+            <p className="max-w-2xl text-sm font-semibold leading-relaxed text-slate-500">Sports achievements added from the admin panel appear here, in the home carousel, and in the gallery timeline.</p>
+          </div>
+
+          {achievementsLoading ? (
+            <p className="text-center font-bold text-slate-500">Loading sports achievements...</p>
+          ) : achievementYears.length ? (
+            <div className="space-y-12">
+              {achievementYears.map(year => {
+                const yearItems = publishedAchievements.filter(item => getAchievementYear(item) === year);
+                return (
+                  <div key={year}>
+                    <div className="mb-5 flex items-center gap-4">
+                      <h3 className="text-2xl font-black text-emerald-950">{year}</h3>
+                      <span className="h-px flex-1 bg-slate-200" />
+                    </div>
+                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                      {yearItems.map((item, index) => {
+                        const imageUrl = item.thumbnailUrl || item.imageUrl || item.imageUrls?.[0];
+                        return (
+                          <Link key={item.id} to={`/sports-achievements/${item.id}`} className="group overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl">
+                            <div className="relative aspect-[4/3] bg-slate-100">
+                              {imageUrl ? (
+                                <img src={imageUrl} alt={item.title} className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" loading={index < 3 ? 'eager' : 'lazy'} />
+                              ) : (
+                                <div className="absolute inset-0 flex items-center justify-center text-slate-400">
+                                  <LearningIcon name="trophy" className="h-12 w-12" />
+                                </div>
+                              )}
+                            </div>
+                            <div className="p-6">
+                              {item.date && <p className="text-xs font-black uppercase tracking-widest text-amber-600">{item.date}</p>}
+                              <h3 className="mt-2 line-clamp-2 text-xl font-extrabold text-slate-900 group-hover:text-emerald-700">{item.title}</h3>
+                              {item.studentName && <p className="mt-2 text-sm font-bold text-slate-500">{item.studentName}</p>}
+                              {item.description && <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-slate-600">{item.description}</p>}
+                            </div>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <p className="rounded-2xl border border-slate-100 bg-white p-8 text-center font-bold text-slate-500">Sports achievements will appear here once published.</p>
+          )}
         </section>
       </main>
     </Layout>
@@ -1092,6 +1187,7 @@ export default function App() {
         <Route path="/ansar-times" element={<AnsarTimes />} />
         <Route path="/alumni" element={<DynamicPage slug="alumni" />} />
         <Route path="/achievements" element={<Achievements />} />
+        <Route path="/sports-achievements/:id" element={<ArticleView />} />
         <Route path="/sop" element={<DynamicPage slug="sop" />} />
         <Route path="/mandatory-public-disclosure" element={<MandatoryDisclosure />} />
         <Route path="/learning/:slug" element={<LearningFeaturePage />} />
@@ -1117,6 +1213,8 @@ export default function App() {
                   <Route path="/pages" element={<Navigate to="/admin/dashboard" replace />} />
                   <Route path="/updates" element={<AdminUpdates />} />
                   <Route path="/achievements" element={<AdminAchievements />} />
+                  <Route path="/sports-achievements" element={<AdminSportsAchievements />} />
+                  <Route path="/learning-features" element={<AdminLearningFeatures />} />
                   <Route path="/ansar-times" element={<AdminAnsarTimes />} />
                   <Route path="/leadership" element={<AdminLeadership />} />
                   <Route path="/academics" element={<AdminAcademics />} />

@@ -10,7 +10,13 @@ const SHEET_COLUMNS = {
     'thumbnailUrl',
     'coverImageUrl',
     'imageUrls',
+    'imageUrls2',
+    'imageUrls3',
+    'imageUrls4',
     'eventImages',
+    'eventImages2',
+    'eventImages3',
+    'eventImages4',
     'instagramUrl',
     'facebookUrl',
     'youtubeUrl',
@@ -26,6 +32,43 @@ const SHEET_COLUMNS = {
     'imageUrl',
     'thumbnailUrl',
     'order',
+    'published'
+  ],
+  sportsAchievements: [
+    'id',
+    'title',
+    'description',
+    'date',
+    'studentName',
+    'imageUrl',
+    'thumbnailUrl',
+    'imageUrls',
+    'order',
+    'published'
+  ],
+  learningFeatures: [
+    'id',
+    'slug',
+    'title',
+    'kicker',
+    'description',
+    'body',
+    'points',
+    'imageUrl',
+    'galleryImages',
+    'icon',
+    'order',
+    'published'
+  ],
+  contactSubmissions: [
+    'id',
+    'date',
+    'submittedAt',
+    'name',
+    'phone',
+    'email',
+    'category',
+    'message',
     'published'
   ],
   publicDisclosure: [
@@ -184,7 +227,69 @@ function normalizeRecord_(collectionName, record) {
     item.category = item.category || 'News';
   }
 
+  if (collectionName === 'events' || collectionName === 'updates') {
+    splitLargeImageList_(item, 'eventImages');
+    splitLargeImageList_(item, 'imageUrls');
+  }
+
+  if (collectionName === 'sportsAchievements') {
+    item.imageUrl = item.imageUrl || firstImage_(item.imageUrls);
+  }
+
+  if (collectionName === 'learningFeatures') {
+    item.slug = String(item.slug || item.id || item.title || '').trim();
+    item.id = item.slug || item.id || createId_(item.title || collectionName);
+    item.imageUrl = item.imageUrl || firstImage_(item.galleryImages);
+  }
+
+  if (collectionName === 'contactSubmissions') {
+    item.date = item.date || Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd');
+    item.submittedAt = item.submittedAt || Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'dd/MM/yyyy hh:mm:ss a');
+  }
+
   return item;
+}
+
+function firstImage_(value) {
+  if (Array.isArray(value)) return value[0] || '';
+  return String(value || '').split(/\r?\n|,\s*/).map(function(url) {
+    return String(url || '').trim();
+  }).filter(Boolean)[0] || '';
+}
+
+function splitLargeImageList_(item, key) {
+  const urls = normalizeList_(item[key]);
+  if (!urls.length) return;
+
+  const chunks = chunkListForSheetCell_(urls, 45000, 4);
+  item[key] = chunks[0] || [];
+  for (let index = 1; index < 4; index += 1) {
+    item[key + (index + 1)] = chunks[index] || [];
+  }
+}
+
+function normalizeList_(value) {
+  if (Array.isArray(value)) return value.map(function(item) {
+    return String(item || '').trim();
+  }).filter(Boolean);
+  return String(value || '').split(/\r?\n|,\s*/).map(function(item) {
+    return String(item || '').trim();
+  }).filter(Boolean);
+}
+
+function chunkListForSheetCell_(items, maxChars, maxChunks) {
+  const chunks = [[]];
+  items.forEach(function(item) {
+    const current = chunks[chunks.length - 1];
+    const currentSize = current.join('\n').length;
+    const nextSize = currentSize + (current.length ? 1 : 0) + item.length;
+    if (nextSize > maxChars && chunks.length < maxChunks) {
+      chunks.push([item]);
+    } else {
+      current.push(item);
+    }
+  });
+  return chunks;
 }
 
 function ensureHeaders_(sheet, requiredHeaders) {

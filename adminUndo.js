@@ -43,6 +43,11 @@ export async function cleanupExpiredUndoItems() {
   await Promise.all(snapshot.docs.map(item => deleteDoc(item.ref)));
 }
 
+export async function discardUndoRecord(entry) {
+  if (!entry?.id) throw new Error('Missing undo record.');
+  await deleteDoc(doc(db, ADMIN_TRASH_COLLECTION, entry.id));
+}
+
 export async function softDeleteRecord(collectionName, item, options = {}) {
   const docId = options.docId || item?.recordId || item?.id;
   if (!docId) throw new Error('Missing document id for delete.');

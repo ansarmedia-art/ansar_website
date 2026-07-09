@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { collection, addDoc, updateDoc, doc, serverTimestamp, query, orderBy, onSnapshot } from 'firebase/firestore';
 import { db } from './firebase-init';
 import { softDeleteRecord } from './adminUndo';
+import ImgBbUrlImporter from './ImgBbUrlImporter';
 
 export default function AdminNotices() {
   const [notices, setNotices] = useState([]);
@@ -95,6 +96,9 @@ export default function AdminNotices() {
           <div>
             <label className="block text-sm font-bold text-slate-700 mb-2">Notice Image URL (Optional Banner)</label>
             <input name="imageUrl" type="url" value={formData.imageUrl} onChange={handleChange} placeholder="https://example.com/poster.jpg" className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" />
+            <div className="mt-2">
+              <ImgBbUrlImporter onExtracted={(url) => setFormData(prev => ({ ...prev, imageUrl: url }))} />
+            </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-5 bg-emerald-50/50 border border-emerald-100 rounded-xl">
             <div>

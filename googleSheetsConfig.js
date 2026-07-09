@@ -8,6 +8,9 @@ export const GOOGLE_SHEETS_DATABASE = {
     updates: ['updates', 'Updates'],
     events: ['updates', 'Updates'],
     achievements: ['achievements', 'Achievements'],
+    sportsAchievements: ['sportsAchievements', 'SportsAchievements', 'Sports Achievements'],
+    learningFeatures: ['learningFeatures', 'LearningFeatures', 'Learning Features'],
+    contactSubmissions: ['contactSubmissions', 'ContactSubmissions', 'Contact Submissions'],
     ansarTimes: ['ansarTimes', 'AnsarTimes', 'Ansar Times']
   }
 };

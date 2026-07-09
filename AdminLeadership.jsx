@@ -3,6 +3,7 @@ import { collection, addDoc, updateDoc, doc, serverTimestamp } from 'firebase/fi
 import { db } from './firebase-init';
 import { useFirestoreCollection } from './useFirestoreCollection';
 import { softDeleteRecord } from './adminUndo';
+import ImgBbUrlImporter from './ImgBbUrlImporter';
 
 export default function AdminLeadership() {
   const { data: items, loading } = useFirestoreCollection('leadership', 'order', 'asc');
@@ -73,7 +74,13 @@ export default function AdminLeadership() {
             <div><label className="block text-sm font-bold text-slate-700 mb-1">Full Name *</label><input name="name" value={formData.name} onChange={handleChange} required className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" /></div>
             <div><label className="block text-sm font-bold text-slate-700 mb-1">Designation / Role *</label><input name="role" value={formData.role} onChange={handleChange} required className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" /></div>
             <div className="md:col-span-2"><label className="block text-sm font-bold text-slate-700 mb-1">Qualifications / Subtitle</label><input name="qualification" value={formData.qualification} onChange={handleChange} className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" /></div>
-            <div><label className="block text-sm font-bold text-slate-700 mb-1">Profile Image URL</label><input name="imageUrl" type="url" value={formData.imageUrl} onChange={handleChange} className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" /></div>
+            <div>
+              <label className="block text-sm font-bold text-slate-700 mb-1">Profile Image URL</label>
+              <input name="imageUrl" type="url" value={formData.imageUrl} onChange={handleChange} className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" />
+              <div className="mt-2">
+                <ImgBbUrlImporter onExtracted={(url) => setFormData(prev => ({ ...prev, imageUrl: url }))} />
+              </div>
+            </div>
             <div><label className="block text-sm font-bold text-slate-700 mb-1">Display Order</label><input name="order" type="number" value={formData.order} onChange={handleChange} className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" /></div>
           </div>
           <div className="flex items-center justify-between mt-6 pt-4 border-t border-slate-100">

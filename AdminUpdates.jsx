@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { addDoc, collection, doc, serverTimestamp, updateDoc } from 'firebase/firestore';
+import { addDoc, collection, deleteField, doc, serverTimestamp, updateDoc } from 'firebase/firestore';
 import { db } from './firebase-init';
 import { clearGoogleSheetsCache, useContentCollection } from './useContentCollection';
 import { saveSheetRecord } from './googleSheetsAdminApi';
@@ -137,6 +137,18 @@ export default function AdminUpdates() {
         youtubeUrl: formData.youtubeUrl || '',
         published: !!formData.published
       };
+      const firestorePayload = {
+        category: payload.category,
+        title: payload.title,
+        description: payload.description,
+        date: payload.date,
+        coverImageUrl: cleanedCoverImageUrl || cleanedEventImages[0] || '',
+        imageUrl: cleanedCoverImageUrl || cleanedEventImages[0] || '',
+        instagramUrl: payload.instagramUrl,
+        facebookUrl: payload.facebookUrl,
+        youtubeUrl: payload.youtubeUrl,
+        published: payload.published
+      };
 
       let recordId = editingId;
       let firestoreError = null;
@@ -144,10 +156,15 @@ export default function AdminUpdates() {
 
       try {
         if (editingId && (!editingItem?._contentSource || editingItem._contentSource === 'firestore' || editingItem._contentSource === 'merged')) {
-          await updateDoc(doc(db, 'updates', editingId), { ...payload, updatedAt: serverTimestamp() });
+          await updateDoc(doc(db, 'updates', editingId), {
+            ...firestorePayload,
+            eventImages: deleteField(),
+            imageUrls: deleteField(),
+            updatedAt: serverTimestamp()
+          });
         } else if (!editingId) {
           const docRef = await addDoc(collection(db, 'updates'), {
-            ...payload,
+            ...firestorePayload,
             createdAt: serverTimestamp(),
             updatedAt: serverTimestamp()
           });

@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import AdminFieldUndo from './AdminFieldUndo';
 import AdminUndoCenter from './AdminUndoCenter';
 
 export default function AdminLayout({ children, user, onLogout }) {
@@ -28,6 +29,8 @@ export default function AdminLayout({ children, user, onLogout }) {
 
   const getModuleTitle = () => {
     if (path.includes('/updates')) return 'News & Events';
+    if (path.includes('/sports-achievements')) return 'Sports Achievements';
+    if (path.includes('/learning-features')) return 'Student-Centric Learning';
     if (path.includes('/achievements')) return 'Achievements';
     if (path.includes('/ansar-times')) return 'Ansar Times';
     if (path.includes('/leadership')) return 'Leadership';
@@ -63,6 +66,8 @@ export default function AdminLayout({ children, user, onLogout }) {
           <Link to="/admin/dashboard" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'Dashboard' ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>Dashboard</Link>
           <Link to="/admin/updates" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'News & Events' ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>News & Events</Link>
           <Link to="/admin/achievements" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'Achievements' ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>Achievements</Link>
+          <Link to="/admin/sports-achievements" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'Sports Achievements' ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>Sports Achievements</Link>
+          <Link to="/admin/learning-features" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'Student-Centric Learning' ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>Student-Centric Learning</Link>
           <Link to="/admin/ansar-times" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'Ansar Times' ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>Ansar Times</Link>
           <Link to="/admin/leadership" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'Leadership' ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>Leadership</Link>
           <Link to="/admin/academics" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'Academics & Admissions' ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>Academics & Admissions</Link>
@@ -110,6 +115,7 @@ export default function AdminLayout({ children, user, onLogout }) {
           </div>
         </main>
       </div>
+      <AdminFieldUndo />
       <AdminUndoCenter />
     </div>
   );
