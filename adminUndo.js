@@ -13,6 +13,7 @@ import {
 import { db } from './firebase-init';
 import { clearGoogleSheetsCache } from './useContentCollection';
 import { deleteSheetRecord, saveSheetRecord } from './googleSheetsAdminApi';
+import { imageCandidates, normalizeImageUrl } from './imageUrlUtils';
 
 export const ADMIN_UNDO_WINDOW_MS = 15 * 60 * 1000;
 export const ADMIN_TRASH_COLLECTION = 'adminTrash';
@@ -27,6 +28,21 @@ function stripLocalFields(item = {}) {
 
 function dispatchUndoCreated(trashId) {
   window.dispatchEvent(new CustomEvent(ADMIN_UNDO_CREATED_EVENT, { detail: { trashId } }));
+}
+
+function sourceImageUrls(item = {}) {
+  return imageCandidates(item.coverImageUrl, item.imageUrl, item.thumbnailUrl, item.eventImages, item.imageUrls);
+}
+
+async function deleteRelatedGalleryItems(collectionName, item) {
+  if (!['updates', 'events', 'achievements', 'sportsAchievements'].includes(collectionName)) return;
+
+  const urls = new Set(sourceImageUrls(item).map(normalizeImageUrl).filter(Boolean));
+  if (!urls.size) return;
+
+  const snapshot = await getDocs(collection(db, 'gallery'));
+  const relatedDocs = snapshot.docs.filter(docSnap => urls.has(normalizeImageUrl(docSnap.data().imageUrl)));
+  await Promise.all(relatedDocs.map(docSnap => deleteDoc(docSnap.ref)));
 }
 
 export function getUndoTitle(entry) {
@@ -78,6 +94,7 @@ export async function softDeleteRecord(collectionName, item, options = {}) {
       await deleteSheetRecord(sheetCollection, docId);
       clearGoogleSheetsCache();
     }
+    await deleteRelatedGalleryItems(collectionName, firestoreData);
   } catch (error) {
     await deleteDoc(trashRef).catch(() => {});
     throw error;

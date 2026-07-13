@@ -5,6 +5,7 @@ import { clearGoogleSheetsCache, useContentCollection } from './useContentCollec
 import { saveSheetRecord } from './googleSheetsAdminApi';
 import ImgBbUrlImporter from './ImgBbUrlImporter';
 import { softDeleteRecord } from './adminUndo';
+import { normalizeImageUrl } from './imageUrlUtils';
 
 const MAX_SPORTS_ACHIEVEMENT_IMAGES = 30;
 
@@ -114,7 +115,7 @@ export default function AdminSportsAchievements() {
     event.preventDefault();
     setIsSubmitting(true);
     try {
-      const cleanedImageUrls = formData.imageUrls.map(url => url.trim()).filter(Boolean).slice(0, MAX_SPORTS_ACHIEVEMENT_IMAGES);
+      const cleanedImageUrls = [...new Set(formData.imageUrls.map(url => normalizeImageUrl(url)).filter(Boolean))].slice(0, MAX_SPORTS_ACHIEVEMENT_IMAGES);
       const payload = {
         title: formData.title.trim(),
         description: formData.description.trim(),

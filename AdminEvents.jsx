@@ -5,6 +5,7 @@ import { clearGoogleSheetsCache, useContentCollection } from './useContentCollec
 import { saveSheetRecord } from './googleSheetsAdminApi';
 import ImgBbUrlImporter from './ImgBbUrlImporter';
 import { softDeleteRecord } from './adminUndo';
+import { normalizeImageUrl } from './imageUrlUtils';
 
 const MAX_EVENT_IMAGES = 100;
 
@@ -91,7 +92,7 @@ export default function AdminEvents() {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      const cleanedImageUrls = formData.imageUrls.filter(url => url.trim() !== '');
+      const cleanedImageUrls = formData.imageUrls.map(url => normalizeImageUrl(url)).filter(Boolean);
       if (cleanedImageUrls.length > MAX_EVENT_IMAGES) {
         alert(`Save failed: one event can have up to ${MAX_EVENT_IMAGES} image links.`);
         return;

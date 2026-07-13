@@ -5,6 +5,8 @@ import { useSettings } from './SettingsContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import ShareButton from './ShareButton';
 import { useContentDocument } from './useContentCollection';
+import { imageCandidates } from './imageUrlUtils';
+import { formatDisplayDate, isYearOnly } from './dateUtils';
 
 const variants = {
   enter: (direction) => ({
@@ -36,20 +38,20 @@ export default function ArticleView() {
   const { data: article, loading } = useContentDocument(collectionName, id);
 
   const [[page, direction], setPage] = useState([0, 0]);
+  const [brokenImages, setBrokenImages] = useState([]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
     setPage([0, 0]);
+    setBrokenImages([]);
   }, [location.pathname, id]);
 
-  // Safely extract valid images even during the loading state
-  const fallbackImage = article?.coverImageUrl || article?.imageUrl;
-  const arrayImages = article?.eventImages?.length > 0 ? article.eventImages : (article?.imageUrls || []);
-  
-  let validImages = arrayImages.filter(url => url && url.trim() !== '');
-  if (validImages.length === 0 && fallbackImage) {
-      validImages = [fallbackImage];
-  }
+  const allImageCandidates = imageCandidates(article?.coverImageUrl, article?.imageUrl, article?.eventImages, article?.imageUrls);
+  const validImages = allImageCandidates
+    .filter((url) => !brokenImages.includes(url));
+  const exhaustedImages = allImageCandidates.length > 0 && validImages.length === 0;
+  const displayDate = formatDisplayDate(article?.date);
+  const displayStudentName = isSportsAchievement && isYearOnly(article?.studentName) ? '' : article?.studentName;
 
   // Fix negative modulo bug so backwards manual navigation loops safely
   const imageIndex = validImages.length > 0 ? ((page % validImages.length) + validImages.length) % validImages.length : 0;
@@ -79,10 +81,10 @@ export default function ArticleView() {
       <div className="max-w-4xl mx-auto py-12 lg:py-20 px-4">
         <h1 className="text-4xl lg:text-5xl font-extrabold text-emerald-950 mb-4">{article.title}</h1>
         
-        {article.date && (
+        {displayDate && (
           <div className="flex items-center gap-2 text-slate-500 font-semibold mb-6">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-            <span>{article.date}</span>
+            <span>{displayDate}</span>
           </div>
         )}
 
@@ -117,8 +119,8 @@ export default function ArticleView() {
           />
         </div>
 
-        {article.studentName && (
-          <p className="text-base font-bold text-emerald-700 mb-4">{article.studentName}</p>
+        {displayStudentName && (
+          <p className="text-base font-bold text-emerald-700 mb-4">{displayStudentName}</p>
         )}
 
         {article.description && (
@@ -131,7 +133,7 @@ export default function ArticleView() {
             alt={article.title} 
             style={{ width: '100%', height: 'auto', maxHeight: '600px', objectFit: 'contain', backgroundColor: '#f7f9fa', display: 'block', margin: '0 auto', borderRadius: '12px' }}
             className="shadow-xl border border-slate-200"
-            onError={(e) => { e.target.onerror = null; e.target.src = fallbackImageSvg; }} 
+            onError={() => setBrokenImages((urls) => [...new Set([...urls, validImages[0]])])}
           />
         )}
 
@@ -149,7 +151,7 @@ export default function ArticleView() {
                 transition={{ x: { type: "spring", stiffness: 300, damping: 30 }, opacity: { duration: 0.2 } }}
                 style={{ width: '100%', height: '100%', maxHeight: '600px', objectFit: 'contain', backgroundColor: '#f7f9fa', display: 'block', margin: '0 auto' }}
                 className="absolute inset-0"
-                onError={(e) => { e.target.onerror = null; e.target.src = fallbackImageSvg; }}
+                onError={() => setBrokenImages((urls) => [...new Set([...urls, validImages[imageIndex]])])}
               />
             </AnimatePresence>
             
@@ -167,6 +169,15 @@ export default function ArticleView() {
               </div>
             </>
           </div>
+        )}
+
+        {exhaustedImages && (
+          <img
+            src={fallbackImageSvg}
+            alt="Image unavailable"
+            style={{ width: '100%', height: 'auto', maxHeight: '600px', objectFit: 'contain', backgroundColor: '#f7f9fa', display: 'block', margin: '0 auto', borderRadius: '12px' }}
+            className="shadow-xl border border-slate-200"
+          />
         )}
       </div>
     </Layout>

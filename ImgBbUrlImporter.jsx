@@ -1,24 +1,5 @@
 import React, { useState } from 'react';
-
-export function extractImageUrls(value) {
-  if (!value || typeof value !== 'string') return [];
-
-  const urls = new Set();
-  const patterns = [
-    /src=["'](https?:\/\/i\.ibb\.co\/[^"']+)["']/gi,
-    /(https?:\/\/i\.ibb\.co\/[^\s"'<>]+)/gi,
-    /(https?:\/\/[^\s"'<>]+\.(?:png|jpe?g|webp|gif)(?:\?[^\s"'<>]*)?)/gi
-  ];
-
-  patterns.forEach((pattern) => {
-    let match;
-    while ((match = pattern.exec(value)) !== null) {
-      urls.add(match[1].replace(/&amp;/g, '&').trim());
-    }
-  });
-
-  return Array.from(urls);
-}
+import { extractImageUrls } from './imageUrlUtils';
 
 export default function ImgBbUrlImporter({ multiple = false, onExtracted, label }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -27,7 +8,7 @@ export default function ImgBbUrlImporter({ multiple = false, onExtracted, label 
   const applyExtractedUrls = () => {
     const urls = extractImageUrls(rawText);
     if (!urls.length) {
-      alert('No direct image URL found. Paste the ImgBB HTML code or a direct https://i.ibb.co/... image URL.');
+      alert('No image URL found. Paste image-host HTML code, markdown, or a direct hosted image URL.');
       return;
     }
 
@@ -53,7 +34,7 @@ export default function ImgBbUrlImporter({ multiple = false, onExtracted, label 
       <textarea
         value={rawText}
         onChange={(event) => setRawText(event.target.value)}
-        placeholder="Paste ImgBB HTML code or direct image URLs here"
+        placeholder="Paste image-host HTML code, markdown, or direct image URLs here"
         className="h-24 w-full rounded-lg border border-slate-200 p-3 text-sm outline-none focus:ring-2 focus:ring-emerald-500"
       />
       <div className="mt-2 flex flex-wrap items-center gap-2">

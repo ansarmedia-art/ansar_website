@@ -9,6 +9,7 @@ import { useSettings } from './SettingsContext';
 import { useContentCollection } from './useContentCollection';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { isYearOnly } from './dateUtils';
 
 // Transformed into a Bento Layout configuration using Lucide-style SVG icons
 const FALLBACK_FEATURES = [
@@ -447,7 +448,7 @@ export default function Home() {
                   <div className="p-5">
                     <p className="text-xs font-black uppercase tracking-widest text-amber-600">{getContentYear(item)}</p>
                     <h3 className="mt-2 line-clamp-2 text-lg font-extrabold text-slate-900 group-hover:text-emerald-700">{item.title}</h3>
-                    {item.studentName && <p className="mt-2 line-clamp-1 text-sm font-bold text-slate-500">{item.studentName}</p>}
+                    {item.studentName && !isYearOnly(item.studentName) && <p className="mt-2 line-clamp-1 text-sm font-bold text-slate-500">{item.studentName}</p>}
                   </div>
                 </Link>
               );

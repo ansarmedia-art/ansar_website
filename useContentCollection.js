@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { collection, doc, getDoc, limit, onSnapshot, orderBy, query } from 'firebase/firestore';
 import { db } from './firebase-init';
 import { GOOGLE_SHEETS_DATABASE } from './googleSheetsConfig';
+import { normalizeImageUrl, splitImageUrls } from './imageUrlUtils';
 
 const SHEET_CACHE = new Map();
 const SHEET_CACHE_CLEAR_EVENT = 'ansar-sheets-cache-cleared';
@@ -69,6 +70,22 @@ function splitList(value) {
     .filter(Boolean);
 }
 
+function normalizeImageFields(item) {
+  ['imageUrl', 'coverImageUrl', 'thumbnailUrl', 'heroImageUrl', 'logoUrl', 'directorImageUrl', 'principalImageUrl', 'sustainabilityLogoUrl'].forEach((key) => {
+    if (item[key]) item[key] = normalizeImageUrl(item[key]);
+  });
+
+  ['imageUrls', 'eventImages', 'galleryImages', 'premisesImages', 'kgImages'].forEach((key) => {
+    if (item[key]) item[key] = splitImageUrls(item[key]);
+  });
+}
+
+function normalizeContentItem(item) {
+  const normalized = { ...item };
+  normalizeImageFields(normalized);
+  return normalized;
+}
+
 function mergeChunkedListFields(item, key) {
   const chunks = [key, `${key}2`, `${key}3`, `${key}4`]
     .flatMap((field) => splitList(item[field]))
@@ -121,6 +138,7 @@ function coerceRow(row, collectionName, rowIndex) {
   });
   mergeChunkedListFields(item, 'imageUrls');
   mergeChunkedListFields(item, 'eventImages');
+  normalizeImageFields(item);
   return item;
 }
 
@@ -187,12 +205,12 @@ function mergeRows(firestoreRows, sheetRows) {
   const merged = new Map();
 
   firestoreRows.filter(hasDisplayableContent).forEach((item) => {
-    merged.set(item.id, { ...item, _contentSource: 'firestore' });
+    merged.set(item.id, { ...normalizeContentItem(item), _contentSource: 'firestore' });
   });
 
   sheetRows.filter(hasDisplayableContent).forEach((item) => {
     const existing = merged.get(item.id) || {};
-    merged.set(item.id, { ...existing, ...item, _contentSource: existing.id ? 'merged' : 'sheets' });
+    merged.set(item.id, { ...existing, ...normalizeContentItem(item), _contentSource: existing.id ? 'merged' : 'sheets' });
   });
 
   return Array.from(merged.values());

@@ -3,91 +3,113 @@ import { addDoc, collection, doc, onSnapshot, serverTimestamp, updateDoc } from 
 import { db } from './firebase-init';
 import ImgBbUrlImporter from './ImgBbUrlImporter';
 import { softDeleteRecord, softDeleteRecords } from './adminUndo';
+import { imageCandidates, normalizeImageUrl } from './imageUrlUtils';
+import { formatDisplayDate, getDateTime } from './dateUtils';
 
 function getMillis(item) {
+  const dateTime = getDateTime(item.date, null);
+  if (dateTime != null) return dateTime;
   if (item.createdAt?.toMillis) return item.createdAt.toMillis();
   if (item.createdAt?.seconds) return item.createdAt.seconds * 1000;
-  if (item.date) return new Date(item.date).getTime() || 0;
   return 0;
 }
 
 function imageFromGalleryItem(item) {
-  if (!item.imageUrl || item.imageUrl.trim() === '') return null;
+  const url = normalizeImageUrl(item.imageUrl);
+  if (!url) return null;
 
   return {
     id: item.id,
     recordId: item.id,
     source: 'gallery',
     sourceLabel: 'Gallery',
-    url: item.imageUrl,
+    url,
     title: item.title || 'Gallery Image',
     category: item.category || 'General',
-    date: item.date || '',
+    date: formatDisplayDate(item.date),
     published: item.published !== false,
     timestamp: getMillis(item),
     raw: item
   };
 }
 
-function collectWebsiteImages(galleryItems, updates, achievements) {
-  const images = [];
+function collectSourceImages(updates, achievements, sportsAchievements) {
+  const imagesByUrl = new Map();
+  const addImage = (url, item, meta) => {
+    const normalizedUrl = normalizeImageUrl(url);
+    if (!normalizedUrl) return;
 
-  galleryItems.forEach(item => {
-    const galleryImage = imageFromGalleryItem(item);
-    if (galleryImage && galleryImage.published) images.push(galleryImage);
-  });
+    const image = {
+      id: meta.id,
+      recordId: item.id,
+      source: meta.source,
+      sourceLabel: meta.sourceLabel,
+      url: normalizedUrl,
+      title: meta.title,
+      category: meta.category,
+      date: formatDisplayDate(item.date),
+      published: true,
+      timestamp: getMillis(item),
+      raw: item
+    };
+    const existing = imagesByUrl.get(normalizedUrl);
+    if (!existing || image.timestamp > existing.timestamp) imagesByUrl.set(normalizedUrl, image);
+  };
 
   updates.filter(item => item.published !== false).forEach(item => {
-    const urls = new Set();
-    if (item.coverImageUrl) urls.add(item.coverImageUrl);
-    if (item.imageUrl) urls.add(item.imageUrl);
-    if (Array.isArray(item.eventImages)) item.eventImages.forEach(url => url && urls.add(url));
-    if (Array.isArray(item.imageUrls)) item.imageUrls.forEach(url => url && urls.add(url));
-
     let index = 0;
-    urls.forEach(url => {
-      if (!url || url.trim() === '') return;
-      images.push({
+    imageCandidates(item.coverImageUrl, item.imageUrl, item.eventImages, item.imageUrls).forEach(url => {
+      addImage(url, item, {
         id: `${item.id}-update-${index++}`,
-        recordId: item.id,
         source: 'updates',
         sourceLabel: item.category === 'Events' ? 'Event' : 'News',
-        url,
         title: item.title || 'School Update',
-        category: item.category || 'News & Events',
-        date: item.date || '',
-        published: true,
-        timestamp: getMillis(item),
-        raw: item
+        category: item.category || 'News & Events'
       });
     });
   });
 
   achievements.filter(item => item.published !== false).forEach(item => {
-    const urls = new Set();
-    if (item.imageUrl) urls.add(item.imageUrl);
-    if (Array.isArray(item.imageUrls)) item.imageUrls.forEach(url => url && urls.add(url));
-
     let index = 0;
-    urls.forEach(url => {
-      if (!url || url.trim() === '') return;
-      images.push({
+    imageCandidates(item.imageUrl, item.imageUrls).forEach(url => {
+      addImage(url, item, {
         id: `${item.id}-achievement-${index++}`,
-        recordId: item.id,
         source: 'achievements',
         sourceLabel: 'Achievement',
-        url,
         title: item.title || 'Achievement',
-        category: 'Achievements',
-        date: item.date || '',
-        published: true,
-        timestamp: getMillis(item),
-        raw: item
+        category: 'Achievements'
       });
     });
   });
 
-  return images.sort((a, b) => b.timestamp - a.timestamp);
+  sportsAchievements.filter(item => item.published !== false).forEach(item => {
+    let index = 0;
+    imageCandidates(item.imageUrl, item.imageUrls).forEach(url => {
+      addImage(url, item, {
+        id: `${item.id}-sports-achievement-${index++}`,
+        source: 'sportsAchievements',
+        sourceLabel: 'Sports Achievement',
+        title: item.title || 'Sports Achievement',
+        category: 'Sports Achievements'
+      });
+    });
+  });
+
+  return Array.from(imagesByUrl.values()).sort((a, b) => b.timestamp - a.timestamp);
+}
+
+function collectWebsiteImages(galleryItems, updates, achievements, sportsAchievements) {
+  const sourceImages = collectSourceImages(updates, achievements, sportsAchievements);
+  const imagesByUrl = new Map(sourceImages.map(item => [item.url, item]));
+
+  galleryItems.forEach(item => {
+    const galleryImage = imageFromGalleryItem(item);
+    if (galleryImage && galleryImage.published && !imagesByUrl.has(galleryImage.url)) {
+      imagesByUrl.set(galleryImage.url, galleryImage);
+    }
+  });
+
+  return Array.from(imagesByUrl.values()).sort((a, b) => b.timestamp - a.timestamp);
 }
 
 const initialFormState = {
@@ -102,6 +124,7 @@ export default function AdminGallery() {
   const [galleryItems, setGalleryItems] = useState([]);
   const [updates, setUpdates] = useState([]);
   const [achievements, setAchievements] = useState([]);
+  const [sportsAchievements, setSportsAchievements] = useState([]);
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState(initialFormState);
   const [editingId, setEditingId] = useState(null);
@@ -115,8 +138,9 @@ export default function AdminGallery() {
     let loadedGallery = false;
     let loadedUpdates = false;
     let loadedAchievements = false;
+    let loadedSportsAchievements = false;
 
-    const publishLoading = () => setLoading(!(loadedGallery && loadedUpdates && loadedAchievements));
+    const publishLoading = () => setLoading(!(loadedGallery && loadedUpdates && loadedAchievements && loadedSportsAchievements));
 
     const unsubGallery = onSnapshot(collection(db, 'gallery'), (snapshot) => {
       loadedGallery = true;
@@ -148,10 +172,21 @@ export default function AdminGallery() {
       console.error('Unable to load achievement images:', error);
     });
 
+    const unsubSportsAchievements = onSnapshot(collection(db, 'sportsAchievements'), (snapshot) => {
+      loadedSportsAchievements = true;
+      setSportsAchievements(snapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() })));
+      publishLoading();
+    }, (error) => {
+      loadedSportsAchievements = true;
+      publishLoading();
+      console.error('Unable to load sports achievement images:', error);
+    });
+
     return () => {
       unsubGallery();
       unsubUpdates();
       unsubAchievements();
+      unsubSportsAchievements();
     };
   }, []);
 
@@ -163,8 +198,32 @@ export default function AdminGallery() {
   }, [galleryItems]);
 
   const websiteImages = useMemo(() => {
-    return collectWebsiteImages(galleryItems, updates, achievements);
-  }, [galleryItems, updates, achievements]);
+    return collectWebsiteImages(galleryItems, updates, achievements, sportsAchievements);
+  }, [galleryItems, updates, achievements, sportsAchievements]);
+
+  const duplicateGalleryItems = useMemo(() => {
+    const sourceUrls = new Set(collectSourceImages(updates, achievements, sportsAchievements).map(item => item.url));
+    const seenGalleryUrls = new Set();
+    const duplicates = [];
+
+    galleryItems
+      .slice()
+      .sort((a, b) => getMillis(b) - getMillis(a))
+      .forEach(item => {
+        const url = normalizeImageUrl(item.imageUrl);
+        if (!url) {
+          duplicates.push(item);
+          return;
+        }
+        if (sourceUrls.has(url) || seenGalleryUrls.has(url)) {
+          duplicates.push(item);
+          return;
+        }
+        seenGalleryUrls.add(url);
+      });
+
+    return duplicates;
+  }, [galleryItems, updates, achievements, sportsAchievements]);
 
   const categories = useMemo(() => {
     return ['All', ...new Set(managedImages.map(item => item.category).filter(Boolean))];
@@ -227,7 +286,7 @@ export default function AdminGallery() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const cleanedUrls = formData.imageUrls.map(url => url.trim()).filter(Boolean);
+    const cleanedUrls = [...new Set(formData.imageUrls.map(url => normalizeImageUrl(url)).filter(Boolean))];
 
     if (!cleanedUrls.length) {
       alert('Please add at least one image URL.');
@@ -308,6 +367,19 @@ export default function AdminGallery() {
       if (selectedIds.includes(editingId)) resetForm();
     } catch (error) {
       alert('Delete failed: ' + error.message);
+    }
+  };
+
+  const cleanupDuplicateGalleryItems = async () => {
+    if (!duplicateGalleryItems.length) return;
+    if (!window.confirm(`Clean ${duplicateGalleryItems.length} duplicate or stale gallery image${duplicateGalleryItems.length === 1 ? '' : 's'}?`)) return;
+
+    try {
+      await softDeleteRecords('gallery', duplicateGalleryItems);
+      setSelectedIds(prev => prev.filter(id => !duplicateGalleryItems.some(item => item.id === id)));
+      if (duplicateGalleryItems.some(item => item.id === editingId)) resetForm();
+    } catch (error) {
+      alert('Cleanup failed: ' + error.message);
     }
   };
 
@@ -420,6 +492,9 @@ export default function AdminGallery() {
             <button type="button" onClick={() => updateSelectedPublished(true)} disabled={!selectedIds.length} className="rounded-lg px-3 py-2 text-sm font-bold text-emerald-700 transition-colors hover:bg-emerald-50 disabled:opacity-40">Publish</button>
             <button type="button" onClick={() => updateSelectedPublished(false)} disabled={!selectedIds.length} className="rounded-lg px-3 py-2 text-sm font-bold text-amber-700 transition-colors hover:bg-amber-50 disabled:opacity-40">Unpublish</button>
             <button type="button" onClick={deleteSelected} disabled={!selectedIds.length} className="rounded-lg px-3 py-2 text-sm font-bold text-red-600 transition-colors hover:bg-red-50 disabled:opacity-40">Delete</button>
+            <button type="button" onClick={cleanupDuplicateGalleryItems} disabled={!duplicateGalleryItems.length} className="rounded-lg px-3 py-2 text-sm font-bold text-slate-700 transition-colors hover:bg-white disabled:opacity-40">
+              Clean duplicates ({duplicateGalleryItems.length})
+            </button>
           </div>
         </div>
 

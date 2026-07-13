@@ -2,41 +2,21 @@ import React, { useMemo, useState } from 'react';
 import Layout from './Layout';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useContentCollection } from './useContentCollection';
-
-function parseFlexibleDate(value) {
-  if (!value) return null;
-  if (value?.toMillis) return new Date(value.toMillis());
-  if (value?.seconds) return new Date(value.seconds * 1000);
-
-  const text = String(value).trim();
-  const ddmmyyyy = text.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{4})$/);
-  if (ddmmyyyy) {
-    const [, day, month, year] = ddmmyyyy;
-    const parsed = new Date(Number(year), Number(month) - 1, Number(day));
-    return Number.isNaN(parsed.getTime()) ? null : parsed;
-  }
-
-  const parsed = new Date(text);
-  return Number.isNaN(parsed.getTime()) ? null : parsed;
-}
+import { imageCandidates, normalizeImageUrl } from './imageUrlUtils';
+import { formatDisplayDate, getDateTime, getDisplayYear } from './dateUtils';
 
 function getItemTime(item) {
-  const parsedDate = parseFlexibleDate(item.date);
-  if (parsedDate) return parsedDate.getTime();
+  const dateTime = getDateTime(item.date, null);
+  if (dateTime != null) return dateTime;
   if (item.createdAt?.toMillis) return item.createdAt.toMillis();
   if (item.createdAt?.seconds) return item.createdAt.seconds * 1000;
   return 0;
 }
 
-function getItemYear(item) {
-  const date = parseFlexibleDate(item.date);
-  if (date) return date.getFullYear();
-  return 'Undated';
-}
-
 export default function Gallery() {
   const [filter, setFilter] = useState('All');
   const [selectedImg, setSelectedImg] = useState(null);
+  const [brokenUrls, setBrokenUrls] = useState([]);
   const { data: updates, loading: loadingUpdates } = useContentCollection('updates', null);
   const { data: achievements, loading: loadingAchievements } = useContentCollection('achievements', null);
   const { data: sportsAchievements, loading: loadingSportsAchievements } = useContentCollection('sportsAchievements', null);
@@ -44,93 +24,76 @@ export default function Gallery() {
   const loading = loadingUpdates || loadingAchievements || loadingSportsAchievements || loadingGallery;
 
   const media = useMemo(() => {
-      let allImages = [];
+      const dedupedImages = new Map();
+      const addImage = (url, item, meta) => {
+        const normalizedUrl = normalizeImageUrl(url);
+        if (!normalizedUrl || brokenUrls.includes(normalizedUrl)) return;
 
-      // Legacy Gallery Collection support
-      galleryData.filter(item => item.published !== false).forEach(item => {
-        if (item.imageUrl && item.imageUrl.trim() !== '') {
-          allImages.push({
-            id: item.id + '-gal',
-            url: item.imageUrl,
-            title: item.title || 'Gallery Image',
-            category: item.category || 'General',
-            date: item.date || '',
-            year: getItemYear(item),
-            timestamp: getItemTime(item)
-          });
+        const next = {
+          id: meta.id,
+          url: normalizedUrl,
+          title: meta.title,
+          category: meta.category,
+          date: formatDisplayDate(item.date),
+          year: getDisplayYear(item.date),
+          timestamp: getItemTime(item),
+          sourceRank: meta.sourceRank
+        };
+        const existing = dedupedImages.get(normalizedUrl);
+
+        if (!existing || next.sourceRank < existing.sourceRank || next.timestamp > existing.timestamp) {
+          dedupedImages.set(normalizedUrl, next);
         }
-      });
+      };
 
       // Updates (News & Events) Collections
       updates.filter(item => item.published !== false).forEach(item => {
-        const urls = new Set();
-        if (item.coverImageUrl) urls.add(item.coverImageUrl);
-        if (item.imageUrl) urls.add(item.imageUrl);
-        if (Array.isArray(item.eventImages)) item.eventImages.forEach(u => u && urls.add(u));
-        if (Array.isArray(item.imageUrls)) item.imageUrls.forEach(u => u && urls.add(u));
-
         let i = 0;
-        urls.forEach(url => {
-          if (url && url.trim() !== '') {
-            allImages.push({
-              id: `${item.id}-upd-${i++}`,
-              url: url,
-              title: item.title || 'School Update',
-              category: item.category || 'News & Events',
-              date: item.date || '',
-              year: getItemYear(item),
-              timestamp: getItemTime(item)
-            });
-          }
-        });
+        imageCandidates(item.coverImageUrl, item.imageUrl, item.eventImages, item.imageUrls).forEach(url => addImage(url, item, {
+          id: `${item.id}-upd-${i++}`,
+          title: item.title || 'School Update',
+          category: item.category || 'News & Events',
+          sourceRank: 1
+        }));
       });
 
       // Achievements Collection
       achievements.filter(item => item.published !== false).forEach(item => {
-        const urls = new Set();
-        if (item.imageUrl) urls.add(item.imageUrl);
-        if (Array.isArray(item.imageUrls)) item.imageUrls.forEach(url => url && urls.add(url));
         let i = 0;
-        urls.forEach(url => {
-          if (url && url.trim() !== '') {
-            allImages.push({
-              id: item.id + `-ach-${i++}`,
-              url: url,
-              title: item.title || 'Achievement',
-              category: 'Achievements',
-              date: item.date || '',
-              year: getItemYear(item),
-              timestamp: getItemTime(item)
-            });
-          }
-        });
+        imageCandidates(item.imageUrl, item.imageUrls).forEach(url => addImage(url, item, {
+          id: item.id + `-ach-${i++}`,
+          title: item.title || 'Achievement',
+          category: 'Achievements',
+          sourceRank: 1
+        }));
       });
 
       // Sports Achievements Collection
       sportsAchievements.filter(item => item.published !== false).forEach(item => {
-        const urls = new Set();
-        if (item.imageUrl) urls.add(item.imageUrl);
-        if (Array.isArray(item.imageUrls)) item.imageUrls.forEach(url => url && urls.add(url));
         let i = 0;
-        urls.forEach(url => {
-          if (url && url.trim() !== '') {
-          allImages.push({
-              id: item.id + `-sport-ach-${i++}`,
-              url: url,
-              title: item.title || 'Sports Achievement',
-              category: 'Sports Achievements',
-            date: item.date || '',
-              year: getItemYear(item),
-              timestamp: getItemTime(item)
-          });
-        }
+        imageCandidates(item.imageUrl, item.imageUrls).forEach(url => addImage(url, item, {
+          id: item.id + `-sport-ach-${i++}`,
+          title: item.title || 'Sports Achievement',
+          category: 'Sports Achievements',
+          sourceRank: 1
+        }));
+      });
+
+      // Legacy Gallery Collection support
+      galleryData.filter(item => item.published !== false).forEach(item => {
+        addImage(item.imageUrl, item, {
+          id: item.id + '-gal',
+          title: item.title || 'Gallery Image',
+          category: item.category || 'General',
+          sourceRank: 2
         });
       });
 
       // Sort strictly chronologically (newest first)
+      const allImages = Array.from(dedupedImages.values());
       allImages.sort((a, b) => b.timestamp - a.timestamp);
       return allImages;
-  }, [updates, achievements, sportsAchievements, galleryData]);
+  }, [updates, achievements, sportsAchievements, galleryData, brokenUrls]);
 
   const categories = ['All', ...new Set(media.map(item => item.category).filter(Boolean))];
   const filteredMedia = filter === 'All' ? media : media.filter(item => item.category === filter);
@@ -209,7 +172,7 @@ export default function Gallery() {
                   <div className="columns-1 gap-4 sm:columns-2 md:columns-3 xl:columns-4">
                     {filteredMedia.filter(item => item.year === year).map(item => (
                       <div key={item.id} className="break-inside-avoid relative group overflow-hidden rounded-xl shadow-sm cursor-pointer mb-4 bg-slate-100 border border-slate-200" onClick={() => setSelectedImg(item)}>
-                         <img src={item.url} alt={item.title} className="w-full h-auto block group-hover:scale-105 transition-transform duration-500" loading="lazy" />
+                         <img src={item.url} alt={item.title} className="w-full h-auto block group-hover:scale-105 transition-transform duration-500" loading="lazy" onError={() => setBrokenUrls(urls => [...new Set([...urls, item.url])])} />
                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-5">
                             <h3 className="text-white font-bold text-sm lg:text-base leading-snug line-clamp-2 drop-shadow-md">{item.title}</h3>
                             <span className="text-emerald-400 font-bold text-xs uppercase tracking-wider mt-1 drop-shadow-md">{item.category}</span>
@@ -260,7 +223,7 @@ export default function Gallery() {
             >
               <div className="text-center px-4">
                 <h3 className="text-white font-bold text-xl sm:text-2xl drop-shadow-md">{selectedImg.title}</h3>
-                <p className="text-emerald-400 font-medium text-sm drop-shadow-md">{selectedImg.category} {selectedImg.date && `• ${selectedImg.date}`}</p>
+                <p className="text-emerald-400 font-medium text-sm drop-shadow-md">{selectedImg.category} {selectedImg.date && ` | ${selectedImg.date}`}</p>
               </div>
               <button 
                 onClick={(e) => { e.stopPropagation(); handleDownload(selectedImg.url, selectedImg.title); }}

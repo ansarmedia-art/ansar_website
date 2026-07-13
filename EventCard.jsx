@@ -1,10 +1,16 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ShareButton from './ShareButton';
+import { imageCandidates } from './imageUrlUtils';
 
 export default function EventCard({ id, title, description, date, thumbnailUrl, coverImageUrl, imageUrl, eventImages, imageUrls, type = 'events', priority = false }) {
-  const primaryImage = thumbnailUrl || coverImageUrl || imageUrl || (eventImages && eventImages[0]) || (imageUrls && imageUrls[0]) || null;
-  const [imgError, setImgError] = useState(false);
+  const images = imageCandidates(thumbnailUrl, coverImageUrl, imageUrl, eventImages, imageUrls);
+  const [imageIndex, setImageIndex] = useState(0);
+  const primaryImage = images[imageIndex] || null;
   const shareUrl = `${window.location.origin}/${type}/${id}`;
+
+  useEffect(() => {
+    setImageIndex(0);
+  }, [images.join('|')]);
 
   return (
     <div className="relative isolate bg-white rounded-xl shadow-sm hover:shadow-2xl hover:shadow-emerald-500/10 transition-all duration-500 overflow-hidden border border-slate-100 group flex flex-col h-full transform hover:-translate-y-2">
@@ -13,7 +19,7 @@ export default function EventCard({ id, title, description, date, thumbnailUrl, 
 
       {/* Image Grid Presentation */}
       <div className="relative z-10 w-full bg-[#f7f9fa] overflow-hidden flex-shrink-0 border-b border-slate-100" style={{ minHeight: '224px' }}>
-        {primaryImage && !imgError ? (
+        {primaryImage ? (
           <img
             src={primaryImage}
             alt={title}
@@ -24,7 +30,7 @@ export default function EventCard({ id, title, description, date, thumbnailUrl, 
             loading={priority ? 'eager' : 'lazy'}
             decoding="async"
             fetchPriority={priority ? 'high' : 'auto'}
-            onError={() => setImgError(true)}
+            onError={() => setImageIndex((index) => index + 1)}
           />
         ) : (
           <div className="flex flex-col items-center justify-center h-full w-full bg-slate-100 text-slate-400">

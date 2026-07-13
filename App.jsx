@@ -33,6 +33,7 @@ import MandatoryDisclosure from './MandatoryDisclosure';
 import ContentPageLayout from './ContentPageLayout';
 import { SettingsProvider, useSettings } from './SettingsContext';
 import { DEFAULT_SPORTS_PAGE, mergeListWithDefaults } from './contentDefaults';
+import { formatDisplayDate, getDateTime, getDisplayYear, isYearOnly } from './dateUtils';
 
 // --- AUTHORIZED ADMIN EMAILS ---
 const ADMIN_EMAILS = [
@@ -838,30 +839,14 @@ function SportsPage() {
   const sportsItems = mergeListWithDefaults(settings?.sportsItems, DEFAULT_SPORTS_PAGE.items);
   const title = settings?.sportsPageTitle || DEFAULT_SPORTS_PAGE.title;
   const description = settings?.sportsPageDescription || DEFAULT_SPORTS_PAGE.description;
-  const parseSportsDate = (value) => {
-    if (!value) return null;
-    const text = String(value).trim();
-    const ddmmyyyy = text.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{4})$/);
-    if (ddmmyyyy) {
-      const [, day, month, year] = ddmmyyyy;
-      const parsed = new Date(Number(year), Number(month) - 1, Number(day));
-      return Number.isNaN(parsed.getTime()) ? null : parsed;
-    }
-    const parsed = new Date(text);
-    return Number.isNaN(parsed.getTime()) ? null : parsed;
-  };
   const getAchievementTime = (item) => {
-    const parsedDate = parseSportsDate(item.date);
-    if (parsedDate) return parsedDate.getTime();
+    const dateTime = getDateTime(item.date, null);
+    if (dateTime != null) return dateTime;
     if (item.createdAt?.toMillis) return item.createdAt.toMillis();
     if (item.createdAt?.seconds) return item.createdAt.seconds * 1000;
     return Number.MIN_SAFE_INTEGER;
   };
-  const getAchievementYear = (item) => {
-    const date = parseSportsDate(item.date);
-    if (date) return date.getFullYear();
-    return 'Other';
-  };
+  const getAchievementYear = (item) => getDisplayYear(item.date, 'Other');
   const publishedAchievements = achievements
     .filter(item => item.published !== false)
     .sort((a, b) => getAchievementTime(b) - getAchievementTime(a));
@@ -949,9 +934,9 @@ function SportsPage() {
                               )}
                             </div>
                             <div className="p-6">
-                              {item.date && <p className="text-xs font-black uppercase tracking-widest text-amber-600">{item.date}</p>}
+                              {item.date && <p className="text-xs font-black uppercase tracking-widest text-amber-600">{formatDisplayDate(item.date)}</p>}
                               <h3 className="mt-2 line-clamp-2 text-xl font-extrabold text-slate-900 group-hover:text-emerald-700">{item.title}</h3>
-                              {item.studentName && <p className="mt-2 text-sm font-bold text-slate-500">{item.studentName}</p>}
+                              {item.studentName && !isYearOnly(item.studentName) && <p className="mt-2 text-sm font-bold text-slate-500">{item.studentName}</p>}
                               {item.description && <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-slate-600">{item.description}</p>}
                             </div>
                           </Link>

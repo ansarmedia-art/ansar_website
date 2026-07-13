@@ -85,6 +85,36 @@ export default function NoticePopup() {
           display: flex; justify-content: space-between; align-items: center;
           box-sizing: border-box;
         }
+        @media (max-width: 640px) {
+          .notice-popup-overlay {
+            align-items: flex-start;
+            padding-top: 36vh;
+          }
+          .notice-container-fluid {
+            width: min(92vw, 420px);
+          }
+          .notice-popup-img {
+            border-radius: 12px 12px 0 0;
+          }
+          .notice-overlay-content {
+            position: relative;
+            background: #030712;
+            padding: 16px;
+            gap: 12px;
+            align-items: stretch;
+            flex-direction: column;
+            border-radius: 0 0 12px 12px;
+          }
+          .notice-overlay-content h3 {
+            padding-right: 0;
+            font-size: 1rem;
+            line-height: 1.45;
+          }
+          .notice-overlay-content button {
+            width: 100%;
+            padding: 12px 18px;
+          }
+        }
       `}</style>
     <AnimatePresence>
       {isVisible && (

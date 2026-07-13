@@ -5,6 +5,7 @@ import { clearGoogleSheetsCache, useContentCollection } from './useContentCollec
 import { saveSheetRecord } from './googleSheetsAdminApi';
 import ImgBbUrlImporter from './ImgBbUrlImporter';
 import { softDeleteRecord } from './adminUndo';
+import { normalizeImageUrl } from './imageUrlUtils';
 
 const MAX_EVENT_IMAGES = 100;
 
@@ -15,29 +16,6 @@ function getDateTime(item) {
   if (item.createdAt?.seconds) return item.createdAt.seconds * 1000;
   return Number.MIN_SAFE_INTEGER;
 }
-
-// Utility to clean raw Google Image Search URLs
-const cleanImageUrl = (url) => {
-  if (!url || typeof url !== 'string') return '';
-  
-  const trimmedUrl = url.trim();
-  if (!trimmedUrl) return '';
-  
-  try {
-    const urlObj = new URL(trimmedUrl);
-    
-    // Intercept Google Images redirect URLs
-    if (urlObj.hostname.includes('google.com') && urlObj.pathname.includes('/imgres')) {
-      const imgUrlParam = urlObj.searchParams.get('imgurl');
-      if (imgUrlParam) {
-        return decodeURIComponent(imgUrlParam); 
-      }
-    }
-    return trimmedUrl;
-  } catch (e) {
-    return trimmedUrl; // Fallback to raw string if parsing fails
-  }
-};
 
 export default function AdminUpdates() {
   const [refreshKey, setRefreshKey] = useState(0);
@@ -115,9 +93,9 @@ export default function AdminUpdates() {
     setIsSubmitting(true);
 
     try {
-      const cleanedCoverImageUrl = cleanImageUrl(formData.coverImageUrl);
+      const cleanedCoverImageUrl = normalizeImageUrl(formData.coverImageUrl);
       const cleanedEventImages = (Array.isArray(formData.eventImages) ? formData.eventImages : [])
-        .map(url => cleanImageUrl(url))
+        .map(url => normalizeImageUrl(url))
         .filter(url => url !== '');
 
       if (cleanedEventImages.length > MAX_EVENT_IMAGES) {
