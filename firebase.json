@@ -10,9 +10,171 @@
       "**/node_modules/**"
     ],
     "cleanUrls": true,
+    "trailingSlash": false,
+    "redirects": [
+      {
+        "source": "/staff{,/**}",
+        "destination": "/about",
+        "type": 301
+      },
+      {
+        "source": "/leadership{,/**}",
+        "destination": "/#leadership",
+        "type": 301
+      },
+      {
+        "source": "/event{,/**}",
+        "destination": "/events",
+        "type": 301
+      },
+      {
+        "source": "/library{,/**}",
+        "destination": "/academics",
+        "type": 301
+      },
+      {
+        "source": "/index.html",
+        "destination": "/",
+        "type": 301
+      },
+      {
+        "source": "/index-new.html",
+        "destination": "/",
+        "type": 301
+      },
+      {
+        "source": "/about.html",
+        "destination": "/about",
+        "type": 301
+      },
+      {
+        "source": "/about-new.html",
+        "destination": "/about",
+        "type": 301
+      },
+      {
+        "source": "/academics.html",
+        "destination": "/academics",
+        "type": 301
+      },
+      {
+        "source": "/admission.html",
+        "destination": "/admission",
+        "type": 301
+      },
+      {
+        "source": "/admission-new.html",
+        "destination": "/admission",
+        "type": 301
+      },
+      {
+        "source": "/contact.html",
+        "destination": "/contact",
+        "type": 301
+      },
+      {
+        "source": "/contact-new.html",
+        "destination": "/contact",
+        "type": 301
+      },
+      {
+        "source": "/gallery-page.html",
+        "destination": "/gallery",
+        "type": 301
+      },
+      {
+        "source": "/events.html",
+        "destination": "/events",
+        "type": 301
+      },
+      {
+        "source": "/events-page.html",
+        "destination": "/events",
+        "type": 301
+      },
+      {
+        "source": "/news.html",
+        "destination": "/news",
+        "type": 301
+      },
+      {
+        "source": "/news-page.html",
+        "destination": "/news",
+        "type": 301
+      },
+      {
+        "source": "/news-detail.html",
+        "destination": "/news",
+        "type": 301
+      },
+      {
+        "source": "/admin.html",
+        "destination": "/admin",
+        "type": 301
+      },
+      {
+        "source": "/:path*/",
+        "destination": "/:path",
+        "type": 301
+      }
+    ],
+    "headers": [
+      {
+        "source": "/assets/**",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=31536000, immutable"
+          }
+        ]
+      },
+      {
+        "source": "/@(home-hero-320.avif|home-hero-640.avif|home-hero-320.webp|home-hero-640.webp|favicon-48.png|apple-touch-icon-180.png|icon-192.png|icon-512.png)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=31536000, immutable"
+          }
+        ]
+      },
+      {
+        "source": "/admin{,/**}",
+        "headers": [
+          {
+            "key": "X-Robots-Tag",
+            "value": "noindex, nofollow, noarchive"
+          }
+        ]
+      },
+      {
+        "source": "/election/live",
+        "headers": [
+          {
+            "key": "X-Robots-Tag",
+            "value": "noindex, nofollow, noarchive"
+          },
+          {
+            "key": "Referrer-Policy",
+            "value": "no-referrer"
+          }
+        ]
+      }
+    ],
     "rewrites": [
       {
-        "source": "**",
+        "source": "/@(about|academics|admission|news|events|contact|gallery|sports-page|atl|ansar-sprouts|extension-services|life-at-ansar|ansar-times|alumni|achievements|ansar-media-production|sop|mandatory-public-disclosure|school-election)",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/@(news|events|achievements|sports-achievements|learning)/**",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/election/**",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/admin{,/**}",
         "destination": "/index.html"
       }
     ]

@@ -5,11 +5,14 @@ import { GOOGLE_SHEETS_DATABASE } from './googleSheetsConfig';
 import { normalizeImageUrl, splitImageUrls } from './imageUrlUtils';
 
 const SHEET_CACHE = new Map();
+const SHEET_CACHE_TTL_MS = 5 * 60 * 1000;
+let sheetCacheVersion = Math.floor(Date.now() / SHEET_CACHE_TTL_MS);
 const SHEET_CACHE_CLEAR_EVENT = 'ansar-sheets-cache-cleared';
 const SHEET_CACHE_CLEAR_KEY = 'ansarSheetsCacheClearedAt';
 
 export function clearGoogleSheetsCache() {
   SHEET_CACHE.clear();
+  sheetCacheVersion = Date.now();
   if (typeof window !== 'undefined') {
     window.dispatchEvent(new CustomEvent(SHEET_CACHE_CLEAR_EVENT));
     try {
@@ -219,9 +222,9 @@ function mergeRows(firestoreRows, sheetRows) {
 async function fetchSheetTab(spreadsheetId, tabName) {
   const params = new URLSearchParams({ tqx: 'out:json' });
   if (tabName) params.set('sheet', tabName);
-  params.set('cachebust', String(Date.now()));
+  params.set('v', String(sheetCacheVersion));
   const url = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/gviz/tq?${params.toString()}`;
-  const response = await fetch(url, { cache: 'no-store' });
+  const response = await fetch(url);
   if (!response.ok) throw new Error(`Google Sheets request failed (${response.status})`);
 
   const text = await response.text();
@@ -289,7 +292,7 @@ export function useContentCollection(collectionName, orderByField = 'createdAt',
       const sorted = sortRows(sheetsOnly ? sheetRows : mergeRows(firestoreRows, sheetRows), orderByField, orderDir);
       setState({
         data: maxItems ? sorted.slice(0, maxItems) : sorted,
-        loading: !(firestoreLoaded && sheetLoaded),
+        loading: !(firestoreLoaded || sheetLoaded),
         error: null,
         source: sheetsOnly ? 'sheets' : (useSheets ? 'merged' : 'firestore')
       });
@@ -352,7 +355,7 @@ export function useContentDocument(collectionName, id) {
 
   useEffect(() => {
     let cancelled = false;
-    if (!id || collectionLoading || sheetItem || source === 'sheets') return undefined;
+    if (!id || sheetItem || source === 'sheets') return undefined;
 
     setFirestoreState({ data: null, loading: true, error: null });
     getDoc(doc(db, collectionName, id))
@@ -371,11 +374,11 @@ export function useContentDocument(collectionName, id) {
     return () => {
       cancelled = true;
     };
-  }, [collectionName, id, collectionLoading, sheetItem, source]);
+  }, [collectionName, id, sheetItem, source]);
 
   return {
     data: sheetItem || firestoreState.data,
-    loading: collectionLoading || firestoreState.loading,
+    loading: !sheetItem && !firestoreState.data && (collectionLoading || firestoreState.loading),
     error: collectionError || firestoreState.error,
     source: sheetItem ? 'sheets' : source
   };

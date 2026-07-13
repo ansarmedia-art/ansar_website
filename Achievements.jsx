@@ -82,7 +82,7 @@ export default function Achievements() {
         ) : (
           <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {publishedAchievements.length ? (
-              publishedAchievements.map((item, index) => <AchievementCard key={item.id} achievement={item} priority={index < 3} />)
+              publishedAchievements.map((item, index) => <AchievementCard key={item.id} achievement={item} priority={index === 0} />)
             ) : (
               <p className="col-span-full text-center text-slate-500">Achievements will appear here once published.</p>
             )}

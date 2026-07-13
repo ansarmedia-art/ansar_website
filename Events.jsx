@@ -34,7 +34,7 @@ export default function Events() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {events.length > 0 ? events.map((item, index) => (
               <div key={item.id} onClick={() => navigate(`/events/${item.id}`)} className="cursor-pointer">
-                <EventCard {...item} id={item.id} type="events" priority={index < 3} />
+                <EventCard {...item} id={item.id} type="events" priority={index === 0} />
               </div>
             )) : <p className="col-span-full text-center text-slate-500">No events have been scheduled yet.</p>}
           </div>

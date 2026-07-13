@@ -59,7 +59,7 @@ export default function Footer() {
           <nav className="flex flex-col space-y-2 text-sm">
             <Link to="/about" className="text-slate-400 hover:text-emerald-400 transition-colors">Who we are</Link>
             <Link to="/about" className="text-slate-400 hover:text-emerald-400 transition-colors">Vision & Mission</Link>
-            <Link to="/leadership" className="text-slate-400 hover:text-emerald-400 transition-colors">Staff & Leadership</Link>
+            <Link to="/#leadership" className="text-slate-400 hover:text-emerald-400 transition-colors">Staff & Leadership</Link>
             <Link to="/mandatory-public-disclosure" className="text-slate-400 hover:text-emerald-400 transition-colors">Mandatory Disclosure</Link>
           </nav>
         </div>

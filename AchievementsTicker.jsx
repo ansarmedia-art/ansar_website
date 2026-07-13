@@ -101,7 +101,7 @@ export default function AchievementsTicker() {
                       src={imageUrl}
                       alt={achievement.title}
                       className="absolute inset-0 h-full w-full object-contain p-2 transition-transform duration-500 group-hover:scale-[1.02]"
-                      loading={index < 3 ? 'eager' : 'lazy'}
+                      loading="lazy"
                       decoding="async"
                     />
                   ) : (

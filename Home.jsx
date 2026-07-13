@@ -1,15 +1,33 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { lazy, Suspense, useState, useEffect, useRef } from 'react';
 import Layout from './Layout';
 import Hero from './Hero';
 import NewsCard from './NewsCard';
 import NoticePopup from './NoticePopup';
 import AchievementsTicker from './AchievementsTicker';
-import SchoolChatbot from './SchoolChatbot';
 import { useSettings } from './SettingsContext';
 import { useContentCollection } from './useContentCollection';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { isYearOnly } from './dateUtils';
+import ElectionFloatingButton from './ElectionFloatingButton';
+
+const SchoolChatbot = lazy(() => import('./SchoolChatbot'));
+
+function DeferredSchoolChatbot() {
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    const activate = () => setReady(true);
+    if ('requestIdleCallback' in window) {
+      const idleId = window.requestIdleCallback(activate, { timeout: 3000 });
+      return () => window.cancelIdleCallback(idleId);
+    }
+    const timer = window.setTimeout(activate, 2500);
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  return ready ? <Suspense fallback={null}><SchoolChatbot /></Suspense> : null;
+}
 
 // Transformed into a Bento Layout configuration using Lucide-style SVG icons
 const FALLBACK_FEATURES = [
@@ -126,6 +144,8 @@ function VerticalCarousel({ images, onImageClick }) {
           exit={{ opacity: 0, y: -50 }}
           transition={{ duration: 0.8, ease: "easeInOut" }}
           className="absolute inset-0 w-full h-full object-cover cursor-pointer opacity-80 group-hover:opacity-100 transition-opacity"
+          loading="lazy"
+          decoding="async"
           onClick={() => onImageClick(validImages[index])}
         />
       </AnimatePresence>
@@ -311,18 +331,24 @@ export default function Home() {
   const scrollSportsAchievements = (direction) => {
     const container = sportsAchievementsRef.current;
     if (!container) return;
-    const distance = Math.max(280, Math.floor(container.clientWidth * 0.78));
+    const firstCard = container.firstElementChild;
+    const cardWidth = firstCard?.getBoundingClientRect().width || 288;
+    const gap = Number.parseFloat(window.getComputedStyle(container).columnGap) || 20;
+    const distance = cardWidth + gap;
     container.scrollBy({ left: direction * distance, behavior: 'smooth' });
   };
 
   return (
     <Layout isHome={true}>
       <NoticePopup />
-      <SchoolChatbot />
+      <DeferredSchoolChatbot />
+      <ElectionFloatingButton />
       <Hero 
         title="Empowering Minds, Enriching Futures" 
         subtitle="At Ansar English School, we nurture curious learners, ethical leaders, and responsible global citizens prepared to thrive in an ever-evolving world."
-        imageUrl="https://i.ibb.co/vxgCJ415/image.png"
+        imageUrl="/home-hero-640.webp"
+        imageSrcSet="/home-hero-320.webp 320w, /home-hero-640.webp 640w"
+        imageAvifSrcSet="/home-hero-320.avif 320w, /home-hero-640.avif 640w"
       />
 
       <AnimatedSection className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-20 max-w-6xl mx-auto -mt-12 px-4 sm:px-0">
@@ -369,7 +395,7 @@ export default function Home() {
          </div>
          {settings?.sustainabilityLogoUrl && (
            <div className="w-48 h-48 lg:w-64 lg:h-64 flex-shrink-0 bg-white p-4 rounded-3xl shadow-lg border border-slate-100">
-             <img src={settings.sustainabilityLogoUrl} className="w-full h-full object-contain" alt="Sustainability Logo" />
+             <img src={settings.sustainabilityLogoUrl} className="w-full h-full object-contain" alt="Sustainability Logo" loading="lazy" decoding="async" />
            </div>
          )}
       </AnimatedSection>
@@ -431,14 +457,14 @@ export default function Home() {
               )}
             </div>
           </div>
-          <div ref={sportsAchievementsRef} className="achievement-ticker-scroll flex gap-5 overflow-x-auto scroll-smooth" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+          <div ref={sportsAchievementsRef} className="achievement-ticker-scroll flex snap-x snap-mandatory items-stretch gap-5 overflow-x-auto scroll-smooth pb-1" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
             {homeSportsAchievements.map((item, index) => {
               const imageUrl = item.thumbnailUrl || item.imageUrl || item.imageUrls?.[0];
               return (
-                <Link key={item.id} to={`/sports-achievements/${item.id}`} className="group min-w-[17rem] overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl">
+                <Link key={item.id} to={`/sports-achievements/${item.id}`} className="group block w-72 flex-none snap-start overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl sm:w-80">
                   <div className="relative aspect-[4/3] bg-slate-100">
                     {imageUrl ? (
-                      <img src={imageUrl} alt={item.title} className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" loading={index < 2 ? 'eager' : 'lazy'} />
+                      <img src={imageUrl} alt={item.title} className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" decoding="async" />
                     ) : (
                       <div className="absolute inset-0 flex items-center justify-center text-slate-400">
                         <svg className="h-12 w-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6m12 5h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M18 4c0 3-2 5.5-5 5.5h-2C8 9.5 6 7 6 4V2h12z" /></svg>
@@ -500,7 +526,7 @@ export default function Home() {
         </div>
       </AnimatedSection>
 
-      <AnimatedSection className="mt-32 mb-16">
+      <AnimatedSection className="mt-32 mb-16 scroll-mt-28" id="leadership">
         <div className="mb-12 text-center lg:text-left">
           <p className="text-emerald-600 font-black uppercase tracking-widest text-sm mb-3">Leadership</p>
           <h2 className="text-4xl lg:text-5xl font-extrabold text-emerald-950">Guiding visionaries behind our success</h2>

@@ -7,6 +7,7 @@ import ShareButton from './ShareButton';
 import { useContentDocument } from './useContentCollection';
 import { imageCandidates } from './imageUrlUtils';
 import { formatDisplayDate, isYearOnly } from './dateUtils';
+import { applySeoMetadata, createMetaDescription } from './seoUtils';
 
 const variants = {
   enter: (direction) => ({
@@ -52,6 +53,24 @@ export default function ArticleView() {
   const exhaustedImages = allImageCandidates.length > 0 && validImages.length === 0;
   const displayDate = formatDisplayDate(article?.date);
   const displayStudentName = isSportsAchievement && isYearOnly(article?.studentName) ? '' : article?.studentName;
+
+  useEffect(() => {
+    if (loading) return;
+    const isIndexable = article && article.published !== false;
+    const timer = window.setTimeout(() => {
+      applySeoMetadata(isIndexable ? {
+        title: `${article.title} | Ansar English School`,
+        description: createMetaDescription(article.description || article.excerpt || article.content, `${article.title} from Ansar English School.`),
+        keywords: `${article.title}, Ansar English School, ${isSportsAchievement ? 'sports achievement' : isAchievement ? 'student achievement' : 'school news and events'}`,
+        imageUrl: article.thumbnailUrl || article.coverImageUrl || article.imageUrl || article.eventImages?.[0] || article.imageUrls?.[0]
+      } : {
+        title: 'Article Not Found | Ansar English School',
+        description: 'The requested article does not exist or is not published.',
+        noIndex: true
+      }, location.pathname);
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [article, isAchievement, isSportsAchievement, loading, location.pathname]);
 
   // Fix negative modulo bug so backwards manual navigation loops safely
   const imageIndex = validImages.length > 0 ? ((page % validImages.length) + validImages.length) % validImages.length : 0;

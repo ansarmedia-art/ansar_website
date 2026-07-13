@@ -30,6 +30,7 @@ export default function AdminLayout({ children, user, onLogout }) {
   const getModuleTitle = () => {
     if (path.includes('/updates')) return 'News & Events';
     if (path.includes('/sports-achievements')) return 'Sports Achievements';
+    if (path.includes('/election')) return 'School Election';
     if (path.includes('/learning-features')) return 'Student-Centric Learning';
     if (path.includes('/achievements')) return 'Achievements';
     if (path.includes('/ansar-times')) return 'Ansar Times';
@@ -67,6 +68,7 @@ export default function AdminLayout({ children, user, onLogout }) {
           <Link to="/admin/updates" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'News & Events' ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>News & Events</Link>
           <Link to="/admin/achievements" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'Achievements' ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>Achievements</Link>
           <Link to="/admin/sports-achievements" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'Sports Achievements' ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>Sports Achievements</Link>
+          <Link to="/admin/election" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'School Election' ? 'bg-indigo-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>School Election</Link>
           <Link to="/admin/learning-features" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'Student-Centric Learning' ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>Student-Centric Learning</Link>
           <Link to="/admin/ansar-times" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'Ansar Times' ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>Ansar Times</Link>
           <Link to="/admin/leadership" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'Leadership' ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>Leadership</Link>

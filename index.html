@@ -14,6 +14,24 @@
   <meta name="geo.position" content="10.69946;76.08981">
   <meta name="ICBM" content="10.69946, 76.08981">
   <meta name="theme-color" content="#047857">
+  <style>
+    html { background: #f8fafc; color: #0f172a; }
+    body { margin: 0; min-width: 320px; background: #f8fafc; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    #root { min-height: 100vh; }
+  </style>
+  <script>
+    if (window.location.pathname === '/') {
+      const heroPreload = document.createElement('link');
+      heroPreload.rel = 'preload';
+      heroPreload.as = 'image';
+      heroPreload.type = 'image/avif';
+      heroPreload.href = '/home-hero-320.avif';
+      heroPreload.setAttribute('imagesrcset', '/home-hero-320.avif 320w, /home-hero-640.avif 640w');
+      heroPreload.setAttribute('imagesizes', '(max-width: 639px) calc(100vw - 96px), 480px');
+      heroPreload.setAttribute('fetchpriority', 'high');
+      document.head.appendChild(heroPreload);
+    }
+  </script>
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Ansar English School">
   <meta property="og:title" content="Best CBSE School in Thrissur, Kerala | Ansar English School">
@@ -27,10 +45,9 @@
   <meta name="twitter:image" content="https://ansarschool.in/ansar-logo.png">
   <link rel="canonical" href="https://ansarschool.in/">
   <link rel="preconnect" href="https://i.ibb.co">
-  <link rel="preconnect" href="https://images.unsplash.com">
   <link rel="preconnect" href="https://docs.google.com">
-  <link rel="icon" type="image/png" href="/ansar-logo.png">
-  <link rel="apple-touch-icon" href="/ansar-logo.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-180.png">
   <link rel="manifest" href="/manifest.json">
   <script type="application/ld+json">
     {

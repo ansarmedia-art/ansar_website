@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSettings } from './SettingsContext';
 
-export default function Hero({ imageUrl, title, subtitle }) {
+export default function Hero({ imageUrl, imageSrcSet, imageAvifSrcSet, title, subtitle }) {
   const settings = useSettings();
   const graphicUrl = imageUrl || settings?.logoUrl || 'https://i.ibb.co/7d4mTQVT/image.png';
   const displayTitle = title || settings?.heroTitle || "Welcome to Ansar English School";
@@ -9,7 +9,7 @@ export default function Hero({ imageUrl, title, subtitle }) {
   return (
     <div className="relative w-full rounded-2xl md:rounded-[2.5rem] overflow-hidden shadow-2xl bg-emerald-950 border border-emerald-900/50 mt-4 lg:mt-6">
       {/* Premium Cinematic Overlay & Glows */}
-      <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=2000&auto=format&fit=crop')] bg-cover bg-center opacity-10 mix-blend-overlay pointer-events-none"></div>
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.12),transparent_38%),linear-gradient(135deg,rgba(16,185,129,0.08),transparent_55%)]" />
       <div className="absolute top-0 right-0 -mr-32 -mt-32 w-[600px] h-[600px] rounded-full bg-emerald-500/20 blur-[100px] pointer-events-none" />
       <div className="absolute bottom-0 left-0 -ml-32 -mb-32 w-[400px] h-[400px] rounded-full bg-amber-500/10 blur-[80px] pointer-events-none" />
 
@@ -40,13 +40,23 @@ export default function Hero({ imageUrl, title, subtitle }) {
           <div className="group relative flex w-full max-w-[30rem] items-center justify-center rounded-[2rem] border border-white/25 bg-white/15 p-3 shadow-2xl backdrop-blur-xl sm:p-4">
             <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-white/25 via-white/10 to-white/5 opacity-80" />
             <div className="absolute -inset-4 rounded-[2.25rem] bg-white/10 blur-2xl transition-opacity duration-700 group-hover:opacity-90" />
-            <img 
-              src={graphicUrl} 
-              alt="Featured graphic" 
-              className="relative z-10 max-h-[18rem] w-full rounded-[1.35rem] object-contain transition-transform duration-700 ease-out group-hover:scale-[1.02] sm:max-h-[21rem] lg:max-h-[24rem]"
-              style={{ imageRendering: '-webkit-optimize-contrast', transform: 'translateZ(0)', backfaceVisibility: 'hidden' }}
-              loading="eager"
-            />
+            <picture className="relative z-10 block w-full">
+              {imageAvifSrcSet && <source type="image/avif" srcSet={imageAvifSrcSet} sizes="(max-width: 639px) calc(100vw - 96px), 480px" />}
+              {imageSrcSet && <source type="image/webp" srcSet={imageSrcSet} sizes="(max-width: 639px) calc(100vw - 96px), 480px" />}
+              <img
+                src={graphicUrl}
+                srcSet={imageSrcSet}
+                sizes="(max-width: 639px) calc(100vw - 96px), 480px"
+                alt="Ansar English School featured programme"
+                width="640"
+                height="401"
+                className="max-h-[18rem] w-full rounded-[1.35rem] object-contain transition-transform duration-700 ease-out group-hover:scale-[1.02] sm:max-h-[21rem] lg:max-h-[24rem]"
+                style={{ imageRendering: '-webkit-optimize-contrast', transform: 'translateZ(0)', backfaceVisibility: 'hidden' }}
+                loading="eager"
+                decoding="async"
+                fetchPriority="high"
+              />
+            </picture>
           </div>
         </div>
       </div>

@@ -43,8 +43,11 @@ export default function Navbar() {
           <Link to="/" className="flex items-center gap-3">
             <span className="flex h-16 items-center rounded-2xl bg-white px-3 shadow-md shadow-slate-950/20 ring-1 ring-white/60">
               <img 
-                src={settings?.logoUrl || "https://i.ibb.co/7d4mTQVT/image.png"} 
+                src={settings?.logoUrl || "/icon-192.png"}
                 alt="Ansar English School Logo" 
+                width="48"
+                height="48"
+                decoding="async"
                 className="h-12 w-auto object-contain contrast-125 brightness-105 transition-all duration-300 hover:scale-[1.03]" 
                 style={{ imageRendering: '-webkit-optimize-contrast', transform: 'translateZ(0)', backfaceVisibility: 'hidden' }}
               />

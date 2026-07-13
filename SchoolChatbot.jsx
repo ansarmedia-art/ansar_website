@@ -1,7 +1,7 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { getGenerativeModel } from 'firebase/ai';
 import { Link } from 'react-router-dom';
-import { ai } from './firebase-init';
+import { ai } from './firebase-ai-init';
 import { useSettings } from './SettingsContext';
 import { useContentCollection } from './useContentCollection';
 import { useFirestoreCollection } from './useFirestoreCollection';

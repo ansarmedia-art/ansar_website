@@ -30,10 +30,14 @@ import ArticleView from './ArticleView';
 import AdminSettings from './AdminSettings';
 import AdminPublicDisclosure from './AdminPublicDisclosure';
 import MandatoryDisclosure from './MandatoryDisclosure';
+import ElectionPage from './ElectionPage';
+import ElectionAnalytics from './ElectionAnalytics';
+import AdminElection from './AdminElection';
 import ContentPageLayout from './ContentPageLayout';
 import { SettingsProvider, useSettings } from './SettingsContext';
 import { DEFAULT_SPORTS_PAGE, mergeListWithDefaults } from './contentDefaults';
 import { formatDisplayDate, getDateTime, getDisplayYear, isYearOnly } from './dateUtils';
+import { applySeoMetadata, createMetaDescription } from './seoUtils';
 
 // --- AUTHORIZED ADMIN EMAILS ---
 const ADMIN_EMAILS = [
@@ -43,7 +47,6 @@ const ADMIN_EMAILS = [
   'ansarschooloffice@gmail.com'
 ];
 
-const SITE_URL = 'https://ansarschool.in';
 const DEFAULT_SEO = {
   title: 'Best CBSE School in Thrissur, Kerala | Ansar English School',
   description: 'Ansar English School, Perumpilavu is a leading CBSE Senior Secondary School in Thrissur, Kerala with NABET accreditation, 42+ years of excellence, modern facilities, and value-based education.',
@@ -87,10 +90,60 @@ const ROUTE_SEO = {
     description: 'Explore school events, celebrations, competitions, and activities at Ansar English School, Perumpilavu, Thrissur.',
     keywords: 'Ansar English School events, CBSE school events Thrissur, Perumpilavu school activities'
   },
+  '/school-election': {
+    title: 'School Council Election 2026 | Ansar English School',
+    description: 'Meet the student candidates and participate in the Ansar English School Council Election 2026 campaign popularity poll before the official offline election.',
+    keywords: 'Ansar School election 2026, student council election, school election campaign'
+  },
   '/achievements': {
     title: 'Achievements | Ansar English School Thrissur',
     description: 'Student achievements, academic honours, competitions, and milestones from Ansar English School, Perumpilavu, Thrissur.',
     keywords: 'Ansar English School achievements, CBSE school achievements Thrissur, student achievements Kerala'
+  },
+  '/atl': {
+    title: 'Atal Tinkering Lab | Ansar English School Thrissur',
+    description: 'Explore the Atal Tinkering Lab at Ansar English School, where students develop STEM skills through innovation, prototyping, and hands-on problem solving.',
+    keywords: 'Atal Tinkering Lab Thrissur, ATL Ansar English School, student innovation lab Kerala'
+  },
+  '/sports-page': {
+    title: 'Sports and Athletics | Ansar English School Thrissur',
+    description: 'Explore sports programmes, athletics, team achievements, training, and student highlights at Ansar English School, Perumpilavu.',
+    keywords: 'school sports Thrissur, Ansar English School athletics, student sports achievements Kerala'
+  },
+  '/ansar-times': {
+    title: 'Ansar Times School Magazine | Ansar English School',
+    description: 'Read Ansar Times magazines, newsletters, student contributions, and school stories from Ansar English School.',
+    keywords: 'Ansar Times, Ansar English School magazine, school newsletter Thrissur'
+  },
+  '/ansar-sprouts': {
+    title: 'Ansar Sprouts Early Learning | Ansar English School',
+    description: 'Discover the caring, play-based early learning programme at Ansar Sprouts in Perumpilavu, Thrissur.',
+    keywords: 'Ansar Sprouts, preschool Perumpilavu, early learning Thrissur'
+  },
+  '/extension-services': {
+    title: 'Extension Services | Ansar English School',
+    description: 'Learn about community outreach, service learning, awareness programmes, and student volunteering at Ansar English School.',
+    keywords: 'school community outreach Thrissur, student service learning, Ansar English School extension services'
+  },
+  '/life-at-ansar': {
+    title: 'Life at Ansar | Student Life and Campus Activities',
+    description: 'Explore clubs, celebrations, campus routines, arts, sports, and student life at Ansar English School.',
+    keywords: 'student life Ansar English School, school clubs Thrissur, campus activities Perumpilavu'
+  },
+  '/alumni': {
+    title: 'Ansar Alumni | Ansar English School',
+    description: 'Connect with the Ansar English School alumni community and explore alumni stories, achievements, mentorship, and events.',
+    keywords: 'Ansar English School alumni, Ansar alumni community, school alumni Thrissur'
+  },
+  '/sop': {
+    title: 'School Procedures and Guidelines | Ansar English School',
+    description: 'Read essential school routines, safety practices, academic procedures, and campus guidelines followed at Ansar English School.',
+    keywords: 'Ansar English School procedures, school safety guidelines, school SOP'
+  },
+  '/ansar-media-production': {
+    title: 'Ansar Media Productions | Ansar English School',
+    description: 'Explore photography, videography, podcasting, design, and student media production at Ansar English School.',
+    keywords: 'Ansar Media Productions, school media team Thrissur, student photography videography'
   },
   '/mandatory-public-disclosure': {
     title: 'Mandatory Public Disclosure | Ansar English School',
@@ -99,25 +152,15 @@ const ROUTE_SEO = {
   }
 };
 
-function setMetaTag(selector, attributes) {
-  let tag = document.head.querySelector(selector);
-  if (!tag) {
-    tag = document.createElement('meta');
-    document.head.appendChild(tag);
-  }
-  Object.entries(attributes).forEach(([key, value]) => tag.setAttribute(key, value));
-}
-
-function setLinkTag(selector, attributes) {
-  let tag = document.head.querySelector(selector);
-  if (!tag) {
-    tag = document.createElement('link');
-    document.head.appendChild(tag);
-  }
-  Object.entries(attributes).forEach(([key, value]) => tag.setAttribute(key, value));
-}
-
 function getSeoForPath(pathname) {
+  if (pathname === '/staff' || pathname.startsWith('/staff/')) {
+    return {
+      ...DEFAULT_SEO,
+      title: 'Page Moved | Ansar English School',
+      description: 'This page has moved to the official Ansar English School website.',
+      noIndex: true
+    };
+  }
   if (pathname.startsWith('/admin')) {
     return {
       ...DEFAULT_SEO,
@@ -126,9 +169,18 @@ function getSeoForPath(pathname) {
       noIndex: true
     };
   }
-  if (pathname.startsWith('/news/')) return ROUTE_SEO['/news'];
-  if (pathname.startsWith('/events/')) return ROUTE_SEO['/events'];
-  if (pathname.startsWith('/achievements/')) return ROUTE_SEO['/achievements'];
+  if (pathname === '/election/live') {
+    return {
+      ...DEFAULT_SEO,
+      title: 'Private Election Analytics | Ansar English School',
+      description: 'Private real-time school election analytics.',
+      noIndex: true
+    };
+  }
+  if (pathname.startsWith('/news/')) return { ...ROUTE_SEO['/news'], noIndex: true };
+  if (pathname.startsWith('/events/')) return { ...ROUTE_SEO['/events'], noIndex: true };
+  if (pathname.startsWith('/achievements/')) return { ...ROUTE_SEO['/achievements'], noIndex: true };
+  if (pathname.startsWith('/sports-achievements/')) return { ...ROUTE_SEO['/sports-page'], noIndex: true };
   if (pathname.startsWith('/learning/')) {
     return {
       title: 'Learning Facilities | Ansar English School Thrissur',
@@ -139,7 +191,8 @@ function getSeoForPath(pathname) {
   return ROUTE_SEO[pathname] || {
     title: 'Ansar English School | CBSE School in Thrissur, Kerala',
     description: 'Explore Ansar English School, a CBSE Senior Secondary School in Perumpilavu, Thrissur, Kerala known for academic excellence, student care, and value-based education.',
-    keywords: DEFAULT_SEO.keywords
+    keywords: DEFAULT_SEO.keywords,
+    noIndex: true
   };
 }
 
@@ -148,25 +201,7 @@ function SiteSeo() {
 
   useEffect(() => {
     const seo = getSeoForPath(pathname);
-    const canonicalPath = pathname === '/' ? '/' : pathname.replace(/\/$/, '');
-    const canonicalUrl = `${SITE_URL}${canonicalPath}`;
-    const imageUrl = `${SITE_URL}/ansar-logo.png`;
-
-    document.title = seo.title;
-    setMetaTag('meta[name="description"]', { name: 'description', content: seo.description });
-    setMetaTag('meta[name="keywords"]', { name: 'keywords', content: seo.keywords || DEFAULT_SEO.keywords });
-    setMetaTag('meta[name="robots"]', {
-      name: 'robots',
-      content: seo.noIndex ? 'noindex, nofollow' : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'
-    });
-    setLinkTag('link[rel="canonical"]', { rel: 'canonical', href: canonicalUrl });
-    setMetaTag('meta[property="og:title"]', { property: 'og:title', content: seo.title });
-    setMetaTag('meta[property="og:description"]', { property: 'og:description', content: seo.description });
-    setMetaTag('meta[property="og:url"]', { property: 'og:url', content: canonicalUrl });
-    setMetaTag('meta[property="og:image"]', { property: 'og:image', content: imageUrl });
-    setMetaTag('meta[name="twitter:title"]', { name: 'twitter:title', content: seo.title });
-    setMetaTag('meta[name="twitter:description"]', { name: 'twitter:description', content: seo.description });
-    setMetaTag('meta[name="twitter:image"]', { name: 'twitter:image', content: imageUrl });
+    applySeoMetadata({ ...seo, keywords: seo.keywords || DEFAULT_SEO.keywords }, pathname);
   }, [pathname]);
 
   return null;
@@ -654,6 +689,21 @@ function LearningFeaturePage() {
     image: sheetFeature?.imageUrl || sheetFeature?.image || defaultFeature.image
   } : null;
 
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      applySeoMetadata(feature ? {
+        title: `${feature.title} | Ansar English School`,
+        description: createMetaDescription(feature.description, `Explore ${feature.title} at Ansar English School.`),
+        keywords: `${feature.title}, Ansar English School facilities, CBSE school Thrissur`
+      } : {
+        title: 'Learning Feature Not Found | Ansar English School',
+        description: 'The requested learning feature is not available.',
+        noIndex: true
+      }, `/learning/${slug}`);
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [feature, slug]);
+
   if (!feature) {
     return (
       <Layout>
@@ -734,8 +784,25 @@ function DynamicPage({ slug: propSlug }) {
   const slug = propSlug || params.slug;
   const { data: pages, loading } = useContentCollection('pages', 'createdAt', 'desc', { firestoreOnly: true });
   
-  const page = pages.find(p => p.slug === slug);
+  const page = pages.find(p => p.slug === slug && p.published !== false);
   const samplePage = SAMPLE_PAGES[slug];
+
+  useEffect(() => {
+    if (loading) return;
+    const seoPage = page || samplePage;
+    const timer = window.setTimeout(() => {
+      applySeoMetadata(seoPage ? {
+        title: `${seoPage.title} | Ansar English School`,
+        description: createMetaDescription(seoPage.metaDescription || seoPage.subtitle || seoPage.intro || seoPage.bodyHtml, `Learn more about ${seoPage.title} at Ansar English School.`),
+        keywords: seoPage.keywords || `${seoPage.title}, Ansar English School, CBSE school Thrissur`
+      } : {
+        title: 'Page Not Found | Ansar English School',
+        description: 'The requested page does not exist or is not published.',
+        noIndex: true
+      }, `/${slug}`);
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [loading, page, samplePage, slug]);
 
   if (loading && !page) return <Layout><div className="py-24 text-center"><h2 className="text-2xl font-bold text-slate-900 animate-pulse">Loading page...</h2></div></Layout>;
 
@@ -1162,6 +1229,8 @@ export default function App() {
         <Route path="/admission" element={<Admission />} />
         <Route path="/news" element={<News />} />
         <Route path="/events" element={<Events />} />
+        <Route path="/school-election" element={<ElectionPage />} />
+        <Route path="/election/live" element={<ElectionAnalytics />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/gallery" element={<Gallery />} />
         <Route path="/sports-page" element={<SportsPage />} />
@@ -1199,6 +1268,7 @@ export default function App() {
                   <Route path="/updates" element={<AdminUpdates />} />
                   <Route path="/achievements" element={<AdminAchievements />} />
                   <Route path="/sports-achievements" element={<AdminSportsAchievements />} />
+                  <Route path="/election" element={<AdminElection />} />
                   <Route path="/learning-features" element={<AdminLearningFeatures />} />
                   <Route path="/ansar-times" element={<AdminAnsarTimes />} />
                   <Route path="/leadership" element={<AdminLeadership />} />

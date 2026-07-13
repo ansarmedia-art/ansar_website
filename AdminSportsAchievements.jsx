@@ -22,6 +22,19 @@ function parseFlexibleDate(value) {
   return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
 
+function toDateInputValue(value) {
+  if (!value) return '';
+  const text = String(value).trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(text)) return text;
+
+  const parsedDate = parseFlexibleDate(text);
+  if (!parsedDate) return '';
+  const year = parsedDate.getFullYear();
+  const month = String(parsedDate.getMonth() + 1).padStart(2, '0');
+  const day = String(parsedDate.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 function getAchievementTime(item) {
   const parsedDate = parseFlexibleDate(item.date);
   if (parsedDate) return parsedDate.getTime();
@@ -98,7 +111,7 @@ export default function AdminSportsAchievements() {
       title: item.title || '',
       description: item.description || '',
       imageUrls: Array.isArray(item.imageUrls) && item.imageUrls.length > 0 ? item.imageUrls : (item.imageUrl ? [item.imageUrl] : ['']),
-      date: item.date || '',
+      date: toDateInputValue(item.date),
       studentName: item.studentName || '',
       published: item.published !== false
     });
@@ -195,7 +208,7 @@ export default function AdminSportsAchievements() {
             </div>
             <div>
               <label className="mb-1 block text-sm font-bold text-slate-700">Date</label>
-              <input name="date" value={formData.date} onChange={handleChange} placeholder="dd/mm/yyyy" className="w-full rounded-lg border border-slate-200 p-3 outline-none focus:ring-2 focus:ring-emerald-500" />
+              <input type="date" name="date" value={formData.date} onChange={handleChange} className="w-full cursor-pointer rounded-lg border border-slate-200 p-3 outline-none focus:ring-2 focus:ring-emerald-500" />
             </div>
             <div className="md:col-span-2">
               <label className="mb-1 block text-sm font-bold text-slate-700">Student / Team Name</label>

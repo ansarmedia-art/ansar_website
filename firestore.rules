@@ -23,6 +23,11 @@ service cloud.firestore {
     //
     // Collection: settings
     // Fields: schoolName, email, phone, address, logoUrl, siteDescription
+    //
+    // Collection: electionAdminConfig
+    // Document ID: primary
+    // Fields: analyticsKey (string, required, private), updatedAt (timestamp, required),
+    //         updatedBy (verified admin email string, required)
     // ===============================================================
 
     // ===============================================================
@@ -42,6 +47,10 @@ service cloud.firestore {
         (request.auth.token.email != null && request.auth.token.email in ['d3ztudio@gmail.com', 'ansarmedia@ansarschool.in', 'shafeeqpulikkal32@gmail.com', 'ansarschooloffice@gmail.com']) ||
         (request.auth.token.email != null && exists(/databases/$(database)/documents/admins/$(request.auth.token.email)))
       );
+    }
+
+    function isVerifiedAdmin() {
+      return isAdmin() && request.auth.token.email_verified == true;
     }
 
     // Validate string length to prevent 1MB DoS attacks
@@ -348,6 +357,22 @@ service cloud.firestore {
                isOptionalTimestamp('lastLogin');
     }
 
+    function isValidElectionAdminConfig() {
+      return request.resource.data.keys().hasAll(['analyticsKey', 'updatedAt', 'updatedBy']) &&
+             request.resource.data.keys().hasOnly(['analyticsKey', 'updatedAt', 'updatedBy']) &&
+             request.resource.data.analyticsKey is string &&
+             request.resource.data.analyticsKey.size() >= 20 &&
+             request.resource.data.analyticsKey.size() <= 128 &&
+             request.resource.data.analyticsKey.matches('^[a-zA-Z0-9_-]+$') &&
+             request.resource.data.updatedAt is timestamp &&
+             request.resource.data.updatedAt == request.time &&
+             request.resource.data.updatedBy is string &&
+             request.resource.data.updatedBy.size() >= 1 &&
+             request.resource.data.updatedBy.size() <= 200 &&
+             request.auth.token.email != null &&
+             request.resource.data.updatedBy == request.auth.token.email;
+    }
+
     // ===============================================================
     // Access Rules
     // ===============================================================
@@ -420,6 +445,14 @@ service cloud.firestore {
       allow read: if true;
       allow create, update: if isAdmin();
       allow delete: if false; // Settings documents should not be deleted, only updated
+    }
+
+    // Private election analytics key. Officials never access this document;
+    // admins use it only to generate a keyed, read-only Apps Script report URL.
+    match /electionAdminConfig/{configId} {
+      allow read: if configId == 'primary' && isVerifiedAdmin();
+      allow create, update: if configId == 'primary' && isVerifiedAdmin() && isValidElectionAdminConfig();
+      allow delete: if false;
     }
 
     // Sports Page Content
