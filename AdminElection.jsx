@@ -4,6 +4,7 @@ import { ElectionAnalyticsDashboard } from './ElectionAnalytics';
 import { GOOGLE_SHEETS_DATABASE } from './googleSheetsConfig';
 import { auth, db } from './firebase-init';
 import { loadElectionData, resetElectionVotes, setElectionPolling } from './electionApi';
+import ElectionCandidatesAdmin from './ElectionCandidatesAdmin';
 
 const SESSION_KEY = 'ansar-election-analytics-key';
 const CONFIG_REF = ['electionAdminConfig', 'primary'];
@@ -144,6 +145,8 @@ export default function AdminElection() {
           </button>
         </div>
       </section>
+
+      <ElectionCandidatesAdmin analyticsKey={analyticsKey} />
 
       <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <div className="flex flex-wrap items-start justify-between gap-3">

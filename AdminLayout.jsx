@@ -28,7 +28,9 @@ export default function AdminLayout({ children, user, onLogout }) {
   }, [now]);
 
   const getModuleTitle = () => {
-    if (path.includes('/updates')) return 'News & Events';
+    if (path.includes('/news')) return 'News';
+    if (path.includes('/events')) return 'Events';
+    if (path.includes('/updates')) return 'News';
     if (path.includes('/sports-achievements')) return 'Sports Achievements';
     if (path.includes('/election')) return 'School Election';
     if (path.includes('/learning-features')) return 'Student-Centric Learning';
@@ -65,7 +67,8 @@ export default function AdminLayout({ children, user, onLogout }) {
         </div>
         <nav className="p-4 space-y-1">
           <Link to="/admin/dashboard" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'Dashboard' ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>Dashboard</Link>
-          <Link to="/admin/updates" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'News & Events' ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>News & Events</Link>
+          <Link to="/admin/news" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'News' ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>News</Link>
+          <Link to="/admin/events" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'Events' ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>Events</Link>
           <Link to="/admin/achievements" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'Achievements' ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>Achievements</Link>
           <Link to="/admin/sports-achievements" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'Sports Achievements' ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>Sports Achievements</Link>
           <Link to="/admin/election" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'School Election' ? 'bg-indigo-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>School Election</Link>

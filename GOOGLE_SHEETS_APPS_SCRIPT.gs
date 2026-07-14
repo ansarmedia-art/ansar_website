@@ -166,6 +166,17 @@ function doPost(e) {
       return json_({ ok: true, reset: resetElectionVotes_() });
     }
 
+    if (action === 'electionAdminSaveCandidate') {
+      validateElectionShareKey_(body.key);
+      return json_({ ok: true, candidate: saveRecord_({ collectionName: 'electionCandidates', record: body.candidate }) });
+    }
+
+    if (action === 'electionAdminDeleteCandidate') {
+      validateElectionShareKey_(body.key);
+      deleteRecord_({ collectionName: 'electionCandidates', id: body.id });
+      return json_({ ok: true });
+    }
+
     validateToken_(body.token);
 
     if (action === 'save') {
@@ -243,13 +254,18 @@ function setupElectionSheets() {
     pollClosesAt: '2026-07-23T00:00:00+05:30',
     pollOpen: 'TRUE',
     voteResetId: 'initial',
-    audienceOptions: 'Student|Staff|Parent|Alumni|Other',
+    audienceOptions: 'Student',
     announcement: 'Campaign popularity polling closes before the official offline election on 23 July 2026.'
   };
 
   Object.keys(defaults).forEach(function(key) {
     if (!(key in existing)) settingsSheet.appendRow([key, defaults[key]]);
   });
+
+  if (ss.getSheetByName('electionCandidates').getLastRow() <= 1) seedElectionCandidates2026_();
+  ensureElectionNotaCandidates2026_();
+  ensureElectionCandidatePhotos2026_();
+  migrateElectionPositionLabels2026_();
 
   const properties = PropertiesService.getScriptProperties();
   if (!properties.getProperty('ELECTION_HASH_SALT')) {
@@ -269,6 +285,81 @@ function setupElectionSheets() {
   return result;
 }
 
+function seedElectionCandidates2026_() {
+  const candidates = [
+    ['naeema-kathoon','Senior Secondary Section','Head Girl','Naeema Kathoon','12E','Puzzle Piece',1],
+    ['aathikah-jinan','Senior Secondary Section','Head Girl','Aathikah Jinan','12A','Scales of Justice',2],
+    ['miyaz-musthafa','Senior Secondary Section','Head Boy','Miyaz Musthafa','12F','Football',3],
+    ['zaya-zakharia','Secondary Section','Section Leader','Zaya Zakharia','XH','Clock',1],
+    ['rahmath-bari-pm','Secondary Section','Section Leader','Rahmath Bari P M','XF','Bridge',2],
+    ['rayan-mohamed','Secondary Section','Section Leader','Rayan Mohamed','XG','Microphone',3,'https://i.ibb.co/ym0D1XsJ/1044a44d-bc96-4c4b-9941-3ee76f6fed66.jpg'],
+    ['eshan-mohammed-ms','Secondary Section','Section Leader','Eshan Mohammed M S','XD','Key',4],
+    ['sanvi-k-nair','Middle Section','Section Leader','Sanvi K Nair','8-C','Microphone',1],
+    ['azza-aathif','Middle Section','Section Leader','Azza Aathif','8A','Light Bulb',2],
+    ['diya-nishar','Middle Section','Section Leader','Diya Nishar','8 C','Phoenix',3],
+    ['fateh-mohammed-azeen','Middle Section','Section Leader','Fateh Mohammed Azeen','8 F','Lion',4],
+    ['muhammed-al-fazza-kf','Middle Section','Section Leader','Muhammed Al Fazza K.F','8 B','Football',5],
+    ['mohammed-shayaan','Middle Section','Section Leader','Mohammed Shayaan','8 H','Spectacles',6],
+    ['nota-middle-section-leader','Middle Section','Section Leader','NOTA (None of the Above)','','NOTA',99],
+    ['nota-secondary-section-leader','Secondary Section','Section Leader','NOTA (None of the Above)','','NOTA',99],
+    ['nota-senior-head-boy','Senior Secondary Section','Head Boy','NOTA (None of the Above)','','NOTA',99],
+    ['nota-senior-head-girl','Senior Secondary Section','Head Girl','NOTA (None of the Above)','','NOTA',99]
+  ];
+  candidates.forEach(function(c) {
+    saveRecord_({ collectionName:'electionCandidates', record:{ id:c[0], section:c[1], position:c[2], name:c[3], className:c[4], photoUrl:c[7] || '', symbolName:c[5], symbolUrl:'', manifesto:c[5] === 'NOTA' ? 'Choose this option if you do not support any listed candidate for this position.' : '', audience:'Student', order:c[6], active:true } });
+  });
+  return candidates.length;
+}
+
+function ensureElectionNotaCandidates2026_() {
+  const notaCandidates = [
+    ['nota-middle-section-leader','Middle Section','Section Leader'],
+    ['nota-secondary-section-leader','Secondary Section','Section Leader'],
+    ['nota-senior-head-boy','Senior Secondary Section','Head Boy'],
+    ['nota-senior-head-girl','Senior Secondary Section','Head Girl']
+  ];
+  notaCandidates.forEach(function(c) {
+    saveRecord_({ collectionName:'electionCandidates', record:{ id:c[0], section:c[1], position:c[2], name:'NOTA (None of the Above)', className:'', photoUrl:'', symbolName:'NOTA', symbolUrl:'', manifesto:'Choose this option if you do not support any listed candidate for this position.', audience:'Student', order:99, active:true } });
+  });
+}
+
+function ensureElectionCandidatePhotos2026_() {
+  const sheet = getSpreadsheet_().getSheetByName('electionCandidates');
+  if (!sheet || sheet.getLastRow() < 2) return;
+  const headers = readHeaders_(sheet);
+  const idColumn = headers.indexOf('id') + 1;
+  const photoColumn = headers.indexOf('photoUrl') + 1;
+  if (!idColumn || !photoColumn) return;
+  const rowNumber = findRowById_(sheet, headers, 'rayan-mohamed');
+  if (rowNumber && !String(sheet.getRange(rowNumber, photoColumn).getValue() || '').trim()) {
+    sheet.getRange(rowNumber, photoColumn).setValue('https://i.ibb.co/ym0D1XsJ/1044a44d-bc96-4c4b-9941-3ee76f6fed66.jpg');
+  }
+}
+
+function migrateElectionPositionLabels2026_() {
+  const sheet = getSpreadsheet_().getSheetByName('electionCandidates');
+  if (!sheet || sheet.getLastRow() < 2) return 0;
+  const headers = readHeaders_(sheet);
+  const positionColumn = headers.indexOf('position') + 1;
+  const idColumn = headers.indexOf('id') + 1;
+  if (!positionColumn || !idColumn) return 0;
+  const rowCount = sheet.getLastRow() - 1;
+  const range = sheet.getRange(2, positionColumn, rowCount, 1);
+  const values = range.getValues();
+  const ids = sheet.getRange(2, idColumn, rowCount, 1).getValues();
+  const suppliedPositions = { 'naeema-kathoon':'Head Girl', 'aathikah-jinan':'Head Girl', 'miyaz-musthafa':'Head Boy' };
+  let changed = 0;
+  values.forEach(function(row, index) {
+    const suppliedPosition = suppliedPositions[String(ids[index][0] || '').trim()];
+    if (suppliedPosition && row[0] !== suppliedPosition) {
+      row[0] = suppliedPosition;
+      changed += 1;
+    }
+  });
+  if (changed) range.setValues(values);
+  return changed;
+}
+
 function getElectionPublicData_() {
   const ss = getSpreadsheet_();
   const settings = readElectionSettings_(ss.getSheetByName('electionSettings'));
@@ -278,7 +369,7 @@ function getElectionPublicData_() {
       return {
         id: String(item.id || '').trim(),
         section: String(item.section || '').trim(),
-        position: String(item.position || '').trim(),
+        position: normalizeElectionPosition_(item.position),
         name: String(item.name || '').trim(),
         className: String(item.className || '').trim(),
         photoUrl: safePublicUrl_(item.photoUrl),
@@ -302,11 +393,11 @@ function getElectionPublicData_() {
     closesAt: closesAt,
     isOpen: isOpen,
     announcement: String(settings.announcement || ''),
-    audienceOptions: String(settings.audienceOptions || 'Student|Staff|Parent|Alumni|Other').split('|').map(function(value) { return value.trim(); }).filter(Boolean),
+    audienceOptions: ['Student'],
     sections: ['Middle Section', 'Secondary Section', 'Senior Secondary Section'],
     candidates: candidates,
     voteResetId: String(settings.voteResetId || 'initial'),
-    rule: 'You may cast one vote in each section per day: one in Middle, one in Secondary, and one in Senior Secondary.'
+    rule: 'Students may cast four votes per day: one Middle Section Leader, one Secondary Section Leader, one Senior Secondary Head Boy, and one Senior Secondary Head Girl.'
   };
 }
 
@@ -319,10 +410,9 @@ function saveElectionVote_(body) {
 
     const candidateId = String(body.candidateId || '').trim();
     const deviceId = String(body.deviceId || '').trim();
-    const audience = String(body.audience || '').trim().substring(0, 50);
+    const audience = 'Student';
     if (!candidateId) throw new Error('Choose a candidate.');
     if (!/^[a-zA-Z0-9-]{20,100}$/.test(deviceId)) throw new Error('This browser could not be verified. Refresh and try again.');
-    if (!audience) throw new Error('Choose your audience category.');
 
     const candidate = publicData.candidates.filter(function(item) { return item.id === candidateId; })[0];
     if (!candidate) throw new Error('Candidate is unavailable.');
@@ -333,11 +423,13 @@ function saveElectionVote_(body) {
     const headers = ensureHeaders_(votesSheet, SHEET_COLUMNS.electionVotes);
     const existingVotes = readSheetObjects_(votesSheet);
     const duplicate = existingVotes.some(function(vote) {
-      return String(vote.dateKey) === dateKey &&
-        String(vote.deviceHash) === deviceHash &&
-        String(vote.section) === candidate.section;
+      const sameSection = String(vote.section) === candidate.section;
+      const sameVotingCategory = candidate.section === 'Senior Secondary Section'
+        ? normalizeElectionPosition_(vote.position) === normalizeElectionPosition_(candidate.position)
+        : sameSection;
+      return String(vote.dateKey) === dateKey && String(vote.deviceHash) === deviceHash && sameSection && sameVotingCategory;
     });
-    if (duplicate) throw new Error('This device has already voted in this section today. You can still vote once in each of the other sections.');
+    if (duplicate) throw new Error('This device has already voted in this category today. Other voting categories remain available.');
 
     const vote = {
       id: Utilities.getUuid(),
@@ -506,6 +598,11 @@ function normalizeBoolean_(value, fallback) {
 function safePublicUrl_(value) {
   const url = String(value || '').trim();
   return /^https:\/\//i.test(url) ? url : '';
+}
+
+function normalizeElectionPosition_(value) {
+  const position = String(value || '').trim();
+  return position.toLowerCase() === 'school leader' ? 'Head Boy / Head Girl' : position;
 }
 
 function hashElectionDevice_(deviceId) {

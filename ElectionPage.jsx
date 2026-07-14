@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import Layout from './Layout';
 import { hasVotedLocally, loadElectionData, submitElectionVote } from './electionApi';
+import ElectionSymbolIcon from './ElectionSymbolIcon';
 
 const DEFAULT_ELECTION = {
   title: 'Ansar School Council Election 2026',
@@ -8,11 +9,11 @@ const DEFAULT_ELECTION = {
   closesAt: '2026-07-23T00:00:00+05:30',
   isOpen: false,
   announcement: 'Candidate profiles and positions will be published soon.',
-  audienceOptions: ['Student', 'Staff', 'Parent', 'Alumni', 'Other'],
+  audienceOptions: ['Student'],
   sections: ['Middle Section', 'Secondary Section', 'Senior Secondary Section'],
   voteResetId: 'initial',
   candidates: [],
-  rule: 'You may cast one vote in each section per day: one in Middle, one in Secondary, and one in Senior Secondary.'
+  rule: 'Students may cast four votes per day: one Middle Section Leader, one Secondary Section Leader, one Senior Secondary Head Boy, and one Senior Secondary Head Girl.'
 };
 
 function CandidatePlaceholder() {
@@ -27,15 +28,16 @@ function CandidatePlaceholder() {
   );
 }
 
-function CandidateCard({ candidate, audience, onVote, busy, voted, isOpen }) {
+function CandidateCard({ candidate, onVote, busy, voted, isOpen }) {
+  const isNota = candidate.symbolName === 'NOTA' || candidate.id?.startsWith('nota-');
   return (
     <article className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl">
-      <div className="relative aspect-[4/3] bg-gradient-to-br from-indigo-100 via-white to-amber-50">
-        {candidate.photoUrl ? <img src={candidate.photoUrl} alt={candidate.name} className="h-full w-full object-cover" loading="lazy" decoding="async" /> : (
+      <div className="relative aspect-[7/8] bg-gradient-to-br from-indigo-100 via-white to-amber-50">
+        {candidate.photoUrl ? <img src={candidate.photoUrl} alt={candidate.name} className="h-full w-full object-contain" loading="lazy" decoding="async" /> : (
           <div className="grid h-full place-items-center text-indigo-300"><svg className="h-24 w-24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1"><path d="M20 21a8 8 0 0 0-16 0M12 13a5 5 0 1 0 0-10 5 5 0 0 0 0 10Z" /></svg></div>
         )}
         <div className="absolute bottom-3 right-3 flex items-center gap-2 rounded-2xl bg-white/95 p-2 pr-3 shadow-lg backdrop-blur">
-          {candidate.symbolUrl ? <img src={candidate.symbolUrl} alt="" className="h-10 w-10 rounded-xl object-contain" /> : <span className="grid h-10 w-10 place-items-center rounded-xl bg-amber-100 text-xl">★</span>}
+          {candidate.symbolUrl ? <img src={candidate.symbolUrl} alt="" className="h-10 w-10 rounded-xl object-contain" /> : <span className="grid h-10 w-10 place-items-center rounded-xl bg-amber-100 text-amber-800"><ElectionSymbolIcon name={candidate.symbolName} className="h-7 w-7" /></span>}
           <span className="text-xs font-extrabold text-slate-700">{candidate.symbolName || 'Symbol pending'}</span>
         </div>
       </div>
@@ -46,11 +48,11 @@ function CandidateCard({ candidate, audience, onVote, busy, voted, isOpen }) {
         {candidate.manifesto && <p className="mt-4 text-sm font-medium leading-6 text-slate-600">{candidate.manifesto}</p>}
         <button
           type="button"
-          disabled={busy || voted || !audience || !isOpen}
+          disabled={busy || voted || !isOpen}
           onClick={() => onVote(candidate)}
-          className="mt-5 w-full rounded-xl bg-indigo-700 px-4 py-3 font-extrabold text-white transition hover:bg-indigo-800 disabled:cursor-not-allowed disabled:bg-slate-300"
+          className={`mt-5 w-full rounded-xl px-4 py-3 font-extrabold text-white shadow-md transition disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none ${isNota ? 'bg-gradient-to-r from-rose-600 to-orange-500 ring-4 ring-orange-100 hover:from-rose-700 hover:to-orange-600' : 'bg-indigo-700 hover:bg-indigo-800'}`}
         >
-          {!isOpen ? 'Polling closed' : voted ? 'Voted today' : busy ? 'Sending vote…' : audience ? 'Vote for this candidate' : 'Choose audience above'}
+          {!isOpen ? 'Polling closed' : voted ? (isNota ? 'Voted NOTA today' : 'Voted today') : busy ? 'Sending vote…' : isNota ? 'NOTA' : 'Vote for this candidate'}
         </button>
       </div>
     </article>
@@ -61,7 +63,7 @@ export default function ElectionPage() {
   const [election, setElection] = useState(DEFAULT_ELECTION);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [audience, setAudience] = useState('');
+  const audience = 'Student';
   const [activeSection, setActiveSection] = useState(DEFAULT_ELECTION.sections[0]);
   const [busyId, setBusyId] = useState('');
   const [notice, setNotice] = useState('');
@@ -92,14 +94,14 @@ export default function ElectionPage() {
   const positions = useMemo(() => [...new Set(candidates.map((candidate) => candidate.position))], [candidates]);
 
   const handleVote = async (candidate) => {
-    if (!election.isOpen || !audience || hasVotedLocally(candidate, election.voteResetId)) return;
+    if (!election.isOpen || hasVotedLocally(candidate, election.voteResetId)) return;
     if (!window.confirm(`Submit today's campaign vote for ${candidate.name} as ${candidate.position}?`)) return;
     setBusyId(candidate.id);
     setNotice('');
     try {
       await submitElectionVote(candidate, audience, election.voteResetId);
       setVoteVersion((value) => value + 1);
-      setNotice(`Your vote for ${candidate.name} in ${candidate.section} was sent. You can still cast one vote in each of the other sections today.`);
+      setNotice(`Your ${candidate.position} vote for ${candidate.name} was sent. Each position that is still available remains open for today.`);
     } catch (voteError) {
       setNotice(voteError.message || 'The vote could not be sent. Please try again.');
     } finally {
@@ -126,21 +128,14 @@ export default function ElectionPage() {
           <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-xl sm:p-7">
             <div role="note" className="mb-6 rounded-2xl border-2 border-amber-400 bg-amber-50 px-5 py-4 text-amber-950 shadow-sm">
               <p className="text-xs font-black uppercase tracking-[0.2em] text-amber-700">Important voting notice</p>
-              <p className="mt-2 text-lg font-black leading-7">Everyone can vote in all 3 sections — one vote for Middle, one for Secondary, and one for Senior Secondary.</p>
-              <p className="mt-1 text-sm font-semibold leading-6 text-amber-900">Choose a section below, cast one vote, then visit the other two sections to complete your three votes.</p>
+              <p className="mt-2 text-lg font-black leading-7">This student pre-poll allows 4 votes per day: 1 in Middle, 1 in Secondary, and 2 in Senior Secondary.</p>
+              <p className="mt-1 text-sm font-semibold leading-6 text-amber-900">In Senior Secondary, vote once for Head Boy and once for Head Girl. There is no Senior Secondary Section Leader category.</p>
             </div>
-            <div className="grid gap-6 md:grid-cols-[1fr_auto] md:items-center">
+            <div>
               <div>
                 <h2 className="text-xl font-black text-slate-900">Before you participate</h2>
                 <p className="mt-2 text-sm font-medium leading-6 text-slate-600">{election.rule} This is an informal campaign preference poll, not the official election ballot. The official result will be decided through the school election on 23 July.</p>
               </div>
-              <label className="min-w-56 text-sm font-extrabold text-slate-700">
-                I am participating as
-                <select value={audience} onChange={(event) => setAudience(event.target.value)} className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 font-semibold outline-none focus:ring-2 focus:ring-indigo-500">
-                  <option value="">Select audience</option>
-                  {election.audienceOptions.map((option) => <option key={option}>{option}</option>)}
-                </select>
-              </label>
             </div>
             {notice && <p role="status" className="mt-5 rounded-xl bg-indigo-50 px-4 py-3 text-sm font-bold text-indigo-800">{notice}</p>}
           </div>
@@ -164,7 +159,7 @@ export default function ElectionPage() {
                     <h3 className="mb-4 text-xl font-black text-slate-800">{position}</h3>
                     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                       {candidates.filter((candidate) => candidate.position === position).map((candidate) => (
-                        <CandidateCard key={`${candidate.id}-${voteVersion}`} candidate={candidate} audience={audience} onVote={handleVote} busy={busyId === candidate.id} voted={hasVotedLocally(candidate, election.voteResetId)} isOpen={election.isOpen} />
+                        <CandidateCard key={`${candidate.id}-${voteVersion}`} candidate={candidate} onVote={handleVote} busy={busyId === candidate.id} voted={hasVotedLocally(candidate, election.voteResetId)} isOpen={election.isOpen} />
                       ))}
                     </div>
                   </section>

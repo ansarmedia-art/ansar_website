@@ -17,12 +17,12 @@ function getDateTime(item) {
   return Number.MIN_SAFE_INTEGER;
 }
 
-export default function AdminUpdates() {
+export default function AdminUpdates({ fixedCategory = '' }) {
   const [refreshKey, setRefreshKey] = useState(0);
   const { data: items, loading } = useContentCollection('updates', null, 'asc', { refreshKey });
-  const dateOrderedItems = [...items].sort((a, b) => getDateTime(b) - getDateTime(a));
+  const dateOrderedItems = items.filter((item) => !fixedCategory || item.category === fixedCategory).sort((a, b) => getDateTime(b) - getDateTime(a));
   
-  const initialFormState = { category: 'News', title: '', description: '', date: '', coverImageUrl: '', eventImages: [''], instagramUrl: '', facebookUrl: '', youtubeUrl: '', published: true };
+  const initialFormState = { category: fixedCategory || 'News', title: '', description: '', date: '', coverImageUrl: '', eventImages: [''], instagramUrl: '', facebookUrl: '', youtubeUrl: '', published: true };
   const [formData, setFormData] = useState(initialFormState);
   const [editingId, setEditingId] = useState(null);
   const [editingItem, setEditingItem] = useState(null);
@@ -104,7 +104,7 @@ export default function AdminUpdates() {
       }
 
       const payload = {
-        category: formData.category || 'News',
+        category: fixedCategory || formData.category || 'News',
         title: formData.title || '',
         description: formData.description || '',
         date: formData.date || '',
@@ -191,17 +191,17 @@ export default function AdminUpdates() {
     <div className="max-w-5xl mx-auto">
       {/* Premium Admin Form styling */}
       <div className="bg-white p-8 rounded-2xl shadow-xl border border-emerald-100 mb-8">
-        <h2 className="text-xl font-bold mb-6 text-slate-800">{editingId ? 'Edit Publication' : 'Add News / Event'}</h2>
+        <h2 className="text-xl font-bold mb-6 text-slate-800">{editingId ? `Edit ${fixedCategory || 'Publication'}` : `Add ${fixedCategory || 'News / Event'}`}</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             
-            <div>
+            {!fixedCategory && <div>
               <label className="block text-sm font-bold text-slate-700 mb-1">Category (News or Event) *</label>
               <select name="category" value={formData.category} onChange={handleChange} required className="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none">
                 <option value="News">News</option>
                 <option value="Events">Events</option>
               </select>
-            </div>
+            </div>}
 
             <div>
               <label className="block text-sm font-bold text-slate-700 mb-1">Title *</label>

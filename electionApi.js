@@ -36,7 +36,8 @@ export function indiaDateKey(date = new Date()) {
 }
 
 export function localVoteKey(candidate, voteResetId = 'initial') {
-  return `${VOTE_PREFIX}:${voteResetId}:${indiaDateKey()}:${candidate.section}`;
+  const bucket = candidate.section === 'Senior Secondary Section' ? `${candidate.section}:${candidate.position}` : candidate.section;
+  return `${VOTE_PREFIX}:${voteResetId}:${indiaDateKey()}:${bucket}`;
 }
 
 export function hasVotedLocally(candidate, voteResetId = 'initial') {
@@ -44,7 +45,7 @@ export function hasVotedLocally(candidate, voteResetId = 'initial') {
 
   // Respect vote markers created before section-wide voting was introduced,
   // but discard them after an admin reset changes the reset ID.
-  if (voteResetId !== 'initial') return false;
+  if (voteResetId !== 'initial' || candidate.section === 'Senior Secondary Section') return false;
   const legacyPrefix = `${VOTE_PREFIX}:${indiaDateKey()}:${candidate.section}:`;
   for (let index = 0; index < window.localStorage.length; index += 1) {
     if (String(window.localStorage.key(index) || '').startsWith(legacyPrefix)) return true;
@@ -117,3 +118,14 @@ export async function resetElectionVotes(analyticsKey) {
   if (!result?.ok) throw new Error(result?.error || 'Test votes could not be reset.');
   return result.reset;
 }
+
+async function electionAdminPost(action, analyticsKey, extra = {}) {
+  const response = await fetch(endpoint(), { method:'POST', mode:'cors', headers:{ 'Content-Type':'text/plain;charset=utf-8' }, body:JSON.stringify({ action, key:analyticsKey, ...extra }) });
+  if (!response.ok) throw new Error(`Candidate update failed (${response.status}).`);
+  const result = await response.json();
+  if (!result?.ok) throw new Error(result?.error || 'Candidate update failed.');
+  return result;
+}
+
+export const saveElectionCandidate = (key, candidate) => electionAdminPost('electionAdminSaveCandidate', key, { candidate });
+export const deleteElectionCandidate = (key, id) => electionAdminPost('electionAdminDeleteCandidate', key, { id });

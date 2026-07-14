@@ -18,6 +18,7 @@ import AnsarTimes from './AnsarTimes';
 import Contact from './Contact';
 import Gallery from './Gallery';
 import AdminUpdates from './AdminUpdates';
+import AdminEvents from './AdminEvents';
 import AdminAchievements from './AdminAchievements';
 import AdminAnsarTimes from './AdminAnsarTimes';
 import AdminGallery from './AdminGallery';
@@ -1265,7 +1266,9 @@ export default function App() {
                   <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />
                   <Route path="/dashboard" element={<AdminDashboard />} />
                   <Route path="/pages" element={<Navigate to="/admin/dashboard" replace />} />
-                  <Route path="/updates" element={<AdminUpdates />} />
+                  <Route path="/updates" element={<Navigate to="/admin/news" replace />} />
+                  <Route path="/news" element={<AdminUpdates fixedCategory="News" />} />
+                  <Route path="/events" element={<AdminEvents />} />
                   <Route path="/achievements" element={<AdminAchievements />} />
                   <Route path="/sports-achievements" element={<AdminSportsAchievements />} />
                   <Route path="/election" element={<AdminElection />} />

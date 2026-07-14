@@ -9,7 +9,7 @@ const exactRoutes = new Set([
   '/', '/about', '/academics', '/admission', '/news', '/events', '/contact', '/gallery',
   '/sports-page', '/atl', '/ansar-sprouts', '/extension-services', '/life-at-ansar',
   '/ansar-times', '/alumni', '/achievements', '/ansar-media-production', '/sop',
-  '/mandatory-public-disclosure', '/admin', '/admin/dashboard', '/admin/updates',
+  '/mandatory-public-disclosure', '/admin', '/admin/dashboard', '/admin/updates', '/admin/news', '/admin/events',
   '/school-election', '/election/live', '/admin/election',
   '/admin/achievements', '/admin/sports-achievements', '/admin/learning-features',
   '/admin/ansar-times', '/admin/leadership', '/admin/academics', '/admin/public-disclosure',
