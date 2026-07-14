@@ -42,9 +42,9 @@ function CandidateCard({ candidate, onVote, busy, voted, isOpen }) {
         </div>
       </div>
       <div className="p-5">
-        <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-indigo-600">{candidate.position}</p>
+        {!isNota && <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-indigo-600">{candidate.position}</p>}
         <h3 className="mt-2 text-xl font-black text-slate-900">{candidate.name}</h3>
-        {candidate.className && <p className="mt-1 text-sm font-semibold text-slate-500">{candidate.className}</p>}
+        {!isNota && candidate.className && <p className="mt-1 text-sm font-semibold text-slate-500">{candidate.className}</p>}
         {candidate.manifesto && <p className="mt-4 text-sm font-medium leading-6 text-slate-600">{candidate.manifesto}</p>}
         <button
           type="button"
