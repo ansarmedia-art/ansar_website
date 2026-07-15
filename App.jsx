@@ -24,6 +24,10 @@ import AdminAnsarTimes from './AdminAnsarTimes';
 import AdminGallery from './AdminGallery';
 import AdminSportsAchievements from './AdminSportsAchievements';
 import AdminLearningFeatures from './AdminLearningFeatures';
+import AdminLifeAtAnsar from './AdminLifeAtAnsar';
+import AdminLearningLabs from './AdminLearningLabs';
+import AdminAnsarSprouts from './AdminAnsarSprouts';
+import AdminFieldTrips from './AdminFieldTrips';
 import AdminLeadership from './AdminLeadership';
 import AdminNotices from './AdminNotices';
 import AdminAcademics from './AdminAcademics';
@@ -35,6 +39,11 @@ import ElectionPage from './ElectionPage';
 import ElectionAnalytics from './ElectionAnalytics';
 import AdminElection from './AdminElection';
 import ContentPageLayout from './ContentPageLayout';
+import LifeAtAnsar from './LifeAtAnsar';
+import AnsarSprouts from './AnsarSprouts';
+import SproutsActivityArticle from './SproutsActivityArticle';
+import FieldTrips from './FieldTrips';
+import LearningLabsSection from './LearningLabsSection';
 import { SettingsProvider, useSettings } from './SettingsContext';
 import { DEFAULT_SPORTS_PAGE, mergeListWithDefaults } from './contentDefaults';
 import { formatDisplayDate, getDateTime, getDisplayYear, isYearOnly } from './dateUtils';
@@ -47,6 +56,7 @@ const ADMIN_EMAILS = [
   'shafeeqpulikkal32@gmail.com',
   'ansarschooloffice@gmail.com'
 ];
+const SPROUTS_ADMIN_EMAIL = 'sprouts@ansar.in';
 
 const DEFAULT_SEO = {
   title: 'Best CBSE School in Thrissur, Kerala | Ansar English School',
@@ -75,6 +85,11 @@ const ROUTE_SEO = {
     title: 'Contact Ansar English School | Perumpilavu, Thrissur',
     description: 'Contact Ansar English School, Perumpilavu, Karikkad P.O, Thrissur, Kerala for admission queries, campus location, phone, email, and school office support.',
     keywords: 'Ansar English School contact, CBSE school Perumpilavu address, school in Thrissur phone'
+  },
+  '/field-trips': {
+    title: 'Field Trips | Learning Beyond the Classroom',
+    description: 'Explore educational visits and field trips across Ansar Sprouts, Primary, Middle, Secondary, and Senior Secondary sections.',
+    keywords: 'Ansar field trips, educational visits, learning beyond classroom, school trips Thrissur'
   },
   '/gallery': {
     title: 'Campus Gallery | Ansar English School Thrissur',
@@ -456,8 +471,9 @@ const LEARNING_FEATURES = {
     kicker: 'Joyful growth',
     icon: 'smile',
     image: 'https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?q=90&w=2400&auto=format&fit=crop',
-    description: 'A dedicated play area gives younger learners space to move, imagine, and build social confidence. Play is treated as a meaningful part of physical, emotional, and creative development.',
-    points: ['Dedicated space for active play', 'Supports social and motor-skill development', 'Encourages confidence through joyful activity']
+    description: 'The Joyful Play Zone shown here is the dedicated KG-section outdoor park, with safe, age-appropriate equipment including swings, slides, and a merry-go-round. Other school sections also have play areas designed for their respective age groups.',
+    body: ['Active outdoor play supports balance, coordination, physical strength, imagination, friendship, confidence, and emotional well-being. The KG play area gives Ansar Sprouts children a cheerful environment where movement and social learning happen naturally through supervised play.'],
+    points: ['Dedicated outdoor park for the KG section', 'Safe swings, slides, and merry-go-round', 'Other sections have age-appropriate play areas']
   },
   'advanced-labs': {
     title: 'Experiential Learning Labs',
@@ -542,6 +558,16 @@ function LearningImageCarousel({ feature }) {
   const goToNext = () => {
     setActiveIndex((current) => (current === images.length - 1 ? 0 : current + 1));
   };
+
+  useEffect(() => {
+    setActiveIndex(0);
+  }, [feature.slug]);
+
+  useEffect(() => {
+    if (!hasMultipleImages) return undefined;
+    const timer = window.setInterval(goToNext, 4500);
+    return () => window.clearInterval(timer);
+  }, [activeIndex, hasMultipleImages, images.length]);
 
   return (
     <div className="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
@@ -775,6 +801,7 @@ function LearningFeaturePage() {
             </aside>
           </div>
         </section>
+        {slug === 'advanced-labs' && <LearningLabsSection />}
       </main>
     </Layout>
   );
@@ -1196,6 +1223,7 @@ function AdminDashboard() {
 export default function App() {
   const [user, setUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
+  const isSproutsAdmin = String(user?.email || '').toLowerCase() === SPROUTS_ADMIN_EMAIL;
 
   useEffect(() => {
     // Instantly sync Firebase Auth session state with the React application
@@ -1236,9 +1264,11 @@ export default function App() {
         <Route path="/gallery" element={<Gallery />} />
         <Route path="/sports-page" element={<SportsPage />} />
         <Route path="/atl" element={<DynamicPage slug="atl" />} />
-        <Route path="/ansar-sprouts" element={<DynamicPage slug="ansar-sprouts" />} />
+        <Route path="/ansar-sprouts" element={<AnsarSprouts />} />
+        <Route path="/ansar-sprouts/activities/:id" element={<SproutsActivityArticle />} />
+        <Route path="/field-trips" element={<FieldTrips />} />
         <Route path="/extension-services" element={<DynamicPage slug="extension-services" />} />
-        <Route path="/life-at-ansar" element={<DynamicPage slug="life-at-ansar" />} />
+        <Route path="/life-at-ansar" element={<LifeAtAnsar />} />
         <Route path="/ansar-times" element={<AnsarTimes />} />
         <Route path="/alumni" element={<DynamicPage slug="alumni" />} />
         <Route path="/achievements" element={<Achievements />} />
@@ -1260,9 +1290,14 @@ export default function App() {
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
             </div>
           ) : user ? (
-            ADMIN_EMAILS.includes(user.email) ? (
-              <AdminLayout user={user} onLogout={() => signOut(auth)}>
+            (ADMIN_EMAILS.includes(user.email) || isSproutsAdmin) ? (
+              <AdminLayout user={user} onLogout={() => signOut(auth)} sproutsOnly={isSproutsAdmin}>
                 <Routes>
+                  {isSproutsAdmin ? <>
+                    <Route path="/" element={<Navigate to="/admin/ansar-sprouts" replace />} />
+                    <Route path="/ansar-sprouts" element={<AdminAnsarSprouts />} />
+                    <Route path="*" element={<Navigate to="/admin/ansar-sprouts" replace />} />
+                  </> : <>
                   <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />
                   <Route path="/dashboard" element={<AdminDashboard />} />
                   <Route path="/pages" element={<Navigate to="/admin/dashboard" replace />} />
@@ -1273,6 +1308,10 @@ export default function App() {
                   <Route path="/sports-achievements" element={<AdminSportsAchievements />} />
                   <Route path="/election" element={<AdminElection />} />
                   <Route path="/learning-features" element={<AdminLearningFeatures />} />
+                  <Route path="/life-at-ansar" element={<AdminLifeAtAnsar />} />
+                  <Route path="/learning-labs" element={<AdminLearningLabs />} />
+                  <Route path="/ansar-sprouts" element={<AdminAnsarSprouts />} />
+                  <Route path="/field-trips" element={<AdminFieldTrips />} />
                   <Route path="/ansar-times" element={<AdminAnsarTimes />} />
                   <Route path="/leadership" element={<AdminLeadership />} />
                   <Route path="/academics" element={<AdminAcademics />} />
@@ -1281,6 +1320,7 @@ export default function App() {
                   <Route path="/notices" element={<AdminNotices />} />
                   <Route path="/settings" element={<AdminSettings />} />
                   <Route path="*" element={<div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100 border-t-4 border-red-500"><h2 className="text-xl font-bold text-slate-800">Module Not Found</h2><p className="text-slate-500">Select a valid module from the sidebar.</p></div>} />
+                  </>}
                 </Routes>
               </AdminLayout>
             ) : (

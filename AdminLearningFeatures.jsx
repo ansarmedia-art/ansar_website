@@ -39,8 +39,9 @@ const DEFAULT_FEATURES = [
     kicker: 'Joyful growth',
     icon: 'smile',
     imageUrl: 'https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?q=90&w=2400&auto=format&fit=crop',
-    description: 'A dedicated play area gives younger learners space to move, imagine, and build social confidence. Play is treated as a meaningful part of physical, emotional, and creative development.',
-    points: ['Dedicated space for active play', 'Supports social and motor-skill development', 'Encourages confidence through joyful activity']
+    description: 'The Joyful Play Zone shown here is the dedicated KG-section outdoor park, with safe, age-appropriate equipment including swings, slides, and a merry-go-round. Other school sections also have play areas designed for their respective age groups.',
+    body: ['Active outdoor play supports balance, coordination, physical strength, imagination, friendship, confidence, and emotional well-being. The KG play area gives Ansar Sprouts children a cheerful environment where movement and social learning happen naturally through supervised play.'],
+    points: ['Dedicated outdoor park for the KG section', 'Safe swings, slides, and merry-go-round', 'Other sections have age-appropriate play areas']
   },
   {
     slug: 'advanced-labs',

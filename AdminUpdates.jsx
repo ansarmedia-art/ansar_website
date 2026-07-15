@@ -7,7 +7,7 @@ import ImgBbUrlImporter from './ImgBbUrlImporter';
 import { softDeleteRecord } from './adminUndo';
 import { normalizeImageUrl } from './imageUrlUtils';
 
-const MAX_EVENT_IMAGES = 100;
+const MAX_ARTICLE_IMAGES = 100;
 
 function getDateTime(item) {
   const dateTime = Date.parse(item.date);
@@ -41,8 +41,8 @@ export default function AdminUpdates({ fixedCategory = '' }) {
 
   const addEventImageField = () => setFormData(prev => {
     const currentImages = Array.isArray(prev.eventImages) ? prev.eventImages : [];
-    if (currentImages.length >= MAX_EVENT_IMAGES) {
-      alert(`You can add up to ${MAX_EVENT_IMAGES} images for one event.`);
+    if (currentImages.length >= MAX_ARTICLE_IMAGES) {
+      alert(`You can add up to ${MAX_ARTICLE_IMAGES} images for one article.`);
       return prev;
     }
     return { ...prev, eventImages: [...currentImages, ''] };
@@ -50,9 +50,9 @@ export default function AdminUpdates({ fixedCategory = '' }) {
   const appendEventImages = (urls) => {
     setFormData(prev => {
       const existing = Array.isArray(prev.eventImages) ? prev.eventImages.filter(url => url.trim() !== '') : [];
-      const nextImages = [...existing, ...urls].slice(0, MAX_EVENT_IMAGES);
-      if (existing.length + urls.length > MAX_EVENT_IMAGES) {
-        alert(`Only the first ${MAX_EVENT_IMAGES} image links were added. For bigger albums, create another event/gallery entry.`);
+      const nextImages = [...existing, ...urls].slice(0, MAX_ARTICLE_IMAGES);
+      if (existing.length + urls.length > MAX_ARTICLE_IMAGES) {
+        alert(`Only the first ${MAX_ARTICLE_IMAGES} image links were added.`);
       }
       return { ...prev, eventImages: nextImages };
     });
@@ -94,22 +94,28 @@ export default function AdminUpdates({ fixedCategory = '' }) {
 
     try {
       const cleanedCoverImageUrl = normalizeImageUrl(formData.coverImageUrl);
-      const cleanedEventImages = (Array.isArray(formData.eventImages) ? formData.eventImages : [])
-        .map(url => normalizeImageUrl(url))
-        .filter(url => url !== '');
+      const cleanedEventImages = [...new Set(
+        (Array.isArray(formData.eventImages) ? formData.eventImages : [])
+          .map(url => normalizeImageUrl(url))
+          .filter(url => url !== '')
+      )];
 
-      if (cleanedEventImages.length > MAX_EVENT_IMAGES) {
-        alert(`Save failed: one event can have up to ${MAX_EVENT_IMAGES} image links.`);
+      if (cleanedEventImages.length > MAX_ARTICLE_IMAGES) {
+        alert(`Save failed: one article can have up to ${MAX_ARTICLE_IMAGES} image links.`);
         return;
       }
 
+      const category = fixedCategory || formData.category || 'News';
+      const isEvent = category === 'Events';
+
       const payload = {
-        category: fixedCategory || formData.category || 'News',
+        category,
         title: formData.title || '',
         description: formData.description || '',
         date: formData.date || '',
-        coverImageUrl: cleanedCoverImageUrl,
-        eventImages: cleanedEventImages,
+        coverImageUrl: cleanedCoverImageUrl || cleanedEventImages[0] || '',
+        imageUrls: isEvent ? [] : cleanedEventImages,
+        eventImages: isEvent ? cleanedEventImages : [],
         instagramUrl: formData.instagramUrl || '',
         facebookUrl: formData.facebookUrl || '',
         youtubeUrl: formData.youtubeUrl || '',
@@ -136,13 +142,14 @@ export default function AdminUpdates({ fixedCategory = '' }) {
         if (editingId && (!editingItem?._contentSource || editingItem._contentSource === 'firestore' || editingItem._contentSource === 'merged')) {
           await updateDoc(doc(db, 'updates', editingId), {
             ...firestorePayload,
-            eventImages: deleteField(),
-            imageUrls: deleteField(),
+            imageUrls: isEvent ? deleteField() : cleanedEventImages,
+            eventImages: isEvent ? cleanedEventImages : deleteField(),
             updatedAt: serverTimestamp()
           });
         } else if (!editingId) {
           const docRef = await addDoc(collection(db, 'updates'), {
             ...firestorePayload,
+            ...(isEvent ? { eventImages: cleanedEventImages } : { imageUrls: cleanedEventImages }),
             createdAt: serverTimestamp(),
             updatedAt: serverTimestamp()
           });
@@ -245,10 +252,12 @@ export default function AdminUpdates({ fixedCategory = '' }) {
               </div>
               </div>
 
-              {formData.category === 'Events' && (
+              {(fixedCategory || formData.category) && (
                 <div>
                   <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                    <label className="block text-sm font-bold text-slate-700">Event Image URLs (Carousel)</label>
+                    <label className="block text-sm font-bold text-slate-700">
+                      {formData.category === 'Events' ? 'Event Image URLs (Carousel)' : 'Article Image URLs (Carousel)'}
+                    </label>
                     <ImgBbUrlImporter
                       multiple
                       label="Extract Multiple ImgBB URLs"
@@ -276,6 +285,7 @@ export default function AdminUpdates({ fixedCategory = '' }) {
                     </div>
                   ))}
                   <button type="button" onClick={addEventImageField} className="text-sm font-bold text-emerald-600 hover:bg-emerald-50 py-2 px-4 rounded-lg transition-colors border border-emerald-100">+ Add Another Image</button>
+                  <p className="mt-2 text-xs text-slate-500">Add up to {MAX_ARTICLE_IMAGES} images. The cover image remains the thumbnail; all images appear in the article carousel.</p>
                 </div>
               )}
             </div>
@@ -321,16 +331,9 @@ export default function AdminUpdates({ fixedCategory = '' }) {
             
             {/* Defensive Thumbnail Rendering */}
             <div className="flex-shrink-0 w-16 h-16 bg-slate-100 rounded-lg overflow-hidden border border-slate-200 flex items-center justify-center">
-              {(item.coverImageUrl || item.imageUrl) ? (
+              {(item.coverImageUrl || item.imageUrl || item.imageUrls?.[0] || item.eventImages?.[0]) ? (
                 <img 
-                  src={item.coverImageUrl || item.imageUrl} 
-                  alt="Thumbnail" 
-                  className="w-full h-full object-cover" 
-                  onError={(e) => { e.target.onerror = null; e.target.src = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23f1f5f9'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='12' font-weight='bold' fill='%2394a3b8'%3EError%3C/text%3E%3C/svg%3E"; }} 
-                />
-              ) : item.category === 'Events' && Array.isArray(item.eventImages) && item.eventImages.length > 0 ? (
-                <img 
-                  src={item.eventImages[0]} 
+                  src={item.coverImageUrl || item.imageUrl || item.imageUrls?.[0] || item.eventImages?.[0]}
                   alt="Thumbnail" 
                   className="w-full h-full object-cover" 
                   onError={(e) => { e.target.onerror = null; e.target.src = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23f1f5f9'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='12' font-weight='bold' fill='%2394a3b8'%3EError%3C/text%3E%3C/svg%3E"; }} 

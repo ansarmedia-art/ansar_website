@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import AdminFieldUndo from './AdminFieldUndo';
 import AdminUndoCenter from './AdminUndoCenter';
 
-export default function AdminLayout({ children, user, onLogout }) {
+export default function AdminLayout({ children, user, onLogout, sproutsOnly = false }) {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [now, setNow] = useState(() => new Date());
   const location = useLocation();
@@ -34,6 +34,10 @@ export default function AdminLayout({ children, user, onLogout }) {
     if (path.includes('/sports-achievements')) return 'Sports Achievements';
     if (path.includes('/election')) return 'School Election';
     if (path.includes('/learning-features')) return 'Student-Centric Learning';
+    if (path.includes('/life-at-ansar')) return 'Life at Ansar';
+    if (path.includes('/learning-labs')) return 'Experiential Learning Labs';
+    if (path.includes('/ansar-sprouts')) return 'Ansar Sprouts';
+    if (path.includes('/field-trips')) return 'Field Trips';
     if (path.includes('/achievements')) return 'Achievements';
     if (path.includes('/ansar-times')) return 'Ansar Times';
     if (path.includes('/leadership')) return 'Leadership';
@@ -66,6 +70,9 @@ export default function AdminLayout({ children, user, onLogout }) {
           </button>
         </div>
         <nav className="p-4 space-y-1">
+          {sproutsOnly ? (
+          <Link to="/admin/ansar-sprouts" className="block rounded-lg bg-orange-500 px-4 py-3 font-medium text-white">Ansar Sprouts</Link>
+          ) : <>
           <Link to="/admin/dashboard" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'Dashboard' ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>Dashboard</Link>
           <Link to="/admin/news" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'News' ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>News</Link>
           <Link to="/admin/events" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'Events' ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>Events</Link>
@@ -73,6 +80,10 @@ export default function AdminLayout({ children, user, onLogout }) {
           <Link to="/admin/sports-achievements" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'Sports Achievements' ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>Sports Achievements</Link>
           <Link to="/admin/election" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'School Election' ? 'bg-indigo-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>School Election</Link>
           <Link to="/admin/learning-features" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'Student-Centric Learning' ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>Student-Centric Learning</Link>
+          <Link to="/admin/life-at-ansar" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'Life at Ansar' ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>Life at Ansar</Link>
+          <Link to="/admin/learning-labs" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'Experiential Learning Labs' ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>Learning Labs</Link>
+          <Link to="/admin/ansar-sprouts" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'Ansar Sprouts' ? 'bg-orange-500 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>Ansar Sprouts</Link>
+          <Link to="/admin/field-trips" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'Field Trips' ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>Field Trips</Link>
           <Link to="/admin/ansar-times" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'Ansar Times' ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>Ansar Times</Link>
           <Link to="/admin/leadership" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'Leadership' ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>Leadership</Link>
           <Link to="/admin/academics" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'Academics & Admissions' ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>Academics & Admissions</Link>
@@ -80,6 +91,7 @@ export default function AdminLayout({ children, user, onLogout }) {
           <Link to="/admin/gallery" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'Gallery' ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>Gallery</Link>
           <Link to="/admin/notices" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'Notices' ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>Notices</Link>
           <Link to="/admin/settings" className={`block px-4 py-3 rounded-lg font-medium transition-colors ${currentModule === 'Settings' ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}>Settings</Link>
+          </>}
         </nav>
       </aside>
 
@@ -120,8 +132,8 @@ export default function AdminLayout({ children, user, onLogout }) {
           </div>
         </main>
       </div>
-      <AdminFieldUndo />
-      <AdminUndoCenter />
+      {!sproutsOnly && <AdminFieldUndo />}
+      {!sproutsOnly && <AdminUndoCenter />}
     </div>
   );
 }

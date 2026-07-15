@@ -318,9 +318,84 @@ function AboutInstitutionSections() {
 
   return (
     <>
+      <ValuesAndFaculty />
       <AnsarTimeline />
       <HistoryAndTrustees historyText={settings?.ansarHistoryText} trustees={ACT_TRUSTEES} />
     </>
+  );
+}
+
+function ValuesAndFaculty() {
+  const valuePoints = [
+    ['Respect', 'Honouring every person, culture, belief, and perspective.'],
+    ['Empathy', 'Understanding others and responding with kindness and compassion.'],
+    ['Responsibility', 'Making thoughtful choices and contributing positively to the community.'],
+    ['Perseverance', 'Meeting challenges with patience, courage, and purpose.']
+  ];
+
+  const facultyStrengths = [
+    'Well-educated and professionally trained teachers',
+    'Academic and personal mentoring for every learner',
+    'CBSE-certified professional development courses',
+    'Online and offline workshops and school empowerment programmes'
+  ];
+
+  return (
+    <AnimatedSection className="mt-12 space-y-8">
+      <div className="mx-auto max-w-3xl text-center">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-700">Education with Character</p>
+        <h2 className="mt-3 text-4xl font-extrabold leading-tight text-slate-950 lg:text-5xl">Knowledge guided by values and inspiring educators</h2>
+        <p className="mt-5 text-lg leading-8 text-slate-600">Academic excellence becomes meaningful when students learn with integrity, compassion, confidence, and a sense of purpose.</p>
+      </div>
+
+      <section className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-emerald-950 via-emerald-900 to-teal-800 p-7 text-white shadow-xl sm:p-10 lg:p-12">
+        <div className="absolute -right-20 -top-20 h-72 w-72 rounded-full bg-amber-300/10 blur-2xl" />
+        <div className="relative grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+          <div>
+            <span className="inline-flex rounded-full bg-amber-300 px-4 py-2 text-xs font-black uppercase tracking-widest text-emerald-950">Value Integration</span>
+            <h3 className="mt-5 text-3xl font-extrabold leading-tight sm:text-4xl">Nurturing the intellect, heart, and spirit</h3>
+            <p className="mt-5 text-lg leading-8 text-emerald-50/90">Our curriculum thoughtfully integrates respect, empathy, responsibility, and perseverance into everyday learning. We promote ethical behaviour, spiritual awareness, and cultural appreciation so that students grow into compassionate, balanced individuals who contribute positively to society.</p>
+            <p className="mt-4 leading-7 text-emerald-50/75">By encouraging personal and moral growth alongside academic achievement, we prepare learners to face life&apos;s challenges with integrity, resilience, and purpose.</p>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {valuePoints.map(([title, text], index) => (
+              <FadeInOnView key={title} delay={index * 0.06} className="rounded-2xl border border-white/15 bg-white/10 p-5 backdrop-blur-sm">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-300 font-black text-emerald-950">{index + 1}</div>
+                <h4 className="mt-4 text-lg font-extrabold">{title}</h4>
+                <p className="mt-2 text-sm leading-6 text-emerald-50/75">{text}</p>
+              </FadeInOnView>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="overflow-hidden rounded-[2rem] border border-slate-100 bg-white shadow-xl">
+        <div className="grid lg:grid-cols-[0.75fr_1.25fr]">
+          <div className="flex min-h-72 items-center justify-center bg-gradient-to-br from-amber-100 via-orange-50 to-emerald-100 p-10">
+            <div className="flex h-48 w-48 items-center justify-center rounded-full bg-white text-emerald-800 shadow-xl ring-8 ring-white/60">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="h-28 w-28" aria-hidden="true">
+                <path d="M3 20h18M5 20V9l7-5 7 5v11M9 20v-6h6v6M8 10h.01M12 10h.01M16 10h.01" />
+                <path d="M7 6V3h10v3" />
+              </svg>
+            </div>
+          </div>
+          <div className="p-7 sm:p-10 lg:p-12">
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-amber-600">Our Faculty</p>
+            <h3 className="mt-3 text-3xl font-extrabold leading-tight text-slate-950 sm:text-4xl">Teachers, mentors, and lifelong learners</h3>
+            <p className="mt-5 text-lg leading-8 text-slate-600">Ansar English School, Perumpilavu is committed to a thriving educational environment built by dedicated human capital. Our well-educated and trained teachers create a nurturing, supportive atmosphere in which students feel encouraged to learn, question, and grow.</p>
+            <p className="mt-4 leading-7 text-slate-600">Beyond classroom teaching, our educators serve as mentors who guide students academically and personally. We continuously invest in professional development so that every teacher has the current knowledge, confidence, and skills needed to inspire students and help them reach their full potential.</p>
+            <ul className="mt-7 grid gap-3 sm:grid-cols-2">
+              {facultyStrengths.map(item => (
+                <li key={item} className="flex items-start gap-3 rounded-xl bg-slate-50 p-4 text-sm font-bold leading-6 text-slate-700">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" aria-hidden="true"><path d="m5 12 4 4L19 6" /></svg>
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+    </AnimatedSection>
   );
 }
 

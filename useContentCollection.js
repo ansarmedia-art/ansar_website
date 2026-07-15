@@ -114,6 +114,15 @@ function coerceRow(row, collectionName, rowIndex) {
     fileurl: 'fileUrl',
     imageurl: 'imageUrl',
     image: 'imageUrl',
+    imageurls: 'imageUrls',
+    imageurls2: 'imageUrls2',
+    imageurls3: 'imageUrls3',
+    imageurls4: 'imageUrls4',
+    eventimages: 'eventImages',
+    eventimages2: 'eventImages2',
+    eventimages3: 'eventImages3',
+    eventimages4: 'eventImages4',
+    galleryimages: 'galleryImages',
     coverimageurl: 'coverImageUrl',
     thumbnailurl: 'thumbnailUrl',
     thumburl: 'thumbnailUrl',
@@ -222,7 +231,7 @@ function mergeRows(firestoreRows, sheetRows) {
 async function fetchSheetTab(spreadsheetId, tabName) {
   const params = new URLSearchParams({ tqx: 'out:json' });
   if (tabName) params.set('sheet', tabName);
-  params.set('v', String(sheetCacheVersion));
+  params.set('v', `${sheetCacheVersion}-${Date.now()}`);
   const url = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/gviz/tq?${params.toString()}`;
   const response = await fetch(url);
   if (!response.ok) throw new Error(`Google Sheets request failed (${response.status})`);
@@ -256,10 +265,14 @@ export async function fetchSheetCollection(collectionName) {
   for (const tab of tabs) {
     const cacheKey = `${config.spreadsheetId}:${tab || '__first__'}`;
     try {
-      if (!SHEET_CACHE.has(cacheKey)) {
-        SHEET_CACHE.set(cacheKey, fetchSheetTab(config.spreadsheetId, tab));
+      const cached = SHEET_CACHE.get(cacheKey);
+      if (!cached || cached.expiresAt <= Date.now()) {
+        SHEET_CACHE.set(cacheKey, {
+          promise: fetchSheetTab(config.spreadsheetId, tab),
+          expiresAt: Date.now() + SHEET_CACHE_TTL_MS
+        });
       }
-      const rows = await SHEET_CACHE.get(cacheKey);
+      const rows = await SHEET_CACHE.get(cacheKey).promise;
       if (rows.length) return rows.map((item, index) => ({ ...item, id: item.id || `${collectionName}-${index + 1}` }));
     } catch (error) {
       SHEET_CACHE.delete(cacheKey);
@@ -289,7 +302,8 @@ export function useContentCollection(collectionName, orderByField = 'createdAt',
 
     const publish = () => {
       if (cancelled) return;
-      const sorted = sortRows(sheetsOnly ? sheetRows : mergeRows(firestoreRows, sheetRows), orderByField, orderDir);
+      const sheetContentRows = sheetRows.filter(hasDisplayableContent);
+      const sorted = sortRows(sheetsOnly ? sheetContentRows : mergeRows(firestoreRows, sheetContentRows), orderByField, orderDir);
       setState({
         data: maxItems ? sorted.slice(0, maxItems) : sorted,
         loading: !(firestoreLoaded || sheetLoaded),

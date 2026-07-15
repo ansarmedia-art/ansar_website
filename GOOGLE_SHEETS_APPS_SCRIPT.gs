@@ -60,6 +60,19 @@ const SHEET_COLUMNS = {
     'order',
     'published'
   ],
+  sproutsActivities: [
+    'id',
+    'title',
+    'category',
+    'date',
+    'description',
+    'imageUrls',
+    'imageUrls2',
+    'imageUrls3',
+    'imageUrls4',
+    'order',
+    'published'
+  ],
   contactSubmissions: [
     'id',
     'date',
@@ -67,6 +80,7 @@ const SHEET_COLUMNS = {
     'name',
     'phone',
     'email',
+    'destination',
     'category',
     'message',
     'published'
@@ -688,6 +702,11 @@ function normalizeRecord_(collectionName, record) {
     item.slug = String(item.slug || item.id || item.title || '').trim();
     item.id = item.slug || item.id || createId_(item.title || collectionName);
     item.imageUrl = item.imageUrl || firstImage_(item.galleryImages);
+  }
+
+  if (collectionName === 'sproutsActivities') {
+    item.category = item.category || 'Sprouts Activity';
+    splitLargeImageList_(item, 'imageUrls');
   }
 
   if (collectionName === 'contactSubmissions') {

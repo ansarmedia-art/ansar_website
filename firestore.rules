@@ -124,7 +124,7 @@ service cloud.firestore {
     // ===============================================================
     
     function isValidPage() {
-      return hasOnlyAllowedFields(['title', 'slug', 'subtitle', 'category', 'heroImageUrl', 'bodyHtml', 'virtualTourUrl', 'virtualTourText', 'order', 'published', 'href', 'metaDescription', 'keywords', 'createdAt', 'updatedAt']) &&
+      return hasOnlyAllowedFields(['title', 'slug', 'subtitle', 'category', 'heroImageUrl', 'bodyHtml', 'virtualTourUrl', 'virtualTourText', 'order', 'published', 'href', 'metaDescription', 'keywords', 'clubsTitle', 'clubsBody', 'clubsImages', 'nssTitle', 'nssBody', 'nssImages', 'spcTitle', 'spcBody', 'spcImages', 'sproutsImages', 'createdAt', 'updatedAt']) &&
              isValidStringLength('title', 1, 200) &&
              isValidStringLength('slug', 1, 200) &&
              isValidOptionalString('subtitle', 0, 1000) &&
@@ -136,6 +136,16 @@ service cloud.firestore {
              isValidOptionalString('href', 0, 500) &&
              isValidOptionalString('metaDescription', 0, 1000) &&
              isValidOptionalString('keywords', 0, 500) &&
+             isValidOptionalString('clubsTitle', 0, 200) &&
+             isValidOptionalString('clubsBody', 0, 50000) &&
+             isOptionalUrlList('clubsImages', 30) &&
+             isValidOptionalString('nssTitle', 0, 200) &&
+             isValidOptionalString('nssBody', 0, 50000) &&
+             isOptionalUrlList('nssImages', 30) &&
+             isValidOptionalString('spcTitle', 0, 200) &&
+             isValidOptionalString('spcBody', 0, 50000) &&
+             isOptionalUrlList('spcImages', 30) &&
+             isOptionalUrlList('sproutsImages', 30) &&
              isOptionalNumber('order') &&
              isOptionalBool('published') &&
              isOptionalTimestamp('createdAt') &&
@@ -188,6 +198,31 @@ service cloud.firestore {
              isValidUrl('facebookUrl') &&
              isValidUrl('instagramUrl') &&
              isValidUrl('youtubeUrl') &&
+             isOptionalBool('published') &&
+             isOptionalTimestamp('createdAt') &&
+             isOptionalTimestamp('updatedAt');
+    }
+
+    function isValidLearningLab() {
+      return hasOnlyAllowedFields(['slug', 'title', 'description', 'imageUrls', 'order', 'published', 'createdAt', 'updatedAt']) &&
+             isValidStringLength('slug', 1, 100) &&
+             isValidStringLength('title', 1, 200) &&
+             isValidStringLength('description', 1, 10000) &&
+             isOptionalUrlList('imageUrls', 30) &&
+             isOptionalNumber('order') &&
+             isOptionalBool('published') &&
+             isOptionalTimestamp('createdAt') &&
+             isOptionalTimestamp('updatedAt');
+    }
+
+    function isValidFieldTrip() {
+      return hasOnlyAllowedFields(['title', 'section', 'destination', 'date', 'description', 'imageUrls', 'published', 'createdAt', 'updatedAt']) &&
+             isValidStringLength('title', 1, 200) &&
+             request.resource.data.section in ['Ansar Sprouts', 'Primary Section', 'Middle Section', 'Secondary Section', 'Senior Secondary Section', 'General'] &&
+             isValidOptionalString('destination', 0, 300) &&
+             isValidDateString('date') &&
+             isValidStringLength('description', 1, 20000) &&
+             isOptionalUrlList('imageUrls', 30) &&
              isOptionalBool('published') &&
              isOptionalTimestamp('createdAt') &&
              isOptionalTimestamp('updatedAt');
@@ -387,8 +422,20 @@ service cloud.firestore {
     // Public Pages
     match /pages/{pageSlug} {
       allow read: if true;
-      allow create, update: if isAdmin();
+      allow create, update: if isVerifiedAdmin() && isValidPage();
       allow delete: if isAdmin();
+    }
+
+    match /learningLabs/{labId} {
+      allow read: if true;
+      allow create, update: if isVerifiedAdmin() && isValidLearningLab() && request.resource.data.slug == labId;
+      allow delete: if isVerifiedAdmin();
+    }
+
+    match /fieldTrips/{tripId} {
+      allow read: if true;
+      allow create, update: if isVerifiedAdmin() && isValidFieldTrip();
+      allow delete: if isVerifiedAdmin();
     }
 
     // News Articles

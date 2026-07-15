@@ -4,12 +4,15 @@ import { saveSheetRecord } from './googleSheetsAdminApi';
 
 export default function Contact() {
   const schoolEmail = 'hr@ansar.in';
+  const schoolPhone = '8129808051';
+  const sproutsPhone = '8129851737';
   const developerEmail = 'ansarmedia@ansarschool.in';
   const developerPhone = '9188081324';
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
     email: '',
+    destination: 'School',
     category: 'Admission Query',
     message: ''
   });
@@ -36,10 +39,14 @@ export default function Contact() {
     e.preventDefault();
     
     // 1. Structure the text payload
-    const payload = `Hello Ansar English School, I have an inquiry:
+    const isSproutsInquiry = formData.destination === 'Ansar Sprouts';
+    const recipientName = isSproutsInquiry ? 'Ansar Sprouts Preschool' : 'Ansar English School';
+    const recipientPhone = isSproutsInquiry ? sproutsPhone : schoolPhone;
+    const payload = `Hello ${recipientName}, I have an inquiry:
 - Name: ${formData.name}
 - Phone: ${formData.phone}
 - Email: ${formData.email}
+- For: ${formData.destination}
 - Category: ${formData.category}
 
 Message:
@@ -56,6 +63,7 @@ ${formData.message}`;
         name: formData.name.trim(),
         phone: formData.phone.trim(),
         email: formData.email.trim(),
+        destination: formData.destination,
         category: formData.category,
         message: formData.message.trim()
       });
@@ -63,9 +71,9 @@ ${formData.message}`;
       console.error('Unable to save contact inquiry to Google Sheets:', error);
     }
     
-    // 3. Open WhatsApp in a new tab
-    const whatsappUrl = `https://wa.me/918129808051?text=${encodedPayload}`;
-    window.open(whatsappUrl, '_blank');
+    // 3. Redirect to the selected team's WhatsApp conversation.
+    const whatsappUrl = `https://wa.me/91${recipientPhone}?text=${encodedPayload}`;
+    window.location.assign(whatsappUrl);
   };
 
   return (
@@ -114,7 +122,10 @@ ${formData.message}`;
                   </div>
                   <div className="ml-4">
                     <h4 className="text-lg font-medium">Call Us</h4>
-                    <p className="mt-1 text-slate-300">+91 81298 08051</p>
+                    <div className="mt-2 space-y-2 text-slate-300">
+                      <a href={`tel:+91${schoolPhone}`} className="block transition-colors hover:text-emerald-300"><span className="font-semibold text-white">School:</span> +91 81298 08051</a>
+                      <a href={`tel:+91${sproutsPhone}`} className="block transition-colors hover:text-orange-300"><span className="font-semibold text-white">Ansar Sprouts:</span> +91 81298 51737</a>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -125,6 +136,17 @@ ${formData.message}`;
           <div className="p-10 lg:p-14 lg:w-7/12">
             <h3 className="text-2xl font-bold text-slate-900 mb-8">Send us a Message</h3>
             <form onSubmit={handleSubmit} className="space-y-6">
+              <fieldset>
+                <legend className="block text-sm font-bold text-slate-700 mb-2">Who would you like to contact? *</legend>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  {['School', 'Ansar Sprouts'].map(destination => (
+                    <label key={destination} className={`flex cursor-pointer items-center gap-3 rounded-xl border p-4 font-bold transition-colors ${formData.destination === destination ? 'border-emerald-500 bg-emerald-50 text-emerald-900 ring-1 ring-emerald-500' : 'border-slate-200 bg-slate-50 text-slate-700 hover:border-emerald-200'}`}>
+                      <input type="radio" name="destination" value={destination} checked={formData.destination === destination} onChange={handleChange} className="h-4 w-4 text-emerald-600" />
+                      <span>{destination}</span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-bold text-slate-700 mb-2">Full Name *</label>
