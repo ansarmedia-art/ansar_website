@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { db } from './firebase-init';
 import ImgBbUrlImporter from './ImgBbUrlImporter';
-import { DEFAULT_ACADEMIC_SECTIONS, DEFAULT_SPORTS_PAGE, mergeListWithDefaults } from './contentDefaults';
+import { DEFAULT_ACADEMICS_PAGE, DEFAULT_ACADEMIC_SECTIONS, DEFAULT_SPORTS_PAGE, mergeListWithDefaults } from './contentDefaults';
 
 export default function AdminAcademics() {
   const [formData, setFormData] = useState({
@@ -10,7 +10,8 @@ export default function AdminAcademics() {
     sportsPageTitle: DEFAULT_SPORTS_PAGE.title,
     sportsPageDescription: DEFAULT_SPORTS_PAGE.description,
     sportsItems: DEFAULT_SPORTS_PAGE.items,
-    academicSections: DEFAULT_ACADEMIC_SECTIONS
+    academicSections: DEFAULT_ACADEMIC_SECTIONS,
+    academicsPage: DEFAULT_ACADEMICS_PAGE
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState('');
@@ -27,7 +28,12 @@ export default function AdminAcademics() {
         sportsPageTitle: data.sportsPageTitle || prev.sportsPageTitle,
         sportsPageDescription: data.sportsPageDescription || prev.sportsPageDescription,
         sportsItems: mergeListWithDefaults(data.sportsItems, DEFAULT_SPORTS_PAGE.items),
-        academicSections: mergeListWithDefaults(data.academicSections, DEFAULT_ACADEMIC_SECTIONS)
+        academicSections: mergeListWithDefaults(data.academicSections, DEFAULT_ACADEMIC_SECTIONS),
+        academicsPage: {
+          ...DEFAULT_ACADEMICS_PAGE,
+          ...(data.academicsPage || {}),
+          beyondItems: mergeListWithDefaults(data.academicsPage?.beyondItems, DEFAULT_ACADEMICS_PAGE.beyondItems)
+        }
       }));
     };
     fetchSettings();
@@ -42,6 +48,18 @@ export default function AdminAcademics() {
     const next = [...formData[listName]];
     next[index] = { ...next[index], [field]: value };
     setFormData(prev => ({ ...prev, [listName]: next }));
+  };
+
+  const handleAcademicsPageChange = (field, value) => {
+    setFormData(prev => ({ ...prev, academicsPage: { ...prev.academicsPage, [field]: value } }));
+  };
+
+  const handleBeyondChange = (index, field, value) => {
+    setFormData(prev => {
+      const beyondItems = [...prev.academicsPage.beyondItems];
+      beyondItems[index] = { ...beyondItems[index], [field]: value };
+      return { ...prev, academicsPage: { ...prev.academicsPage, beyondItems } };
+    });
   };
 
   const addSport = () => {
@@ -61,11 +79,9 @@ export default function AdminAcademics() {
     }));
   };
 
-  const normalizeItems = (items) => items.map(item => ({
-    title: item.title || '',
-    description: item.description || '',
-    imageUrl: item.imageUrl || ''
-  }));
+  const normalizeItems = (items) => items.map(item => Object.fromEntries(
+    Object.entries(item).map(([key, value]) => [key, typeof value === 'string' ? value.trim() : value])
+  ));
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -79,6 +95,10 @@ export default function AdminAcademics() {
         sportsPageDescription: formData.sportsPageDescription,
         sportsItems: normalizeItems(formData.sportsItems),
         academicSections: normalizeItems(formData.academicSections),
+        academicsPage: {
+          ...formData.academicsPage,
+          beyondItems: normalizeItems(formData.academicsPage.beyondItems)
+        },
         updatedAt: serverTimestamp()
       }, { merge: true });
       setMessage('Academics and sports page content updated successfully!');
@@ -151,14 +171,61 @@ export default function AdminAcademics() {
           <section className="space-y-4 rounded-xl border border-slate-100 bg-slate-50 p-6">
             <div>
               <p className="text-xs font-black uppercase tracking-widest text-emerald-600">Academics Page</p>
+              <h3 className="mt-1 font-extrabold text-slate-900">Page introduction and overview</h3>
+            </div>
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+              <label className="text-sm font-bold text-slate-700">Page eyebrow
+                <input value={formData.academicsPage.eyebrow} onChange={(e) => handleAcademicsPageChange('eyebrow', e.target.value)} className="mt-2 w-full rounded-lg border border-slate-200 p-3 font-normal outline-none focus:ring-2 focus:ring-emerald-500" />
+              </label>
+              <label className="text-sm font-bold text-slate-700">Page title
+                <input value={formData.academicsPage.title} onChange={(e) => handleAcademicsPageChange('title', e.target.value)} className="mt-2 w-full rounded-lg border border-slate-200 p-3 font-normal outline-none focus:ring-2 focus:ring-emerald-500" />
+              </label>
+            </div>
+            <label className="block text-sm font-bold text-slate-700">Introduction
+              <textarea value={formData.academicsPage.introduction} onChange={(e) => handleAcademicsPageChange('introduction', e.target.value)} className="mt-2 h-28 w-full rounded-lg border border-slate-200 p-3 font-normal outline-none focus:ring-2 focus:ring-emerald-500" />
+            </label>
+            <label className="block text-sm font-bold text-slate-700">Hero image URL
+              <input value={formData.academicsPage.heroImageUrl} onChange={(e) => handleAcademicsPageChange('heroImageUrl', e.target.value)} placeholder="Leave empty to show an image placeholder" className="mt-2 w-full rounded-lg border border-slate-200 p-3 font-normal outline-none focus:ring-2 focus:ring-emerald-500" />
+            </label>
+            <ImgBbUrlImporter onExtracted={(url) => handleAcademicsPageChange('heroImageUrl', url)} />
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+              <label className="text-sm font-bold text-slate-700">Overview title
+                <input value={formData.academicsPage.overviewTitle} onChange={(e) => handleAcademicsPageChange('overviewTitle', e.target.value)} className="mt-2 w-full rounded-lg border border-slate-200 p-3 font-normal outline-none focus:ring-2 focus:ring-emerald-500" />
+              </label>
+              <label className="text-sm font-bold text-slate-700">Overview text
+                <textarea value={formData.academicsPage.overviewBody} onChange={(e) => handleAcademicsPageChange('overviewBody', e.target.value)} className="mt-2 h-36 w-full rounded-lg border border-slate-200 p-3 font-normal outline-none focus:ring-2 focus:ring-emerald-500" />
+              </label>
+            </div>
+          </section>
+
+          <section className="space-y-4 rounded-xl border border-slate-100 bg-slate-50 p-6">
+            <h3 className="font-extrabold text-slate-900">Beyond the Classroom</h3>
+            <input value={formData.academicsPage.beyondTitle} onChange={(e) => handleAcademicsPageChange('beyondTitle', e.target.value)} className="w-full rounded-lg border border-slate-200 p-3 outline-none focus:ring-2 focus:ring-emerald-500" />
+            <textarea value={formData.academicsPage.beyondIntroduction} onChange={(e) => handleAcademicsPageChange('beyondIntroduction', e.target.value)} className="h-24 w-full rounded-lg border border-slate-200 p-3 outline-none focus:ring-2 focus:ring-emerald-500" />
+            <div className="grid gap-4 lg:grid-cols-2">
+              {formData.academicsPage.beyondItems.map((item, index) => (
+                <div key={`beyond-${index}`} className="space-y-3 rounded-xl bg-white p-4 shadow-sm">
+                  <input value={item.title} onChange={(e) => handleBeyondChange(index, 'title', e.target.value)} className="w-full rounded-lg border border-slate-200 p-3 font-bold outline-none focus:ring-2 focus:ring-emerald-500" />
+                  <textarea value={item.description} onChange={(e) => handleBeyondChange(index, 'description', e.target.value)} className="h-28 w-full rounded-lg border border-slate-200 p-3 outline-none focus:ring-2 focus:ring-emerald-500" />
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="space-y-4 rounded-xl border border-slate-100 bg-slate-50 p-6">
+            <div>
+              <p className="text-xs font-black uppercase tracking-widest text-emerald-600">Academics Page</p>
               <h3 className="mt-1 font-extrabold text-slate-900">Section descriptions and image holders</h3>
             </div>
+            <input value={formData.academicsPage.sectionsTitle} onChange={(e) => handleAcademicsPageChange('sectionsTitle', e.target.value)} className="w-full rounded-lg border border-slate-200 p-3 font-bold outline-none focus:ring-2 focus:ring-emerald-500" />
+            <textarea value={formData.academicsPage.sectionsIntroduction} onChange={(e) => handleAcademicsPageChange('sectionsIntroduction', e.target.value)} className="h-28 w-full rounded-lg border border-slate-200 p-3 outline-none focus:ring-2 focus:ring-emerald-500" />
             <div className="space-y-4">
               {formData.academicSections.map((section, index) => (
                 <div key={`academic-section-${index}`} className="grid grid-cols-1 gap-4 rounded-xl border border-white bg-white p-4 shadow-sm lg:grid-cols-[1fr_1.3fr]">
                   <div className="space-y-3">
                     <div className="inline-flex rounded-lg bg-slate-100 px-3 py-2 text-sm font-black text-slate-600">#{index + 1}</div>
                     <input value={section.title || ''} onChange={(event) => handleListChange('academicSections', index, 'title', event.target.value)} placeholder="Section title" className="w-full rounded-lg border border-slate-200 p-3 outline-none focus:ring-2 focus:ring-emerald-500" />
+                    <input value={section.tagline || ''} onChange={(event) => handleListChange('academicSections', index, 'tagline', event.target.value)} placeholder="Section tagline" className="w-full rounded-lg border border-slate-200 p-3 outline-none focus:ring-2 focus:ring-emerald-500" />
                     <input value={section.imageUrl || ''} onChange={(event) => handleListChange('academicSections', index, 'imageUrl', event.target.value)} placeholder="Image URL" className="w-full rounded-lg border border-slate-200 p-3 outline-none focus:ring-2 focus:ring-emerald-500" />
                     <ImgBbUrlImporter onExtracted={(url) => handleListChange('academicSections', index, 'imageUrl', url)} />
                   </div>

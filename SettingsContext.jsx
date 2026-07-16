@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from './firebase-init';
-import { DEFAULT_ACADEMIC_SECTIONS, DEFAULT_SPORTS_PAGE, mergeListWithDefaults } from './contentDefaults';
+import { DEFAULT_ACADEMICS_PAGE, DEFAULT_ACADEMIC_SECTIONS, DEFAULT_SPORTS_PAGE, mergeListWithDefaults } from './contentDefaults';
 
 const SettingsContext = createContext();
 
@@ -72,6 +72,7 @@ export const SettingsProvider = ({ children }) => {
     sportsPageDescription: DEFAULT_SPORTS_PAGE.description,
     sportsItems: DEFAULT_SPORTS_PAGE.items,
     academicSections: DEFAULT_ACADEMIC_SECTIONS,
+    academicsPage: DEFAULT_ACADEMICS_PAGE,
     _isLoaded: false
   });
 
@@ -88,6 +89,11 @@ export const SettingsProvider = ({ children }) => {
           sportsPageDescription: savedSettings.sportsPageDescription || prev.sportsPageDescription,
           sportsItems: mergeListWithDefaults(savedSettings.sportsItems, DEFAULT_SPORTS_PAGE.items),
           academicSections: mergeListWithDefaults(savedSettings.academicSections, DEFAULT_ACADEMIC_SECTIONS),
+          academicsPage: {
+            ...DEFAULT_ACADEMICS_PAGE,
+            ...(savedSettings.academicsPage || {}),
+            beyondItems: mergeListWithDefaults(savedSettings.academicsPage?.beyondItems, DEFAULT_ACADEMICS_PAGE.beyondItems)
+          },
           _isLoaded: true
         }));
       } else {
