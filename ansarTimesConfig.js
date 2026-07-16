@@ -24,7 +24,7 @@ export function getAnsarTimesId(year, month) {
 }
 
 export function getAnsarTimesPdfUrl(item) {
-  return item?.pdfUrl || item?.documentUrl || item?.fileUrl || '';
+  return item?.pdfUrl || item?.documentUrl || item?.fileUrl || item?.driveLink || item?.link || item?.url || '';
 }
 
 const ANSAR_TIMES_DELETED_KEY = 'ansarTimesDeletedIds';
@@ -44,7 +44,11 @@ function writeDeletedIds(ids) {
 }
 
 export function getAnsarTimesRecordId(item) {
-  return item?.id || getAnsarTimesId(item?.year, item?.month);
+  // Google Sheets can auto-format values such as `2026-june` as a date and
+  // return a differently cased/formatted id. The year/month pair is the
+  // stable identity for an Ansar Times edition.
+  if (item?.year && item?.month) return getAnsarTimesId(item.year, item.month);
+  return item?.id || '';
 }
 
 export function markAnsarTimesDeleted(itemOrId) {

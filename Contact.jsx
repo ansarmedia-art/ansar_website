@@ -196,13 +196,16 @@ ${formData.message}`;
               <p className="mt-3 text-sm leading-relaxed text-emerald-50">For website support, corrections, media updates, or technical help, contact the development desk directly.</p>
             </div>
             <div className="grid grid-cols-1 gap-4 p-6 sm:grid-cols-2 lg:p-8">
-              <a href={`mailto:${developerEmail}`} className="flex items-center gap-4 rounded-xl border border-slate-100 bg-slate-50 p-5 transition-colors hover:border-emerald-200 hover:bg-emerald-50">
+              <a href={`mailto:${developerEmail}`} className="flex min-w-0 items-center gap-3 rounded-xl border border-slate-100 bg-slate-50 p-5 transition-colors hover:border-emerald-200 hover:bg-emerald-50">
                 <span className="flex h-12 w-12 flex-none items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
                   <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
                 </span>
-                <span>
+                <span className="min-w-0">
                   <span className="block text-sm font-black uppercase tracking-wider text-slate-500">Media Mail</span>
-                  <span className="mt-1 block break-all text-base font-extrabold text-slate-900">{developerEmail}</span>
+                  <span className="mt-1 block text-sm font-extrabold leading-5 text-slate-900 sm:text-base">
+                    <span className="block">ansarmedia@</span>
+                    <span className="block">ansarschool.in</span>
+                  </span>
                 </span>
               </a>
               <a href={`tel:+91${developerPhone}`} className="flex items-center gap-4 rounded-xl border border-slate-100 bg-slate-50 p-5 transition-colors hover:border-emerald-200 hover:bg-emerald-50">

@@ -33,7 +33,12 @@ export default function AdminAnsarTimes() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const sortedEntries = useMemo(() => {
-    return entries.filter(item => !isAnsarTimesDeleted(item)).sort((a, b) => {
+    const editions = new Map();
+    entries.filter(item => !isAnsarTimesDeleted(item) && getAnsarTimesPdfUrl(item)).forEach(item => {
+      editions.set(getAnsarTimesId(item.year, item.month), item);
+    });
+
+    return Array.from(editions.values()).sort((a, b) => {
       const yearDiff = Number(b.year || 0) - Number(a.year || 0);
       if (yearDiff) return yearDiff;
       return Number(a.monthIndex || getMonthIndex(a.month)) - Number(b.monthIndex || getMonthIndex(b.month));

@@ -7,13 +7,13 @@ import NotificationsBell from './NotificationsBell';
 const LEGACY_EXPLORE_LINKS = [
   { title: 'Gallery', slug: 'gallery' },
   { title: 'Achievements', slug: 'achievements' },
-  { title: 'ANSAR MEDIA PRODUCTIONS', slug: 'ansar-media-production' },
+  { title: 'Ansar Media Productions', slug: 'ansar-media-production' },
   { title: 'Sports', slug: 'sports-page' },
   { title: 'ATL', slug: 'atl' },
-  { title: 'Ansar Sprouts', slug: 'ansar-sprouts' },
   { title: 'Extension Services', slug: 'extension-services' },
   { title: 'Life at Ansar', slug: 'life-at-ansar' },
   { title: 'Ansar Times', slug: 'ansar-times' },
+  { title: 'Ansar Family', slug: 'ansar-family' },
   { title: 'Alumni', slug: 'alumni' },
   { title: 'SOP', slug: 'sop' },
   { title: 'Mandatory Public Disclosure', slug: 'mandatory-public-disclosure' }
@@ -63,9 +63,18 @@ export default function Navbar() {
           
           {/* Fluid Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-5">
-            {['Home', 'About', 'Academics', 'Admission', 'News', 'Events', 'Contact'].map((item) => (
-              <Link key={item} to={item === 'Home' ? '/' : `/${item.toLowerCase()}`} className="relative text-sm font-bold text-white/90 hover:text-amber-300 transition-colors py-2 group">
-                {item}
+            {[
+              { title: 'Home', path: '/' },
+              { title: 'About', path: '/about' },
+              { title: 'Academics', path: '/academics' },
+              { title: 'Admission', path: '/admission' },
+              { title: 'Ansar Sprouts', path: '/ansar-sprouts' },
+              { title: 'News', path: '/news' },
+              { title: 'Events', path: '/events' },
+              { title: 'Contact', path: '/contact' }
+            ].map((item) => (
+              <Link key={item.path} to={item.path} className="relative text-sm font-bold text-white/90 hover:text-amber-300 transition-colors py-2 group">
+                {item.title}
                 <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-amber-300 transition-all duration-300 ease-out group-hover:w-full rounded-full"></span>
               </Link>
             ))}
@@ -116,6 +125,7 @@ export default function Navbar() {
             <Link to="/" onClick={() => setIsOpen(false)} className="block rounded-lg px-4 py-3 text-base text-white font-bold hover:bg-white/10 hover:text-amber-300">Home</Link>
             <Link to="/about" onClick={() => setIsOpen(false)} className="block rounded-lg px-4 py-3 text-base text-white font-bold hover:bg-white/10 hover:text-amber-300">About Us</Link>
             <Link to="/admission" onClick={() => setIsOpen(false)} className="block rounded-lg px-4 py-3 text-base text-white font-bold hover:bg-white/10 hover:text-amber-300">Admissions</Link>
+            <Link to="/ansar-sprouts" onClick={() => setIsOpen(false)} className="block rounded-lg px-4 py-3 text-base text-white font-bold hover:bg-white/10 hover:text-amber-300">Ansar Sprouts</Link>
             <Link to="/academics" onClick={() => setIsOpen(false)} className="block rounded-lg px-4 py-3 text-base text-white font-bold hover:bg-white/10 hover:text-amber-300">Academics</Link>
             <Link to="/news" onClick={() => setIsOpen(false)} className="block rounded-lg px-4 py-3 text-base text-white font-bold hover:bg-white/10 hover:text-amber-300">News</Link>
             <Link to="/events" onClick={() => setIsOpen(false)} className="block rounded-lg px-4 py-3 text-base text-white font-bold hover:bg-white/10 hover:text-amber-300">Events</Link>

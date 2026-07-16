@@ -130,7 +130,9 @@ function coerceRow(row, collectionName, rowIndex) {
     facebookurl: 'facebookUrl',
     instagramurl: 'instagramUrl',
     youtubeurl: 'youtubeUrl',
-    pdfurl: 'pdfUrl'
+    pdfurl: 'pdfUrl',
+    drivelink: 'driveLink',
+    googledrivelink: 'driveLink'
   };
 
   const item = {};

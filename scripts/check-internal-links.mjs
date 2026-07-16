@@ -8,7 +8,7 @@ const ignoredDirectories = new Set(['.git', '.firebase', 'dist', 'node_modules',
 const exactRoutes = new Set([
   '/', '/about', '/academics', '/admission', '/news', '/events', '/contact', '/gallery',
   '/sports-page', '/atl', '/ansar-sprouts', '/extension-services', '/life-at-ansar',
-  '/field-trips',
+  '/field-trips', '/ansar-family',
   '/ansar-times', '/alumni', '/achievements', '/ansar-media-production', '/sop',
   '/mandatory-public-disclosure', '/admin', '/admin/dashboard', '/admin/updates', '/admin/news', '/admin/events',
   '/school-election', '/election/live', '/admin/election',

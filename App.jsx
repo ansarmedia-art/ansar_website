@@ -15,6 +15,7 @@ import News from './News';
 import Events from './Events';
 import Achievements from './Achievements';
 import AnsarTimes from './AnsarTimes';
+import Staff from './Staff';
 import Contact from './Contact';
 import Gallery from './Gallery';
 import AdminUpdates from './AdminUpdates';
@@ -130,6 +131,11 @@ const ROUTE_SEO = {
     title: 'Ansar Times School Magazine | Ansar English School',
     description: 'Read Ansar Times magazines, newsletters, student contributions, and school stories from Ansar English School.',
     keywords: 'Ansar Times, Ansar English School magazine, school newsletter Thrissur'
+  },
+  '/ansar-family': {
+    title: 'Our Faculty | Ansar Family | Ansar English School',
+    description: 'Meet the leadership, counsellors, teaching faculty, and physical education staff of Ansar English School for the academic year 2026–27.',
+    keywords: 'Ansar English School faculty, Ansar Family, teachers Perumpilavu, CBSE school staff Thrissur'
   },
   '/ansar-sprouts': {
     title: 'Ansar Sprouts Early Learning | Ansar English School',
@@ -1270,6 +1276,7 @@ export default function App() {
         <Route path="/extension-services" element={<DynamicPage slug="extension-services" />} />
         <Route path="/life-at-ansar" element={<LifeAtAnsar />} />
         <Route path="/ansar-times" element={<AnsarTimes />} />
+        <Route path="/ansar-family" element={<Staff />} />
         <Route path="/alumni" element={<DynamicPage slug="alumni" />} />
         <Route path="/achievements" element={<Achievements />} />
         <Route path="/sports-achievements/:id" element={<ArticleView />} />
