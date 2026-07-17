@@ -2,14 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { db } from './firebase-init';
 import ImgBbUrlImporter from './ImgBbUrlImporter';
-import { DEFAULT_ACADEMICS_PAGE, DEFAULT_ACADEMIC_SECTIONS, DEFAULT_SPORTS_PAGE, mergeListWithDefaults } from './contentDefaults';
+import { DEFAULT_ACADEMICS_PAGE, DEFAULT_ACADEMIC_SECTIONS, mergeListWithDefaults } from './contentDefaults';
 
 export default function AdminAcademics() {
   const [formData, setFormData] = useState({
     feeStructurePdfUrl: '',
-    sportsPageTitle: DEFAULT_SPORTS_PAGE.title,
-    sportsPageDescription: DEFAULT_SPORTS_PAGE.description,
-    sportsItems: DEFAULT_SPORTS_PAGE.items,
     academicSections: DEFAULT_ACADEMIC_SECTIONS,
     academicsPage: DEFAULT_ACADEMICS_PAGE
   });
@@ -25,9 +22,6 @@ export default function AdminAcademics() {
       setFormData(prev => ({
         ...prev,
         feeStructurePdfUrl: data.feeStructurePdfUrl || prev.feeStructurePdfUrl,
-        sportsPageTitle: data.sportsPageTitle || prev.sportsPageTitle,
-        sportsPageDescription: data.sportsPageDescription || prev.sportsPageDescription,
-        sportsItems: mergeListWithDefaults(data.sportsItems, DEFAULT_SPORTS_PAGE.items),
         academicSections: mergeListWithDefaults(data.academicSections, DEFAULT_ACADEMIC_SECTIONS),
         academicsPage: {
           ...DEFAULT_ACADEMICS_PAGE,
@@ -62,23 +56,6 @@ export default function AdminAcademics() {
     });
   };
 
-  const addSport = () => {
-    setFormData(prev => ({
-      ...prev,
-      sportsItems: [
-        ...prev.sportsItems,
-        { title: '', description: '', imageUrl: '' }
-      ]
-    }));
-  };
-
-  const removeSport = (index) => {
-    setFormData(prev => ({
-      ...prev,
-      sportsItems: prev.sportsItems.filter((_, itemIndex) => itemIndex !== index)
-    }));
-  };
-
   const normalizeItems = (items) => items.map(item => Object.fromEntries(
     Object.entries(item).map(([key, value]) => [key, typeof value === 'string' ? value.trim() : value])
   ));
@@ -91,9 +68,6 @@ export default function AdminAcademics() {
     try {
       await setDoc(doc(db, 'settings', 'global'), {
         feeStructurePdfUrl: formData.feeStructurePdfUrl,
-        sportsPageTitle: formData.sportsPageTitle,
-        sportsPageDescription: formData.sportsPageDescription,
-        sportsItems: normalizeItems(formData.sportsItems),
         academicSections: normalizeItems(formData.academicSections),
         academicsPage: {
           ...formData.academicsPage,
@@ -101,7 +75,7 @@ export default function AdminAcademics() {
         },
         updatedAt: serverTimestamp()
       }, { merge: true });
-      setMessage('Academics and sports page content updated successfully!');
+      setMessage('Academics and admissions content updated successfully!');
       setTimeout(() => setMessage(''), 3000);
     } catch (error) {
       setMessage('Error saving: ' + error.message);
@@ -113,7 +87,7 @@ export default function AdminAcademics() {
   return (
     <div className="mx-auto max-w-6xl">
       <div className="rounded-2xl border border-emerald-100 bg-white p-8 shadow-xl">
-        <h2 className="mb-6 text-xl font-bold text-slate-800">Academics & Sports Page Editor</h2>
+        <h2 className="mb-6 text-xl font-bold text-slate-800">Academics & Admissions Editor</h2>
         {message && <div className={`mb-6 rounded-lg p-4 text-sm font-bold ${message.includes('Error') ? 'bg-red-50 text-red-600' : 'bg-emerald-50 text-emerald-700'}`}>{message}</div>}
 
         <form onSubmit={handleSubmit} className="space-y-8">
@@ -124,48 +98,6 @@ export default function AdminAcademics() {
               <input name="feeStructurePdfUrl" type="url" value={formData.feeStructurePdfUrl} onChange={handleChange} placeholder="https://drive.google.com/file/d/..." className="w-full rounded-lg border border-slate-200 p-3 outline-none focus:ring-2 focus:ring-emerald-500" />
               <p className="mt-2 text-xs text-slate-500">Paste the shareable link to the PDF. The frontend will use this for the fee structure button.</p>
             </div>
-          </section>
-
-          <section className="space-y-4 rounded-xl border border-slate-100 bg-slate-50 p-6">
-            <div>
-              <p className="text-xs font-black uppercase tracking-widest text-emerald-600">Sports Page</p>
-              <h3 className="mt-1 font-extrabold text-slate-900">Sports page text and images</h3>
-            </div>
-            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-              <div>
-                <label className="mb-2 block text-sm font-bold text-slate-700">Page Title</label>
-                <input name="sportsPageTitle" value={formData.sportsPageTitle} onChange={handleChange} className="w-full rounded-lg border border-slate-200 p-3 outline-none focus:ring-2 focus:ring-emerald-500" />
-              </div>
-              <div>
-                <label className="mb-2 block text-sm font-bold text-slate-700">Page Description</label>
-                <textarea name="sportsPageDescription" value={formData.sportsPageDescription} onChange={handleChange} className="h-24 w-full rounded-lg border border-slate-200 p-3 outline-none focus:ring-2 focus:ring-emerald-500" />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-              {formData.sportsItems.map((sport, index) => (
-                <div key={`sport-${index}`} className="space-y-3 rounded-xl border border-white bg-white p-4 shadow-sm">
-                  <div className="flex items-center justify-between gap-3">
-                    <h4 className="font-bold text-emerald-800">{sport.title || `Sport ${index + 1}`}</h4>
-                    <button
-                      type="button"
-                      onClick={() => removeSport(index)}
-                      disabled={formData.sportsItems.length <= 1}
-                      className="rounded-lg border border-red-100 px-3 py-2 text-sm font-bold text-red-600 transition-colors hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-40"
-                    >
-                      Remove
-                    </button>
-                  </div>
-                  <input value={sport.title || ''} onChange={(event) => handleListChange('sportsItems', index, 'title', event.target.value)} placeholder="Sport title" className="w-full rounded-lg border border-slate-200 p-3 outline-none focus:ring-2 focus:ring-emerald-500" />
-                  <textarea value={sport.description || ''} onChange={(event) => handleListChange('sportsItems', index, 'description', event.target.value)} placeholder="Sport description" className="h-24 w-full rounded-lg border border-slate-200 p-3 outline-none focus:ring-2 focus:ring-emerald-500" />
-                  <input value={sport.imageUrl || ''} onChange={(event) => handleListChange('sportsItems', index, 'imageUrl', event.target.value)} placeholder="Image URL" className="w-full rounded-lg border border-slate-200 p-3 outline-none focus:ring-2 focus:ring-emerald-500" />
-                  <ImgBbUrlImporter onExtracted={(url) => handleListChange('sportsItems', index, 'imageUrl', url)} />
-                </div>
-              ))}
-            </div>
-            <button type="button" onClick={addSport} className="rounded-lg bg-white px-4 py-2 text-sm font-bold text-emerald-700 shadow-sm ring-1 ring-emerald-100 transition-colors hover:bg-emerald-50">
-              + Add Sport
-            </button>
           </section>
 
           <section className="space-y-4 rounded-xl border border-slate-100 bg-slate-50 p-6">

@@ -254,7 +254,7 @@ function JuniorPrincipalTile({ leader, index }) {
           )}
         </div>
         <div className="flex flex-1 flex-col justify-center p-5 sm:p-6">
-          <p className="text-[10px] font-black uppercase tracking-widest text-emerald-600">{role}</p>
+          <p className="font-sans text-sm font-semibold normal-case leading-snug tracking-normal text-emerald-700">{role}</p>
           <h4 className="mt-2 text-xl font-extrabold leading-tight text-emerald-950">{leader.name}</h4>
           {qualification && <p className="mt-2 text-sm font-bold leading-snug text-amber-600">{qualification}</p>}
           {section && <p className="mt-2 text-sm font-bold text-slate-600">{section}</p>}

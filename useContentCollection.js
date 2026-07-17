@@ -78,7 +78,7 @@ function normalizeImageFields(item) {
     if (item[key]) item[key] = normalizeImageUrl(item[key]);
   });
 
-  ['imageUrls', 'eventImages', 'galleryImages', 'premisesImages', 'kgImages'].forEach((key) => {
+  ['imageUrls', 'eventImages', 'galleryImages', 'outdoorGymImageUrls', 'premisesImages', 'kgImages'].forEach((key) => {
     if (item[key]) item[key] = splitImageUrls(item[key]);
   });
 }
@@ -123,6 +123,7 @@ function coerceRow(row, collectionName, rowIndex) {
     eventimages3: 'eventImages3',
     eventimages4: 'eventImages4',
     galleryimages: 'galleryImages',
+    outdoorgymimageurls: 'outdoorGymImageUrls',
     coverimageurl: 'coverImageUrl',
     thumbnailurl: 'thumbnailUrl',
     thumburl: 'thumbnailUrl',
@@ -147,7 +148,7 @@ function coerceRow(row, collectionName, rowIndex) {
   if (item.year !== '' && item.year != null) item.year = Number(item.year) || item.year;
   if (item.monthIndex !== '' && item.monthIndex != null) item.monthIndex = Number(item.monthIndex) || 0;
   if ('published' in item) item.published = parseBoolean(item.published, true);
-  ['imageUrls', 'eventImages', 'sections', 'premisesImages', 'kgImages', 'mandatoryDisclosureSections', 'galleryImages', 'points'].forEach((key) => {
+  ['imageUrls', 'eventImages', 'sections', 'premisesImages', 'kgImages', 'mandatoryDisclosureSections', 'galleryImages', 'outdoorGymImageUrls', 'points'].forEach((key) => {
     if (item[key]) item[key] = splitList(item[key]);
   });
   mergeChunkedListFields(item, 'imageUrls');

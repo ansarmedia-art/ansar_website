@@ -56,6 +56,9 @@ const SHEET_COLUMNS = {
     'points',
     'imageUrl',
     'galleryImages',
+    'outdoorGymTitle',
+    'outdoorGymDescription',
+    'outdoorGymImageUrls',
     'icon',
     'order',
     'published'

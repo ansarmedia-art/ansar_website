@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
-import { addDoc, collection, doc, serverTimestamp, updateDoc } from 'firebase/firestore';
+import React, { useEffect, useState } from 'react';
+import { addDoc, collection, doc, getDoc, serverTimestamp, setDoc, updateDoc } from 'firebase/firestore';
 import { db } from './firebase-init';
 import { clearGoogleSheetsCache, useContentCollection } from './useContentCollection';
 import { saveSheetRecord } from './googleSheetsAdminApi';
 import ImgBbUrlImporter from './ImgBbUrlImporter';
 import { softDeleteRecord } from './adminUndo';
 import { normalizeImageUrl } from './imageUrlUtils';
+import { DEFAULT_SPORTS_PAGE, mergeListWithDefaults } from './contentDefaults';
 
 const MAX_SPORTS_ACHIEVEMENT_IMAGES = 30;
 
@@ -60,6 +61,54 @@ export default function AdminSportsAchievements() {
   const [editingId, setEditingId] = useState(null);
   const [editingItem, setEditingItem] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [sportsPage, setSportsPage] = useState({
+    title: DEFAULT_SPORTS_PAGE.title,
+    description: DEFAULT_SPORTS_PAGE.description,
+    items: DEFAULT_SPORTS_PAGE.items
+  });
+  const [isSavingPage, setIsSavingPage] = useState(false);
+  const [pageMessage, setPageMessage] = useState('');
+
+  useEffect(() => {
+    getDoc(doc(db, 'settings', 'global')).then(snapshot => {
+      if (!snapshot.exists()) return;
+      const data = snapshot.data();
+      setSportsPage({
+        title: data.sportsPageTitle || DEFAULT_SPORTS_PAGE.title,
+        description: data.sportsPageDescription || DEFAULT_SPORTS_PAGE.description,
+        items: mergeListWithDefaults(data.sportsItems, DEFAULT_SPORTS_PAGE.items)
+      });
+    }).catch(error => setPageMessage(`Error loading Sports page: ${error.message}`));
+  }, []);
+
+  const updateSportItem = (index, field, value) => {
+    setSportsPage(prev => ({
+      ...prev,
+      items: prev.items.map((item, itemIndex) => itemIndex === index ? { ...item, [field]: value } : item)
+    }));
+  };
+
+  const saveSportsPage = async (event) => {
+    event.preventDefault();
+    setIsSavingPage(true);
+    setPageMessage('');
+    try {
+      const items = sportsPage.items.map(item => Object.fromEntries(
+        Object.entries(item).map(([key, value]) => [key, typeof value === 'string' ? value.trim() : value])
+      ));
+      await setDoc(doc(db, 'settings', 'global'), {
+        sportsPageTitle: sportsPage.title.trim(),
+        sportsPageDescription: sportsPage.description.trim(),
+        sportsItems: items,
+        updatedAt: serverTimestamp()
+      }, { merge: true });
+      setPageMessage('Sports page content updated successfully!');
+    } catch (error) {
+      setPageMessage(`Error saving Sports page: ${error.message}`);
+    } finally {
+      setIsSavingPage(false);
+    }
+  };
 
   const handleChange = (event) => {
     const { name, value, type, checked } = event.target;
@@ -198,6 +247,43 @@ export default function AdminSportsAchievements() {
 
   return (
     <div className="mx-auto max-w-5xl">
+      <div className="mb-8 rounded-2xl border border-emerald-100 bg-white p-8 shadow-xl">
+        <div className="mb-6">
+          <p className="text-xs font-black uppercase tracking-widest text-emerald-600">Sports Page</p>
+          <h2 className="mt-1 text-xl font-bold text-slate-800">Sports page content</h2>
+          <p className="mt-1 text-sm text-slate-500">Manage the page introduction and sports cards shown on the public website.</p>
+        </div>
+        {pageMessage && <div className={`mb-5 rounded-lg p-4 text-sm font-bold ${pageMessage.startsWith('Error') ? 'bg-red-50 text-red-600' : 'bg-emerald-50 text-emerald-700'}`}>{pageMessage}</div>}
+        <form onSubmit={saveSportsPage} className="space-y-5">
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+            <label className="text-sm font-bold text-slate-700">Page Title
+              <input value={sportsPage.title} onChange={event => setSportsPage(prev => ({ ...prev, title: event.target.value }))} className="mt-2 w-full rounded-lg border border-slate-200 p-3 font-normal outline-none focus:ring-2 focus:ring-emerald-500" />
+            </label>
+            <label className="text-sm font-bold text-slate-700">Page Description
+              <textarea value={sportsPage.description} onChange={event => setSportsPage(prev => ({ ...prev, description: event.target.value }))} className="mt-2 h-24 w-full rounded-lg border border-slate-200 p-3 font-normal outline-none focus:ring-2 focus:ring-emerald-500" />
+            </label>
+          </div>
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+            {sportsPage.items.map((sport, index) => (
+              <div key={`sport-${index}`} className="space-y-3 rounded-xl border border-slate-100 bg-slate-50 p-4">
+                <div className="flex items-center justify-between gap-3">
+                  <h3 className="font-bold text-emerald-800">{sport.title || `Sport ${index + 1}`}</h3>
+                  <button type="button" onClick={() => setSportsPage(prev => ({ ...prev, items: prev.items.filter((_, itemIndex) => itemIndex !== index) }))} disabled={sportsPage.items.length <= 1} className="rounded-lg px-3 py-2 text-sm font-bold text-red-600 hover:bg-red-50 disabled:opacity-40">Remove</button>
+                </div>
+                <input value={sport.title || ''} onChange={event => updateSportItem(index, 'title', event.target.value)} placeholder="Sport title" className="w-full rounded-lg border border-slate-200 p-3 outline-none focus:ring-2 focus:ring-emerald-500" />
+                <textarea value={sport.description || ''} onChange={event => updateSportItem(index, 'description', event.target.value)} placeholder="Sport description" className="h-24 w-full rounded-lg border border-slate-200 p-3 outline-none focus:ring-2 focus:ring-emerald-500" />
+                <input value={sport.imageUrl || ''} onChange={event => updateSportItem(index, 'imageUrl', event.target.value)} placeholder="Image URL" className="w-full rounded-lg border border-slate-200 p-3 outline-none focus:ring-2 focus:ring-emerald-500" />
+                <ImgBbUrlImporter onExtracted={url => updateSportItem(index, 'imageUrl', url)} />
+              </div>
+            ))}
+          </div>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <button type="button" onClick={() => setSportsPage(prev => ({ ...prev, items: [...prev.items, { title: '', description: '', imageUrl: '' }] }))} className="rounded-lg bg-white px-4 py-2 text-sm font-bold text-emerald-700 ring-1 ring-emerald-100 hover:bg-emerald-50">+ Add Sport</button>
+            <button type="submit" disabled={isSavingPage} className="rounded-lg bg-emerald-600 px-6 py-2.5 font-bold text-white hover:bg-emerald-700 disabled:opacity-50">{isSavingPage ? 'Saving...' : 'Save Sports Page'}</button>
+          </div>
+        </form>
+      </div>
+
       <div className="mb-8 rounded-2xl border border-emerald-100 bg-white p-8 shadow-xl">
         <h2 className="mb-6 text-xl font-bold text-slate-800">{editingId ? 'Edit Sports Achievement' : 'Add Sports Achievement'}</h2>
         <form onSubmit={handleSubmit} className="space-y-4">

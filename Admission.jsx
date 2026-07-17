@@ -107,7 +107,7 @@ export default function Admission() {
     document.body.removeChild(a);
   };
 
-  if (page) {
+  if (page?.useLegacyAdmissionLayout) {
     return (
       <Layout>
         <ContentPageLayout
@@ -144,37 +144,62 @@ export default function Admission() {
     <Layout>
       <div className="max-w-6xl mx-auto py-12 lg:py-20 px-4">
         
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <p className="text-emerald-600 font-bold uppercase tracking-wider text-sm mb-2">Admissions Portal</p>
-          <h1 className="text-4xl lg:text-6xl font-extrabold text-slate-900 mb-6 leading-tight">Join the Ansar Family</h1>
-          <p className="text-xl text-slate-600 font-light leading-relaxed mb-8">We offer a fair, transparent, and merit-based admissions process aligned with NEP guidelines. Discover a community where every student thrives.</p>
-          <div className="flex flex-col items-center justify-center gap-3 sm:flex-row sm:flex-wrap">
+        <section className="relative mb-16 overflow-hidden rounded-[2rem] bg-emerald-950 px-6 py-12 text-white shadow-2xl sm:px-10 lg:px-14 lg:py-16">
+          <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full border-[55px] border-emerald-800/40" />
+          <div className="absolute -bottom-28 left-1/3 h-64 w-64 rounded-full bg-amber-400/10 blur-3xl" />
+          <div className="relative grid grid-cols-1 items-center gap-12 lg:grid-cols-[1.15fr_.85fr]">
+            <div>
+              <div className="inline-flex items-center gap-2 rounded-full border border-emerald-700 bg-emerald-900/70 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-amber-300"><span className="h-2 w-2 rounded-full bg-amber-400" />Admissions 2026–27</div>
+              <h1 className="mt-7 text-4xl font-black leading-[1.05] sm:text-5xl lg:text-6xl">A confident first step toward a bright future.</h1>
+              <p className="mt-6 max-w-2xl text-lg leading-relaxed text-emerald-50/80">A clear, supportive admission journey into a learning community built on excellence, values, care, and opportunity.</p>
+              <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
             <Link to="/contact" className="inline-flex items-center justify-center whitespace-nowrap bg-emerald-600 text-white font-bold px-8 py-4 rounded-full shadow-lg hover:bg-emerald-700 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
               Contact Admissions Office
             </Link>
             <a href={ADMISSION_PAYMENT_PORTAL_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center whitespace-nowrap rounded-full bg-amber-500 px-8 py-4 font-bold text-white shadow-lg transition-all duration-300 hover:-translate-y-1 hover:bg-amber-600 hover:shadow-xl">
               Admission & Payments
             </a>
-            <a href={feeStructureUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center whitespace-nowrap rounded-full border border-slate-200 bg-white px-8 py-4 font-bold text-slate-900 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-emerald-200 hover:text-emerald-700">
+            <a href={feeStructureUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center whitespace-nowrap rounded-full border border-white/20 bg-white/10 px-8 py-4 font-bold text-white shadow-sm backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:bg-white/20">
               View Fee Structure
             </a>
+              </div>
+            </div>
+            <div className="relative mx-auto w-full max-w-sm">
+              <div className="absolute -inset-3 rotate-3 rounded-[2rem] border border-amber-300/30" />
+              <div className="relative rounded-[2rem] bg-white p-7 text-slate-900 shadow-2xl">
+                <p className="text-xs font-black uppercase tracking-[0.2em] text-emerald-600">Admission window</p>
+                <h2 className="mt-3 text-2xl font-black text-emerald-950">January 01 — March 31</h2>
+                <p className="mt-3 leading-relaxed text-slate-600">Our team guides every family through eligibility, assessment, documentation, and enrollment.</p>
+                <div className="mt-6 grid grid-cols-3 gap-2 border-t border-slate-100 pt-6 text-center">
+                  {[['LKG', '3½+'], ['UKG', '4½+'], ['Class I', '5½+']].map(([label, age]) => <div key={label} className="rounded-xl bg-emerald-50 px-2 py-3"><strong className="block text-lg text-emerald-800">{age}</strong><span className="text-xs font-bold text-slate-500">{label}</span></div>)}
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
+        </section>
+
+        {page?.bodyHtml && (
+          <section className="mb-16 rounded-3xl border border-slate-100 bg-white p-8 shadow-sm sm:p-10">
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-emerald-600">About admissions</p>
+            <div className="prose prose-slate prose-lg mt-5 max-w-none prose-headings:text-emerald-950 prose-a:text-emerald-600 prose-img:rounded-2xl" dangerouslySetInnerHTML={{ __html: page.bodyHtml }} />
+          </section>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
           <div className="lg:col-span-2 space-y-8">
             <div className="bg-white p-8 sm:p-10 rounded-3xl shadow-sm border border-slate-100 academics-card">
-              <h2 className="text-2xl font-bold text-slate-900 mb-6">How to Apply: Step-by-Step</h2>
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-emerald-600">Your admission journey</p>
+              <h2 className="mb-8 mt-2 text-3xl font-black text-emerald-950">Three clear steps to enrollment</h2>
               <div className="space-y-6">
-                <div className="flex gap-4">
+                <div className="flex gap-5 rounded-2xl border border-slate-100 p-5 transition-colors hover:border-emerald-200 hover:bg-emerald-50/40">
                   <div className="flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 font-bold flex items-center justify-center text-lg">1</div>
                   <div><h3 className="font-bold text-slate-900 text-lg">Submit Application</h3><p className="text-slate-600 mt-1">Applications are open annually from <strong>Jan 01 to March 31</strong>. Apply online or submit a physical form detached from our school prospectus.</p></div>
                 </div>
-                <div className="flex gap-4">
+                <div className="flex gap-5 rounded-2xl border border-slate-100 p-5 transition-colors hover:border-emerald-200 hover:bg-emerald-50/40">
                   <div className="flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 font-bold flex items-center justify-center text-lg">2</div>
                   <div><h3 className="font-bold text-slate-900 text-lg">Attend Assessment</h3><p className="text-slate-600 mt-1">For students entering above LKG, a language proficiency and diagnostic assessment is mandatory to understand learning needs.</p></div>
                 </div>
-                <div className="flex gap-4">
+                <div className="flex gap-5 rounded-2xl border border-slate-100 p-5 transition-colors hover:border-emerald-200 hover:bg-emerald-50/40">
                   <div className="flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 font-bold flex items-center justify-center text-lg">3</div>
                   <div><h3 className="font-bold text-slate-900 text-lg">Finalize Enrollment</h3><p className="text-slate-600 mt-1">Upon successful assessment, submit the required documents to our school office to secure your child's seat.</p></div>
                 </div>

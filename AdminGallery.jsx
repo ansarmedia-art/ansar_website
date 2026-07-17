@@ -5,6 +5,8 @@ import ImgBbUrlImporter from './ImgBbUrlImporter';
 import { softDeleteRecord, softDeleteRecords } from './adminUndo';
 import { imageCandidates, normalizeImageUrl } from './imageUrlUtils';
 import { formatDisplayDate, getDateTime } from './dateUtils';
+import { clearGoogleSheetsCache, useContentCollection } from './useContentCollection';
+import { saveSheetRecord } from './googleSheetsAdminApi';
 
 function getMillis(item) {
   const dateTime = getDateTime(item.date, null);
@@ -112,6 +114,27 @@ function collectWebsiteImages(galleryItems, updates, achievements, sportsAchieve
   return Array.from(imagesByUrl.values()).sort((a, b) => b.timestamp - a.timestamp);
 }
 
+function removeUrlsFromRecord(item, urlsToDelete) {
+  const deleted = new Set(urlsToDelete.map(normalizeImageUrl));
+  const next = { ...item };
+  ['coverImageUrl', 'imageUrl', 'thumbnailUrl'].forEach(field => {
+    if (deleted.has(normalizeImageUrl(next[field]))) next[field] = '';
+  });
+  ['eventImages', 'imageUrls'].forEach(field => {
+    if (Array.isArray(next[field])) {
+      next[field] = next[field].filter(url => !deleted.has(normalizeImageUrl(url)));
+    }
+  });
+  if (!next.imageUrl && next.imageUrls?.length) next.imageUrl = next.imageUrls[0];
+  if (!next.coverImageUrl && next.eventImages?.length) next.coverImageUrl = next.eventImages[0];
+  return next;
+}
+
+function sheetSafeRecord(item) {
+  const { _contentSource, _sheetRowIndex, recordId, raw, ...record } = item;
+  return record;
+}
+
 const initialFormState = {
   title: '',
   category: 'General',
@@ -119,6 +142,8 @@ const initialFormState = {
   imageUrls: [''],
   published: true
 };
+
+const GALLERY_BATCH_SIZE = 48;
 
 export default function AdminGallery() {
   const [galleryItems, setGalleryItems] = useState([]);
@@ -133,14 +158,15 @@ export default function AdminGallery() {
   const [filter, setFilter] = useState('All');
   const [searchTerm, setSearchTerm] = useState('');
   const [previewImage, setPreviewImage] = useState(null);
+  const [visibleLimit, setVisibleLimit] = useState(GALLERY_BATCH_SIZE);
+  const [contentRefreshKey, setContentRefreshKey] = useState(0);
+  const { data: mergedUpdates, loading: loadingUpdates } = useContentCollection('updates', null, 'desc', { refreshKey: contentRefreshKey });
+  const { data: mergedAchievements, loading: loadingAchievements } = useContentCollection('achievements', null, 'desc', { refreshKey: contentRefreshKey });
+  const { data: mergedSportsAchievements, loading: loadingSportsAchievements } = useContentCollection('sportsAchievements', null, 'desc', { refreshKey: contentRefreshKey });
 
   useEffect(() => {
     let loadedGallery = false;
-    let loadedUpdates = false;
-    let loadedAchievements = false;
-    let loadedSportsAchievements = false;
-
-    const publishLoading = () => setLoading(!(loadedGallery && loadedUpdates && loadedAchievements && loadedSportsAchievements));
+    const publishLoading = () => setLoading(!loadedGallery);
 
     const unsubGallery = onSnapshot(collection(db, 'gallery'), (snapshot) => {
       loadedGallery = true;
@@ -152,54 +178,20 @@ export default function AdminGallery() {
       console.error('Unable to load gallery:', error);
     });
 
-    const unsubUpdates = onSnapshot(collection(db, 'updates'), (snapshot) => {
-      loadedUpdates = true;
-      setUpdates(snapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() })));
-      publishLoading();
-    }, (error) => {
-      loadedUpdates = true;
-      publishLoading();
-      console.error('Unable to load update images:', error);
-    });
-
-    const unsubAchievements = onSnapshot(collection(db, 'achievements'), (snapshot) => {
-      loadedAchievements = true;
-      setAchievements(snapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() })));
-      publishLoading();
-    }, (error) => {
-      loadedAchievements = true;
-      publishLoading();
-      console.error('Unable to load achievement images:', error);
-    });
-
-    const unsubSportsAchievements = onSnapshot(collection(db, 'sportsAchievements'), (snapshot) => {
-      loadedSportsAchievements = true;
-      setSportsAchievements(snapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() })));
-      publishLoading();
-    }, (error) => {
-      loadedSportsAchievements = true;
-      publishLoading();
-      console.error('Unable to load sports achievement images:', error);
-    });
-
     return () => {
       unsubGallery();
-      unsubUpdates();
-      unsubAchievements();
-      unsubSportsAchievements();
     };
   }, []);
 
-  const managedImages = useMemo(() => {
-    return galleryItems
-      .map(imageFromGalleryItem)
-      .filter(Boolean)
-      .sort((a, b) => b.timestamp - a.timestamp);
-  }, [galleryItems]);
+  useEffect(() => setUpdates(mergedUpdates), [mergedUpdates]);
+  useEffect(() => setAchievements(mergedAchievements), [mergedAchievements]);
+  useEffect(() => setSportsAchievements(mergedSportsAchievements), [mergedSportsAchievements]);
 
   const websiteImages = useMemo(() => {
     return collectWebsiteImages(galleryItems, updates, achievements, sportsAchievements);
   }, [galleryItems, updates, achievements, sportsAchievements]);
+
+  const managedImages = websiteImages;
 
   const duplicateGalleryItems = useMemo(() => {
     const sourceUrls = new Set(collectSourceImages(updates, achievements, sportsAchievements).map(item => item.url));
@@ -234,8 +226,13 @@ export default function AdminGallery() {
     const haystack = `${item.title} ${item.category} ${item.date}`.toLowerCase();
     return matchesFilter && haystack.includes(searchTerm.toLowerCase());
   });
+  const displayedManagedImages = visibleManagedImages.slice(0, visibleLimit);
 
-  const allVisibleSelected = visibleManagedImages.length > 0 && visibleManagedImages.every(item => selectedIds.includes(item.recordId));
+  const allVisibleSelected = displayedManagedImages.length > 0 && displayedManagedImages.every(item => selectedIds.includes(item.id));
+
+  useEffect(() => {
+    setVisibleLimit(GALLERY_BATCH_SIZE);
+  }, [filter, searchTerm]);
 
   const handleChange = (event) => {
     const { name, value, type, checked } = event.target;
@@ -332,7 +329,7 @@ export default function AdminGallery() {
   };
 
   const toggleSelectAll = () => {
-    const visibleIds = visibleManagedImages.map(item => item.recordId);
+    const visibleIds = displayedManagedImages.map(item => item.id);
     setSelectedIds(prev => {
       if (visibleIds.every(id => prev.includes(id))) {
         return prev.filter(id => !visibleIds.includes(id));
@@ -343,13 +340,64 @@ export default function AdminGallery() {
 
   const clearSelection = () => setSelectedIds([]);
 
+  const deleteSourceImages = async (images) => {
+    const galleryImages = images.filter(item => item.source === 'gallery');
+    for (const item of galleryImages) {
+      await softDeleteRecord('gallery', item.raw || item, { docId: item.recordId });
+    }
+
+    const sourceGroups = new Map();
+    images.filter(item => item.source !== 'gallery').forEach(item => {
+      const key = `${item.source}:${item.recordId}`;
+      const group = sourceGroups.get(key) || { collectionName: item.source, item: item.raw, urls: [] };
+      group.urls.push(item.url);
+      sourceGroups.set(key, group);
+    });
+
+    for (const group of sourceGroups.values()) {
+      const nextRecord = removeUrlsFromRecord(group.item, group.urls);
+      const source = group.item._contentSource || 'firestore';
+      if (source !== 'sheets') {
+        const imagePayload = group.collectionName === 'updates'
+          ? {
+              coverImageUrl: nextRecord.coverImageUrl || '',
+              imageUrl: nextRecord.imageUrl || '',
+              thumbnailUrl: nextRecord.thumbnailUrl || '',
+              eventImages: nextRecord.eventImages || [],
+              imageUrls: nextRecord.imageUrls || []
+            }
+          : {
+              imageUrl: nextRecord.imageUrl || '',
+              imageUrls: nextRecord.imageUrls || []
+            };
+        await updateDoc(doc(db, group.collectionName, group.item.id), { ...imagePayload, updatedAt: serverTimestamp() });
+      }
+      if (source === 'sheets' || source === 'merged') {
+        await saveSheetRecord(group.collectionName, sheetSafeRecord(nextRecord));
+      }
+    }
+    clearGoogleSheetsCache();
+    setContentRefreshKey(key => key + 1);
+  };
+
   const updateSelectedPublished = async (published) => {
     if (!selectedIds.length) return;
     try {
-      await Promise.all(selectedIds.map(id => updateDoc(doc(db, 'gallery', id), {
-        published,
-        updatedAt: serverTimestamp()
-      })));
+      const records = new Map();
+      websiteImages.filter(item => selectedIds.includes(item.id)).forEach(item => {
+        records.set(`${item.source}:${item.recordId}`, item);
+      });
+      for (const item of records.values()) {
+        const source = item.raw?._contentSource || 'firestore';
+        if (source !== 'sheets') {
+          await updateDoc(doc(db, item.source, item.recordId), { published, updatedAt: serverTimestamp() });
+        }
+        if (source === 'sheets' || source === 'merged') {
+          await saveSheetRecord(item.source, { ...sheetSafeRecord(item.raw), published });
+        }
+      }
+      clearGoogleSheetsCache();
+      setContentRefreshKey(key => key + 1);
       clearSelection();
     } catch (error) {
       alert('Bulk update failed: ' + error.message);
@@ -361,10 +409,10 @@ export default function AdminGallery() {
     if (!window.confirm(`Delete ${selectedIds.length} selected gallery image${selectedIds.length === 1 ? '' : 's'}?`)) return;
 
     try {
-      const selectedItems = galleryItems.filter(item => selectedIds.includes(item.id));
-      await softDeleteRecords('gallery', selectedItems);
+      const selectedItems = websiteImages.filter(item => selectedIds.includes(item.id));
+      await deleteSourceImages(selectedItems);
       clearSelection();
-      if (selectedIds.includes(editingId)) resetForm();
+      if (selectedItems.some(item => item.recordId === editingId)) resetForm();
     } catch (error) {
       alert('Delete failed: ' + error.message);
     }
@@ -386,8 +434,8 @@ export default function AdminGallery() {
   const deleteSingle = async (item) => {
     if (!window.confirm(`Delete "${item.title}" from gallery?`)) return;
     try {
-      await softDeleteRecord('gallery', item.raw || item, { docId: item.recordId });
-      setSelectedIds(prev => prev.filter(id => id !== item.recordId));
+      await deleteSourceImages([item]);
+      setSelectedIds(prev => prev.filter(id => id !== item.id));
       if (editingId === item.recordId) resetForm();
     } catch (error) {
       alert('Delete failed: ' + error.message);
@@ -472,7 +520,7 @@ export default function AdminGallery() {
           <div>
             <p className="text-xs font-black uppercase tracking-widest text-emerald-600">Manage Gallery Collection</p>
             <h3 className="mt-1 text-2xl font-extrabold text-slate-900">Gallery Images</h3>
-            <p className="mt-2 text-sm text-slate-500">{managedImages.length} saved gallery image{managedImages.length === 1 ? '' : 's'}.</p>
+            <p className="mt-2 text-sm text-slate-500">{managedImages.length} published image{managedImages.length === 1 ? '' : 's'} loaded from Gallery, News, Events, Achievements, Sports, Firestore, and Google Sheets.</p>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row">
             <input value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} placeholder="Search gallery..." className="rounded-lg border border-slate-200 px-4 py-2.5 outline-none focus:ring-2 focus:ring-emerald-500" />
@@ -489,6 +537,7 @@ export default function AdminGallery() {
           </label>
           <div className="flex flex-wrap gap-2">
             <span className="rounded-full bg-white px-3 py-2 text-sm font-bold text-slate-600">{selectedIds.length} selected</span>
+            <button type="button" onClick={clearSelection} disabled={!selectedIds.length} className="rounded-lg px-3 py-2 text-sm font-bold text-slate-600 transition-colors hover:bg-white disabled:opacity-40">Clear selection</button>
             <button type="button" onClick={() => updateSelectedPublished(true)} disabled={!selectedIds.length} className="rounded-lg px-3 py-2 text-sm font-bold text-emerald-700 transition-colors hover:bg-emerald-50 disabled:opacity-40">Publish</button>
             <button type="button" onClick={() => updateSelectedPublished(false)} disabled={!selectedIds.length} className="rounded-lg px-3 py-2 text-sm font-bold text-amber-700 transition-colors hover:bg-amber-50 disabled:opacity-40">Unpublish</button>
             <button type="button" onClick={deleteSelected} disabled={!selectedIds.length} className="rounded-lg px-3 py-2 text-sm font-bold text-red-600 transition-colors hover:bg-red-50 disabled:opacity-40">Delete</button>
@@ -498,21 +547,24 @@ export default function AdminGallery() {
           </div>
         </div>
 
-        {loading ? (
+        {loading || loadingUpdates || loadingAchievements || loadingSportsAchievements ? (
           <p className="py-12 text-center font-bold text-slate-500">Loading gallery images...</p>
         ) : visibleManagedImages.length ? (
           <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {visibleManagedImages.map(item => (
-              <article key={item.recordId} className="overflow-hidden rounded-xl border border-slate-100 bg-white shadow-sm transition-all hover:border-emerald-200 hover:shadow-lg">
-                <button type="button" onClick={() => setPreviewImage(item)} className="relative block aspect-[4/3] w-full overflow-hidden bg-slate-100">
-                  <img src={item.url} alt={item.title} className="absolute inset-0 h-full w-full object-cover" loading="lazy" />
-                </button>
+            {displayedManagedImages.map(item => (
+              <article key={item.id} className={`overflow-hidden rounded-xl border-2 bg-white shadow-sm transition-all hover:shadow-lg ${selectedIds.includes(item.id) ? 'border-emerald-500 ring-4 ring-emerald-100' : 'border-transparent hover:border-emerald-200'}`}>
+                <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-100">
+                  <button type="button" onClick={() => setPreviewImage(item)} className="absolute inset-0 block h-full w-full">
+                    <img src={item.url} alt={item.title} className="absolute inset-0 h-full w-full object-cover" loading="lazy" decoding="async" />
+                  </button>
+                  <label className="absolute left-3 top-3 z-10 flex cursor-pointer items-center gap-2 rounded-lg bg-white/95 px-3 py-2 text-xs font-extrabold text-slate-800 shadow-lg backdrop-blur-sm">
+                    <input type="checkbox" checked={selectedIds.includes(item.id)} onChange={() => toggleSelection(item.id)} className="h-5 w-5 rounded text-emerald-600" />
+                    Select
+                  </label>
+                </div>
                 <div className="space-y-3 p-4">
                   <div className="flex items-start justify-between gap-3">
-                    <label className="flex cursor-pointer items-center gap-2">
-                      <input type="checkbox" checked={selectedIds.includes(item.recordId)} onChange={() => toggleSelection(item.recordId)} className="h-5 w-5 rounded text-emerald-600" />
-                      <span className="text-xs font-bold uppercase tracking-wide text-slate-500">Select</span>
-                    </label>
+                    <span className="text-xs font-bold uppercase tracking-wide text-slate-500">{selectedIds.includes(item.id) ? 'Selected' : item.sourceLabel}</span>
                     <span className={`rounded-full px-2 py-1 text-xs font-bold ${item.published ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}`}>
                       {item.published ? 'Published' : 'Draft'}
                     </span>
@@ -522,7 +574,7 @@ export default function AdminGallery() {
                     <p className="mt-1 text-sm font-semibold text-slate-500">{item.category}{item.date ? ` | ${item.date}` : ''}</p>
                   </div>
                   <div className="flex gap-2">
-                    <button type="button" onClick={() => handleEdit(item)} className="flex-1 rounded-lg px-3 py-2 text-sm font-bold text-emerald-700 transition-colors hover:bg-emerald-50">Edit</button>
+                    {item.source === 'gallery' && <button type="button" onClick={() => handleEdit(item)} className="flex-1 rounded-lg px-3 py-2 text-sm font-bold text-emerald-700 transition-colors hover:bg-emerald-50">Edit</button>}
                     <button type="button" onClick={() => deleteSingle(item)} className="flex-1 rounded-lg px-3 py-2 text-sm font-bold text-red-600 transition-colors hover:bg-red-50">Delete</button>
                   </div>
                 </div>
@@ -532,30 +584,13 @@ export default function AdminGallery() {
         ) : (
           <p className="py-12 text-center font-bold text-slate-500">No gallery images match the current filter.</p>
         )}
-      </section>
-
-      <section className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <p className="text-xs font-black uppercase tracking-widest text-emerald-600">Website Gallery Preview</p>
-            <h3 className="mt-1 text-2xl font-extrabold text-slate-900">Images Currently Visible on Gallery Page</h3>
-          </div>
-          <span className="rounded-full bg-slate-100 px-3 py-2 text-sm font-bold text-slate-600">{websiteImages.length} public image{websiteImages.length === 1 ? '' : 's'}</span>
-        </div>
-
-        <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
-          {websiteImages.map(item => (
-            <button key={item.id} type="button" onClick={() => setPreviewImage(item)} className="group overflow-hidden rounded-xl border border-slate-100 bg-slate-100 text-left shadow-sm transition-all hover:border-emerald-200 hover:shadow-lg">
-              <div className="relative aspect-square overflow-hidden">
-                <img src={item.url} alt={item.title} className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
-              </div>
-              <div className="p-3">
-                <span className="text-[10px] font-black uppercase tracking-wider text-emerald-600">{item.sourceLabel}</span>
-                <p className="mt-1 line-clamp-2 text-sm font-bold text-slate-800">{item.title}</p>
-              </div>
+        {displayedManagedImages.length < visibleManagedImages.length && (
+          <div className="mt-8 flex justify-center">
+            <button type="button" onClick={() => setVisibleLimit(limit => limit + GALLERY_BATCH_SIZE)} className="rounded-xl bg-slate-900 px-6 py-3 text-sm font-extrabold text-white transition-colors hover:bg-slate-800">
+              Load {Math.min(GALLERY_BATCH_SIZE, visibleManagedImages.length - displayedManagedImages.length)} more images
             </button>
-          ))}
-        </div>
+          </div>
+        )}
       </section>
 
       {previewImage && (

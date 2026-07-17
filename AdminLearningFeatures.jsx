@@ -29,19 +29,43 @@ const DEFAULT_FEATURES = [
     title: 'Dedicated Support Team',
     kicker: 'Care and guidance',
     icon: 'users',
-    imageUrl: 'https://images.unsplash.com/photo-1577896851231-70ef18881754?q=90&w=2400&auto=format&fit=crop',
-    description: 'Support staff help maintain a smooth daily rhythm for students, teachers, and families. Their presence strengthens care, coordination, and readiness across the school day.',
-    points: ['Student-focused assistance through the day', 'Coordination that supports teachers and learners', 'A dependable campus support system']
+    imageUrl: 'https://i.ibb.co/VYgP8bRD/Web-1.jpg',
+    galleryImages: [
+      'https://i.ibb.co/VYgP8bRD/Web-1.jpg',
+      'https://i.ibb.co/v8t6BJs/Web-23.jpg',
+      'https://i.ibb.co/YmD9Ynd/Web-25.jpg'
+    ],
+    description: 'A dedicated team of support staff helps create a safe, caring, organized, and welcoming school environment. Their attentive presence supports students, teachers, families, and the smooth functioning of everyday campus life.',
+    body: [
+      'Support staff are an essential part of the Ansar English School community. They assist students throughout the school day, help maintain clean and orderly learning spaces, support safe movement around the campus, and respond to practical needs with care and responsibility.',
+      'By working closely with teachers and administrators, the team helps classrooms, offices, common areas, transport routines, events, and student services operate efficiently. Their dependable contribution allows students to learn in a comfortable environment and helps families feel confident that care extends beyond the classroom.',
+      'Respect, patience, teamwork, and readiness guide their service. Every member contributes to the welcoming culture of the school and to the well-being of the children entrusted to its care.'
+    ],
+    points: ['Attentive student assistance throughout the school day', 'Clean, organized, and welcoming campus spaces', 'Close coordination with teachers and administrators', 'Dependable support for daily routines and school activities']
   },
   {
     slug: 'special-play-area',
     title: 'Joyful Play Zone',
     kicker: 'Joyful growth',
     icon: 'smile',
-    imageUrl: 'https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?q=90&w=2400&auto=format&fit=crop',
+    imageUrl: 'https://i.ibb.co/0VdjdrpS/Web-7.jpg',
+    galleryImages: [
+      'https://i.ibb.co/0VdjdrpS/Web-7.jpg',
+      'https://i.ibb.co/wN70YbZ0/Web-8.jpg',
+      'https://i.ibb.co/Zp3985n9/Web-10.jpg',
+      'https://i.ibb.co/zTF0Qj57/Web-11.jpg'
+    ],
+    outdoorGymTitle: 'Outdoor Gyms',
+    outdoorGymDescription: 'Outdoor gym facilities provide students with an accessible space for guided exercise, fitness, strength, and healthy movement in the open air.',
+    outdoorGymImageUrls: [],
     description: 'The Joyful Play Zone shown here is the dedicated KG-section outdoor park, with safe, age-appropriate equipment including swings, slides, and a merry-go-round. Other school sections also have play areas designed for their respective age groups.',
-    body: ['Active outdoor play supports balance, coordination, physical strength, imagination, friendship, confidence, and emotional well-being. The KG play area gives Ansar Sprouts children a cheerful environment where movement and social learning happen naturally through supervised play.'],
-    points: ['Dedicated outdoor park for the KG section', 'Safe swings, slides, and merry-go-round', 'Other sections have age-appropriate play areas']
+    body: [
+      'Active outdoor play supports balance, coordination, physical strength, imagination, friendship, confidence, and emotional well-being. The KG play area gives Ansar Sprouts children a cheerful environment where movement and social learning happen naturally through supervised play.',
+      'The play zone is planned around the needs of young children. Colourful, age-appropriate equipment encourages them to climb, slide, swing, explore, and practise new movements at a comfortable pace. These experiences strengthen gross motor skills while helping children become more confident in using their bodies.',
+      'Shared play also teaches important social habits. Children learn to wait for their turn, cooperate with friends, communicate ideas, solve small problems, and care for the equipment they use. Teachers and support staff guide these routines so that freedom, enjoyment, and safety remain closely connected.',
+      'Play areas for other school sections provide age-suitable opportunities for recreation, exercise, and relaxation. Together with the Outdoor Gyms, these spaces make regular movement a natural part of campus life and encourage students to develop lasting habits of fitness and well-being.'
+    ],
+    points: ['Dedicated outdoor park for the KG section', 'Safe swings, slides, and merry-go-round', 'Supervised play that develops confidence and cooperation', 'Age-appropriate recreation spaces for other sections', 'Outdoor fitness opportunities that support healthy habits']
   },
   {
     slug: 'advanced-labs',
@@ -113,6 +137,9 @@ function createFormState(feature) {
     points: toLines(feature.points),
     imageUrl: feature.imageUrl || feature.image || '',
     galleryImages: Array.isArray(feature.galleryImages) && feature.galleryImages.length ? feature.galleryImages : [''],
+    outdoorGymTitle: feature.outdoorGymTitle || 'Outdoor Gyms',
+    outdoorGymDescription: feature.outdoorGymDescription || '',
+    outdoorGymImageUrls: Array.isArray(feature.outdoorGymImageUrls) && feature.outdoorGymImageUrls.length ? feature.outdoorGymImageUrls : [''],
     published: feature.published !== false
   };
 }
@@ -132,6 +159,7 @@ export default function AdminLearningFeatures() {
         order: saved?.order ?? index + 1,
         imageUrl: saved?.imageUrl || saved?.image || feature.imageUrl,
         galleryImages: Array.isArray(saved?.galleryImages) && saved.galleryImages.length ? saved.galleryImages : feature.galleryImages,
+        outdoorGymImageUrls: Array.isArray(saved?.outdoorGymImageUrls) ? saved.outdoorGymImageUrls : feature.outdoorGymImageUrls,
         points: Array.isArray(saved?.points) && saved.points.length ? saved.points : feature.points
       };
     });
@@ -198,6 +226,7 @@ export default function AdminLearningFeatures() {
     try {
       const defaultIndex = DEFAULT_FEATURES.findIndex(feature => feature.slug === formData.slug);
       const galleryImages = formData.galleryImages.map(url => url.trim()).filter(Boolean).slice(0, MAX_GALLERY_IMAGES);
+      const outdoorGymImageUrls = formData.outdoorGymImageUrls.map(url => url.trim()).filter(Boolean).slice(0, MAX_GALLERY_IMAGES);
       const payload = {
         id: formData.slug,
         slug: formData.slug,
@@ -208,6 +237,9 @@ export default function AdminLearningFeatures() {
         points: fromLines(formData.points),
         imageUrl: formData.imageUrl.trim() || galleryImages[0] || '',
         galleryImages,
+        outdoorGymTitle: formData.outdoorGymTitle.trim(),
+        outdoorGymDescription: formData.outdoorGymDescription.trim(),
+        outdoorGymImageUrls,
         icon: formData.icon,
         order: defaultIndex + 1,
         published: !!formData.published
@@ -315,6 +347,32 @@ export default function AdminLearningFeatures() {
               Add Image Link
             </button>
           </div>
+
+          {formData.slug === 'special-play-area' && <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-4">
+            <div className="mb-4">
+              <h3 className="text-base font-extrabold text-slate-900">Outdoor Gyms</h3>
+              <p className="text-sm font-semibold text-slate-500">Edit this additional section on the Joyful Play Zone page.</p>
+            </div>
+            <label className="block">
+              <span className="text-sm font-bold text-slate-700">Section Title</span>
+              <input name="outdoorGymTitle" value={formData.outdoorGymTitle} onChange={handleChange} className="mt-1 w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:ring-2 focus:ring-emerald-500" />
+            </label>
+            <label className="mt-4 block">
+              <span className="text-sm font-bold text-slate-700">Section Description</span>
+              <textarea name="outdoorGymDescription" value={formData.outdoorGymDescription} onChange={handleChange} className="mt-1 h-28 w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:ring-2 focus:ring-emerald-500" />
+            </label>
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+              <span className="text-sm font-bold text-slate-700">Outdoor Gym Images</span>
+              <ImgBbUrlImporter multiple label="Extract Outdoor Gym Images" onExtracted={urls => setFormData(prev => ({ ...prev, outdoorGymImageUrls: [...prev.outdoorGymImageUrls.filter(Boolean), ...urls].slice(0, MAX_GALLERY_IMAGES) }))} />
+            </div>
+            <div className="mt-3 space-y-3">
+              {formData.outdoorGymImageUrls.map((url, index) => <div key={index} className="grid grid-cols-[1fr_auto] gap-2">
+                <input value={url} onChange={event => setFormData(prev => ({ ...prev, outdoorGymImageUrls: prev.outdoorGymImageUrls.map((item, itemIndex) => itemIndex === index ? event.target.value : item) }))} placeholder={`Outdoor gym image ${index + 1}`} className="rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-emerald-500" />
+                <button type="button" onClick={() => setFormData(prev => ({ ...prev, outdoorGymImageUrls: prev.outdoorGymImageUrls.length === 1 ? [''] : prev.outdoorGymImageUrls.filter((_, itemIndex) => itemIndex !== index) }))} className="rounded-xl bg-white px-4 py-3 text-sm font-bold text-red-600 ring-1 ring-slate-200 hover:bg-red-50">Remove</button>
+              </div>)}
+            </div>
+            <button type="button" onClick={() => setFormData(prev => ({ ...prev, outdoorGymImageUrls: [...prev.outdoorGymImageUrls, ''] }))} className="mt-4 rounded-xl border border-emerald-200 bg-white px-4 py-2 text-sm font-bold text-emerald-700 hover:bg-emerald-50">Add Outdoor Gym Image</button>
+          </div>}
 
           <label className="mt-5 flex items-center gap-3 text-sm font-bold text-slate-700">
             <input type="checkbox" name="published" checked={formData.published} onChange={handleChange} className="h-5 w-5 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500" />

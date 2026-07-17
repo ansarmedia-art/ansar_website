@@ -42,20 +42,20 @@ export default function Navbar() {
           {/* Premium Logo Layout */}
           <Link to="/" className="flex items-center gap-3">
             <span className="flex h-16 items-center rounded-2xl bg-white px-3 shadow-md shadow-slate-950/20 ring-1 ring-white/60">
-              <img 
+              <img
                 src={settings?.logoUrl || "/icon-192.png"}
-                alt="Ansar English School Logo" 
+                alt="Ansar English School Logo"
                 width="48"
                 height="48"
                 decoding="async"
-                className="h-12 w-auto object-contain contrast-125 brightness-105 transition-all duration-300 hover:scale-[1.03]" 
+                className="h-12 w-auto object-contain contrast-125 brightness-105 transition-all duration-300 hover:scale-[1.03]"
                 style={{ imageRendering: '-webkit-optimize-contrast', transform: 'translateZ(0)', backfaceVisibility: 'hidden' }}
               />
             </span>
             <div className="hidden sm:flex flex-col border-l-2 border-white/25 pl-3 ml-1">
               <span className="block text-lg font-extrabold uppercase leading-tight tracking-wide text-white">ANSAR ENGLISH SCHOOL</span>
               <div className="flex items-center gap-2 mt-0.5">
-                <span className="block text-emerald-100 text-[10px] font-bold uppercase tracking-widest">Perumpilavu</span>
+                <span className="block font-sans text-sm font-semibold normal-case tracking-normal text-emerald-50">Perumpilavu</span>
                 <span className="block rounded bg-amber-100 px-2 py-0.5 text-[11px] font-black uppercase leading-none tracking-wide text-amber-900 shadow-sm">NABET Accredited</span>
               </div>
             </div>
